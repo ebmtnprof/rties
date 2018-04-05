@@ -7,8 +7,9 @@ Depends: R (>= 3.4.4)
 Imports:
     car,
     DataCombine,    
-    deSolve,    
+    deSolve,  
     ggplot2,
+    gridExtra,  
     lattice,
     nlme,
     plyr,
