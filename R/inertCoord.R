@@ -11,7 +11,7 @@
 #' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). 
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf"
 
 #' @import ggplot2
 #' @export
@@ -71,7 +71,7 @@ indivInert <- function(basedata, dist0name, dist1name, obsName)
 #' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2", 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). 
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2", 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "coordPlots.pdf"
 
 #' @import ggplot2
 #' @export
@@ -95,7 +95,6 @@ indivCoord <- function(basedata, dist0name, dist1name, obsName)
 			param[[i]][numParam + 1] <- unique(datai$dyad)
 			datai$obsPred <- predict(m)
 			datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) 
-			# Note: When you take an indicator variable and turn it into a factor, the levels are reversed
 			plotTitle <- as.character(unique(datai$dyad))
 						
 			plots[[i]] <- ggplot(datai, aes(x=time)) +
@@ -132,7 +131,7 @@ indivCoord <- function(basedata, dist0name, dist1name, obsName)
 #' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2", 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). 
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2", 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertCoordPlots.pdf"
 
 #' @import ggplot2
 #' @export
@@ -156,7 +155,6 @@ indivInertCoord <- function(basedata, dist0name, dist1name, obsName)
 			param[[i]][numParam + 1] <- unique(datai$dyad)
 			datai$obsPred <- predict(m)
 			datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) 
-			# Note: When you take an indicator variable and turn it into a factor, the levels are reversed
 			plotTitle <- as.character(unique(datai$dyad))
 						
 			plots[[i]] <- ggplot(datai, aes(x=time)) +
@@ -184,9 +182,9 @@ indivInertCoord <- function(basedata, dist0name, dist1name, obsName)
 }
 
 
-#' Compares models for predicting the system variable from the dynamic parameters.
+#' Compares inertia-coordination models for predicting the system variable from the dynamic parameters.
 #' 
-#' The 3 models compared are the inertia-only, coordination-only and full inertia-coordination models. These are estimated separately for each level of the distinguishing variable. In other words, the system variable is predicted separately for each level of the distinguishing variable from both partner's inertia parameter estimates (inertia-only), or both partner's coordination parameter estimates (coordination-only), or both partner's inertia and coordination parameter estimates (full inertia-coordination).
+#' The dynamic parameters used in these models come from a set including both people's inertia (inert0 and inert1) and coordination (coord0 and coord1) estimates. The 3 models compared are the inertia-only (inert0 + inert1), coordination-only (coord0 + coord1) and the full inertia-coordination (inert0 + inert1 + coord0 + coord1) models. These are estimated separately for each level of the distinguishing variable. 
 #' 
 #' @param basedata A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.
 #' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
@@ -195,7 +193,6 @@ indivInertCoord <- function(basedata, dist0name, dist1name, obsName)
 #' 
 #' @return The function returns a list including: 1) the lm objects containing the full results for each model for each level of the distinguishing variable (called "models0" and "models1"), 2) anova output for each model for each level of the distinguishing variable (called "anovas0" and "anovas1"), 3) summary output for each model for each level of the distinguishing variable (called "summaries0" and "summaries1") and 4) adjusted R^2 information for each model for each level of the distinguishing variable (called "adjustR20" and "adjustR21"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model. 
 
-#' @import ggplot2
 #' @export
 inertCoordSysVarOutCompare <- function(basedata, dist0name, dist1name, sysVarName)
 {
@@ -301,7 +298,7 @@ inertCoordSysVarOutCompare <- function(basedata, dist0name, dist1name, sysVarNam
 
 #' Plots of the system variable predicted from the inertia parameter estimates.
 #'
-#' Bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) inertia parameter estimates.
+#' Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) inertia parameter estimates.
 #' 
 #' @param basedata A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.
 #' @param centInert0 A vector of low, medium and high centering values for the inertia parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of inertia for the 0-level partner).
@@ -436,7 +433,7 @@ inertSysVarOutPlots <- function(basedata, centInert0, centInert1, sysVarName, di
 
 #' Plots of the system variable predicted from the coordination parameter estimates.
 #'
-#' Bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) coordination parameter estimates.
+#' Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) coordination parameter estimates.
 #' 
 #' @param basedata A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.
 #' @param centCoord0 A vector of low, medium and high centering values for the coordination parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of coordination for the 0-level partner).
@@ -572,7 +569,7 @@ coordSysVarOutPlots <- function(basedata, centCoord0, centCoord1, sysVarName, di
 
 #' Plots of the system variable predicted from the inertia and coordination parameter estimates.
 #'
-#' Bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) inertia and coordination parameter estimates.
+#' Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) inertia and coordination parameter estimates.
 #' 
 #' @param basedata A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.
 #' @param centInert0 A vector of low, medium and high centering values for the inertia parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of inertia for the 0-level partner).

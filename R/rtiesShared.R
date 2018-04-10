@@ -138,8 +138,16 @@ plotRaw <- function(basedata, dist0name, dist1name, obsName){
 	lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist1, type=c("l"), ylab=obsName, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
 }
 
-# This function plots linear regression lines for each person in each dyad
+# Plots of linear regression lines for both people in each dyad
+#'
+#' Produces plots of temporal trajectories predicted by linear dyadic growth models. 
+#'
+#' @param basedata A dataframe produced by "dataPrep".
+#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
+#' @param obsName A name for the observed variable being plotted (e.g., "Emotional Experience").
 
+#' @export
 plotLinear <- function(basedata, dist0name, dist1name, obsName){
 	lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist1, type=c("r"), ylab=obsName, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
 }
@@ -177,7 +185,7 @@ orderedPlotsLinearDist <- function(basedata, dist)
 			 	stop(call.=F)}
 	temp$sysVarJ <- round(jitter(temp$sysVar), 5)
 	temp <- subset(temp, select=c(dyad, sysVarJ))
-	data <- join(basedata, temp)
+	data <- plyr::join(basedata, temp)
 	
 	lattice::xyplot(obs ~time|as.factor(sysVarJ), data = data, group=dist1, type=c("r"), col=c("red", "blue"),
 			as.table=T, layout = c(3,3))
@@ -191,7 +199,7 @@ orderedPlotsDetrendAve <- function(basedata)
 	temp <- aggregate(basedata$sysVar, by=list(basedata$dyad), FUN="mean", na.rm=TRUE)
 	colnames(temp) <- c("dyad", "sysVarAve")
 	temp$sysVarAveJ <- round(jitter(temp$sysVarAve), 5)
-	data <- join(basedata, temp)
+	data <- plyr::join(basedata, temp)
 
 	lattice::xyplot(obs_deTrend ~time|as.factor(sysVarAveJ), data = data, group=dist1, type=c("l"), col=c("red", "blue"),
 			as.table=T, layout = c(3,3))
@@ -211,20 +219,14 @@ orderedPlotsDetrendDist <- function(basedata, dist)
 			 	stop(call.=F)}
 	temp$sysVarJ <- round(jitter(temp$sysVar), 5)
 	temp <- subset(temp, select=c(dyad, sysVarJ))
-	data <- join(basedata, temp)
+	data <- plyr::join(basedata, temp)
 	
 	lattice::xyplot(obs_deTrend ~time|as.factor(sysVarJ), data = data, group=dist1, type=c("l"), col=c("red", "blue"),
 			as.table=T, layout = c(3,3))
 }
 
  
-#' Produces plots of the system variable as predicted by each dyad's parameters from a given model. E.g., for the inertia-coordination model the system variable is predicted from both partner's inertia and coordination estimates.
-#'
-#' @param paramData A dataframe containing parameter estimates produced by another rties function.
-#' @param colToPlot A vector with the column numbers in the paramData for the parameter estimates that you want to be included.
-#' @param sysVarName A name for the system variable being predicted from the parameters (e.g., "Health Behaviors").
 
-#' @export
 sysVarByParam <- function(paramData, colToPlot, sysVarName)
 {
 	ymin <- min(paramData$sysVar, na.rm=T)

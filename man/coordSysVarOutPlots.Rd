@@ -23,5 +23,5 @@ coordSysVarOutPlots(basedata, centCoord0, centCoord1, sysVarName, dist,
 \item{dist1name}{A name for the 1-level of the distinguishing variable (e.g., "Men").}
 }
 \description{
-Bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) coordination parameter estimates.
+Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) coordination parameter estimates.
 }
