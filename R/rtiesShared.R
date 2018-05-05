@@ -128,15 +128,27 @@ histAll <- function(basedata)
 #'
 #' Produces plots of the observed variable for each dyad over time to check for data errors, etc. 
 #'
-#' @param basedata A dataframe produced by "dataPrep".
+#' @param basedata A dataframe.
+#' @param dyad The name of the column in the dataframe that has the dyad-level identifier.
+#' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
+#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
 #' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
-#' @param obsName A name for the observed variable being plotted (e.g., "Emotional Experience").
 
 #' @export
-plotRaw <- function(basedata, dist0name, dist1name, obsName){
-	lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist1, type=c("l"), ylab=obsName, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
-}
+
+plotRaw <- function(basedata,dyad,obs,dist,time_name, dist0name, dist1name) 
+{
+  obs_name <- obs 
+  basedata <- subset(basedata, select=c(dyad, obs, dist, time_name))
+  names(basedata)[1] <- "dyad"
+  names(basedata)[2] <- "obs"
+  names(basedata)[3] <- "dist"
+  names(basedata)[4] <- "time"
+  
+ lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
+  }
 
 # Plots of linear regression lines for both people in each dyad
 #'
