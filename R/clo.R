@@ -1,7 +1,10 @@
 
 ## This file includes all the functions needed for a coupled oscillator analysis
 
-#### The following two functions were written by Dr. Steven Boker and are available on his website, http://people.virginia.edu/~smb3u/
+#### The first two functions were written by Dr. Steven Boker and are available on his website, http://people.virginia.edu/~smb3u/. The method they are implementing is described in the following two publications:
+
+# Boker SM, Nesselroade JR. A method for modeling the intrinsic dynamics of intraindividual variability: Recovering parameters of simulated oscillators in multi-wave panel data. Multivariate Behavioral Research. 2002;37:127–60. 
+#  Boker SM, Deboeck PR, Edler C, Keel PK. Generalized local linear approximation of derivatives from time series. In: Chow S, Ferrer E, Hsieh F, editors. Statistical methods for modeling human dynamics. New York: Routledge; 2010. p. 161–78. 
 
 #---------------------------------------------------------
 # gllaWMatrix -- Calculates a GLLA linear transformation matrix to 
