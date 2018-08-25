@@ -887,6 +887,8 @@ dampSysVarOutPlots <- function(basedata, centFreqSelf0, centDampSelf0, centFreqP
 #' 
 #' @param origdata A dataframe produced by the "dataPrep" function.
 #' @param paramData A dataframe produced by the "indivClo" function.
+#' @paramM1 vector of centering values for the first comparison model
+#' @paramM2 vector of centering values for the second comparison model
 #' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
 #' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the state variable (e.g., "Emotional Experience").
@@ -895,7 +897,7 @@ dampSysVarOutPlots <- function(basedata, centFreqSelf0, centDampSelf0, centFreqP
 
 #' @import ggplot2
 #' @export
-cloPredTraj <- function(origdata, paramData, dist0name, dist1name, obsName, m1Name, m2Name)
+cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1name, obsName, m1Name, m2Name)
 {
 	statedata0 <- origdata[origdata$dist0 == 1 & origdata$time ==1,] 
 	start0 <- median(statedata0$obs_deTrend)
