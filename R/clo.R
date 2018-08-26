@@ -183,11 +183,11 @@ estDerivs <- function(basedata, taus, embeds, delta)
 #' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "cloPlots.pdf"
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "cloPlotsCouple.pdf"
 
 #' @import ggplot2
 #' @export
-indivClo <- function(basedata, dist0name, dist1name, obsName)
+indivCloCouple <- function(basedata, dist0name, dist1name, obsName)
 {
 	newDiD <- unique(factor(basedata$dyad))
 	basedata <- basedata[complete.cases(basedata), ]
@@ -227,7 +227,7 @@ indivClo <- function(basedata, dist0name, dist1name, obsName)
 			p_d1_1 <- param[[i]][8]
 			paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)
 			
-			temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloOde, parms= paramClo))
+			temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloCoupleOde, parms= paramClo))
 			temp2 <- subset(temp, select=-c(y2, y4))
 			names(temp2) <- c("time","d0.pred","d1.pred")
 			temp2$dyad <- statedatai$dyad
@@ -258,14 +258,103 @@ indivClo <- function(basedata, dist0name, dist1name, obsName)
 		paramData <- suppressMessages(plyr::join(param, temp2))
 		
 		cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
-		ggsave('cloPlots.pdf', cloPlots)
+		ggsave('cloPlotsCouple.pdf', cloPlots)
 
 	results <- list(r2=r2, paramData=paramData, plots=plots)
 }
 
+
+#############################
+
+#' Estimates an "un-coupled oscillator" model (e.g., only self frequency and damping with no coupling) for each dyad.
+#' 
+#' The second derivatives of the observed state variables (with linear trends removed) are predicted from each person's own observed state variable (again with linear trends removed), as well as each person's own first derivatives of the observed state variables (again with linear trends removed).
+#'
+#' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
+#' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
+#' 
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "cloPlotsUncouple.pdf"
+
+#' @import ggplot2
+#' @export
+indivCloUncouple <- function(basedata, dist0name, dist1name, obsName)
+{
+	newDiD <- unique(factor(basedata$dyad))
+	basedata <- basedata[complete.cases(basedata), ]
+	min <- min(basedata$obs_deTrend, na.rm=T)
+	max <- max(basedata$obs_deTrend, na.rm=T)
+	
+	r2 <- vector()
+	param <- list()
+	plots <- list()
+	
+		for (i in 1:length(newDiD))
+		{
+			statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,] 
+  			maxtime <- max(statedatai$time) 
+ 			plotTimes <- seq(1, maxtime, by=1)
+ 			start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))
+			y1 <- mean(start$obs_deTrend, na.rm=T)
+ 			y2 <- 0
+			y3 <- mean(start$p_obs_deTrend, na.rm=T)
+ 			y4 <- 0
+ 			statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)
+			
+			datai <- basedata[basedata$dyad == newDiD[i], ]
+			m <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1, na.action=na.exclude, data=datai)
+			r2[[i]] <- summary(m)$adj.r.squared
+			param[[i]] <- round(as.numeric(m$coefficients), 5)
+			numParam <- length(m$coefficients)
+			param[[i]][numParam + 1] <- unique(datai$dyad)
+			
+			obs_0 <- param[[i]][1]	
+			d1_0 <- param[[i]][2]
+			obs_1 <- param[[i]][3]
+			d1_1 <- param[[i]][4]
+			paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)
+			
+			temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloUncoupleOde, parms= paramClo))
+			temp2 <- subset(temp, select=-c(y2, y4))
+			names(temp2) <- c("time","d0.pred","d1.pred")
+			temp2$dyad <- statedatai$dyad
+			temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
+			temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad+500)
+			temp4 <- suppressMessages(plyr::join(datai, temp3))
+			temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
+			
+			plotData <- temp4[complete.cases(temp4), ]	
+			plotTitle <- as.character(unique(datai$dyad))
+						
+			plots[[i]] <- ggplot(plotData, aes(x=time)) +
+				geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +
+				geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + 
+				scale_color_manual(name="Role", values=c("red","blue")) +
+				ylab(obsName) +
+				ylim(min, max) +
+				annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=3) +
+				labs(title= "Dyad ID:", subtitle= plotTitle) +
+				theme(plot.title=element_text(size=11)) +
+				theme(plot.subtitle=element_text(size=10))			
+		}
+	
+		param <- as.data.frame(do.call(rbind, param))
+		colnames(param) <- c("obs_0","d1_0","obs_1","d1_1","dyad")
+		temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))
+		temp2 <- unique(temp)
+		paramData <- suppressMessages(plyr::join(param, temp2))
+		
+		cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
+		ggsave('cloPlotsUncouple.pdf', cloPlots)
+
+	results <- list(r2=r2, paramData=paramData, plots=plots)
+}
+
+
 #' Provides the equation for a coupled oscillator model for the differential equation solver (ode) to plot
 
-cloOde <- function(t, state, parameters)
+cloCoupleOde <- function(t, state, parameters)
 {
 	with(as.list(c(state, parameters)), 
 	{
@@ -277,9 +366,56 @@ cloOde <- function(t, state, parameters)
 	})
 }
 
-#' Compares clo models for predicting the system variable from the dynamic parameters.
+
+#' Provides the equation for an un-coupled oscillator model for the differential equation solver (ode) to plot
+
+cloUncoupleOde <- function(t, state, parameters)
+{
+	with(as.list(c(state, parameters)), 
+	{
+		dy1 <- y2
+		dy2 <- y1*obs_0 + y2*d1_0 
+		dy3 <- y4
+		dy4 <- y3*obs_1 + y4*d1_1 
+		list(c(dy1, dy2, dy3, dy4))		
+	})
+}
+
+
+#' Compares model fit for the uncoupled and coupled oscillator for each dyad's state trajectories using an R-square comparison. 
 #' 
-#' The dynamic parameters used in these models come from a set including people's own and partner's influence on their frequency (freqS0, freqS1, freqP0, freqP1) and own and partner's influence on their damping/amplification (dampS0, dampS1, dampP0, dampP1). The 3 models compared are the self-only (freqS + dampS), damp-only (dampS + dampP), and the full coupled model (freqS + dampS + freqP + dampP). These are estimated separately for each level of the distinguishing variable. 
+#' Fits an uncoupled and coupled oscillator model to each dyad's observed state variables and returns the adjusted R-squares, along with the difference between them (coupled - uncoupled, so positive values indicate better fit for the more complex model).
+#'
+#' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' 
+#' @return The function returns a named list including: 1) the adjusted R^2 for the uncoupled model for each dyad (called "r2uncouple"), 2) the adjusted R^2 for the coupled model for each dyad (called "r2couple"), and 3) the difference between the R-squares for each dyad (coupled - uncoupled, called "r2dif").
+
+#' @export
+cloIndivCompare <- function(basedata)
+{
+	newDiD <- unique(factor(basedata$dyad))
+	basedata <- basedata[complete.cases(basedata), ]
+
+	r2uncouple <- vector()
+	r2couple <- vector()
+	r2dif <- vector()
+	
+		for (i in 1:length(newDiD))
+		{
+			datai <- basedata[basedata$dyad == newDiD[i], ]
+			uncouple <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1, na.action=na.exclude, data=datai)
+			couple <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1-1, na.action=na.exclude, data=datai)	
+			r2uncouple[[i]] <- summary(uncouple)$adj.r.squared
+			r2couple[[i]] <- summary(couple)$adj.r.squared	
+			r2dif[[i]] <- r2couple[[i]] - r2uncouple[[i]]
+		}			
+		output <- list(r2uncouple=r2uncouple, r2couple=r2couple, r2dif=r2dif)
+		}
+
+
+#' Compares coupled and uncoupled clo models for predicting the system variable from the dynamic parameters.
+#' 
+#' The dynamic parameters used in these models come from a set including people's own and partner's influence on their frequency (freqS0, freqS1, freqP0, freqP1) and own and partner's influence on their damping/amplification (dampS0, dampS1, dampP0, dampP1). The 2 models compared are the uncoupled, self-only CLO (freqS + dampS) and the full coupled CLO (freqS + dampS + freqP + dampP). These are estimated separately for each level of the distinguishing variable. 
 #' 
 #' @param basedata A dataframe containing the coupled oscillator parameter estimates produced by the "indivClo" function.
 #' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
@@ -300,48 +436,35 @@ cloSysVarOutCompare <- function(basedata, dist0name, dist1name, sysVarName)
 	freqPname <- paste("freq","partner", sep="_")
 	dampPname <- paste("damp","partner", sep="_")
 
-	self0 <- lm(sysVar ~ obs_0 + d1_0 , data= basedata0)
-	names(self0$coefficients) <- c("intercept", freqSname, dampSname)
-	self1 <- lm(sysVar ~ obs_1 + d1_1 , data= basedata1)
-	names(self1$coefficients) <- c("intercept", freqSname, dampSname)
+	uncoupled0 <- lm(sysVar ~ obs_0 + d1_0 , data= basedata0)
+	names(uncoupled0$coefficients) <- c("intercept", freqSname, dampSname)
+	uncoupled1 <- lm(sysVar ~ obs_1 + d1_1 , data= basedata1)
+	names(uncoupled1$coefficients) <- c("intercept", freqSname, dampSname)
 	
 	couple0 <- lm(sysVar ~ obs_0 + d1_0 + p_obs_0 + p_d1_0, data= basedata0)
 	names(couple0$coefficients) <- c("intercept", freqSname, dampSname, freqPname, dampPname)
 	couple1 <- lm(sysVar ~ obs_1 + d1_1 + p_obs_1 + p_d1_1, data= basedata1)
 	names(couple1$coefficients) <- c("intercept", freqSname, dampSname, freqPname, dampPname)
 	
-	damp0 <- lm(sysVar ~ d1_0 + p_d1_0, data= basedata0)
-	names(damp0$coefficients) <- c("intercept", dampSname, dampPname)
-	damp1 <- lm(sysVar ~ d1_1 + p_d1_1, data= basedata1)
-	names(damp1$coefficients) <- c("intercept", dampSname, dampPname)
-
-	self0Anova <- car::Anova(self0, type="III")
-	self0Summary <- summary(self0)
+	uncoupled0Anova <- car::Anova(uncoupled0, type="III")
+	uncoupled0Summary <- summary(uncoupled0)
 	couple0Anova <- car::Anova(couple0, type="III")
 	couple0Summary <- summary(couple0)
-	damp0Anova <- car::Anova(damp0, type="III")
-	damp0Summary <- summary(damp0)
 	
-	self1Anova <- car::Anova(self1, type="III")
-	self1Summary <- summary(self1)
+	uncoupled1Anova <- car::Anova(uncoupled1, type="III")
+	uncoupled1Summary <- summary(uncoupled1)
 	couple1Anova <- car::Anova(couple1, type="III")
 	couple1Summary <- summary(couple1)
-	damp1Anova <- car::Anova(damp1, type="III")
-	damp1Summary <- summary(damp1)
 
-	self0Pred <- predict(self0)
-	self0R2 <- summary(self0)$adj.r.squared
+	uncoupled0Pred <- predict(uncoupled0)
+	uncoupled0R2 <- summary(uncoupled0)$adj.r.squared
 	couple0Pred <- predict(couple0)
 	couple0R2 <- summary(couple0)$adj.r.squared
-	damp0Pred <- predict(damp0)
-	damp0R2 <- summary(damp0)$adj.r.squared
 	
-	self1Pred <- predict(self1)
-	self1R2 <- summary(self1)$adj.r.squared
+	uncoupled1Pred <- predict(uncoupled1)
+	uncoupled1R2 <- summary(uncoupled1)$adj.r.squared
 	couple1Pred <- predict(couple1)
 	couple1R2 <- summary(couple1)$adj.r.squared
-	damp1Pred <- predict(damp1)
-	damp1R2 <- summary(damp1)$adj.r.squared
 
 	min0 <- min(basedata0$sysVar, na.rm=T)
 	max0 <- max(basedata0$sysVar, na.rm=T)
@@ -350,46 +473,38 @@ cloSysVarOutCompare <- function(basedata, dist0name, dist1name, sysVarName)
 
 	ylabName <- paste(sysVarName, "obs", sep=" ")
 	xlabName <- paste(sysVarName, "pred", sep=" ")
-	self0name <- paste("Self-Only", dist0name, sep=" ")
-	self1name <- paste("Self-Only", dist1name, sep="_")
-	couple0name <- paste("Self & Partner", dist0name, sep=" ")
-	couple1name <- paste("Self & Partner", dist1name, sep=" ")
-	damp0name <- paste("Damp Only", dist0name, sep=" ")
-	damp1name <- paste("Damp Only", dist1name, sep=" ")
+	uncoupled0name <- paste("Uncoupled (Self Only)", dist0name, sep=" ")
+	uncoupled1name <- paste("Uncoupled (Self Only)", dist1name, sep="_")
+	couple0name <- paste("Coupled (Self & Partner)", dist0name, sep=" ")
+	couple1name <- paste("Coupled (Self & Partner)", dist1name, sep=" ")
 
 	par(mfrow=c(2,1))
-	hist(residuals(self0))
-	plot(basedata0$sysVar ~ self0Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=self0name)
+	hist(residuals(uncoupled0))
+	plot(basedata0$sysVar ~ uncoupled0Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=uncoupled0name)
 	par(mfrow=c(2,1))
 	hist(residuals(couple0))
 	plot(basedata0$sysVar ~ couple0Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=couple0name)
-	par(mfrow=c(2,1))
-	hist(residuals(damp0))
-	plot(basedata0$sysVar ~ damp0Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=damp0name)
 	
 	par(mfrow=c(2,1))
-	hist(residuals(self1))
-	plot(basedata1$sysVar ~ self1Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=self1name)
+	hist(residuals(uncoupled1))
+	plot(basedata1$sysVar ~ uncoupled1Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=uncoupled1name)
 	par(mfrow=c(2,1))
 	hist(residuals(couple1))
 	plot(basedata1$sysVar ~ couple1Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=couple1name)
-	par(mfrow=c(2,1))
-	hist(residuals(damp1))
-	plot(basedata1$sysVar ~ damp1Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=damp1name)
 
-	models0 <- list(self0=self0, couple0=couple0, damp0=damp0)
-	models1 <- list(self1=self1, couple1=couple1, damp1=damp1)
-	anovas0 <- list(self0Anova=self0Anova, couple0Anova=couple0Anova, damp0Anova=damp0Anova)
-	anovas1 <- list(self1Anova=self1Anova, couple1Anova=couple1Anova, damp1Anova=damp1Anova)
-	summaries0 <- list(self0Summary=self0Summary, couple0Summary=couple0Summary, damp0Summary=damp0Summary)
-	summaries1 <- list(self1Summary=self1Summary, couple1Summary=couple1Summary, damp1Summary=damp1Summary)	
-	r20 <- list(self0R2=self0R2, couple0R2=couple0R2, damp0R2=damp0R2)
-	r21 <- list(self1R2=self1R2, couple1R2=couple1R2, damp1R2=damp1R2)
+	models0 <- list(uncoupled0=uncoupled0, couple0=couple0)
+	models1 <- list(uncoupled1=uncoupled1, couple1=couple1)
+	anovas0 <- list(uncoupled0Anova=uncoupled0Anova, couple0Anova=couple0Anova)
+	anovas1 <- list(uncoupled1Anova=uncoupled1Anova, couple1Anova=couple1Anova)
+	summaries0 <- list(uncoupled0Summary=uncoupled0Summary, couple0Summary=couple0Summary)
+	summaries1 <- list(uncoupled1Summary=uncoupled1Summary, couple1Summary=couple1Summary)	
+	r20 <- list(uncoupled0R2=uncoupled0R2, couple0R2=couple0R2)
+	r21 <- list(uncoupled1R2=uncoupled1R2, couple1R2=couple1R2)
 	
 	output <- list(models0=models0, models1=models1, anovas0=anovas0, summaries0=summaries0, adjustR20=r20, anovas1=anovas1, summaries1=summaries1, adjustR21=r21)
 }
 
-#' Plots of the system variable predicted from the "self-only" version of the clo model.
+#' Plots of the system variable predicted from the uncoupled version of the clo model.
 #'
 #' Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own frequency and damping/amplification parameter estimates.
 #' 
@@ -409,7 +524,7 @@ cloSysVarOutCompare <- function(basedata, dist0name, dist1name, sysVarName)
 
 #' @import ggplot2
 #' @export
-selfSysVarOutPlots <- function(basedata, centFreqSelf0, centDampSelf0, centFreqPart0, centDampPart0, centFreqSelf1, centDampSelf1, centFreqPart1, centDampPart1, sysVarName, dist, dist0name, dist1name)
+uncoupleSysVarOutPlots <- function(basedata, centFreqSelf0, centDampSelf0, centFreqPart0, centDampPart0, centFreqSelf1, centDampSelf1, centFreqPart1, centDampPart1, sysVarName, dist, dist0name, dist1name)
 {
 	if(dist==0)
 	{
@@ -468,7 +583,7 @@ selfSysVarOutPlots <- function(basedata, centFreqSelf0, centDampSelf0, centFreqP
 		geom_bar(position=position_dodge(), stat="identity") +
 		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
 		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Self-Only", subtitle= distName) +
+		labs(title="Uncoupled (Self-Only)", subtitle= distName) +
 		ylab(sysVarName) +
 		theme(plot.title=element_text(size=12))
 	
@@ -519,7 +634,7 @@ selfSysVarOutPlots <- function(basedata, centFreqSelf0, centDampSelf0, centFreqP
 		geom_bar(position=position_dodge(), stat="identity") +
 		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
 		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Self-Only", subtitle= distName) +
+		labs(title="Uncoupled (Self-Only)", subtitle= distName) +
 		ylab(sysVarName) +
 		theme(plot.title=element_text(size=12))
 	
@@ -527,7 +642,7 @@ selfSysVarOutPlots <- function(basedata, centFreqSelf0, centDampSelf0, centFreqP
 	plots <- self
 }
 
-#' Plots of the system variable predicted from the full "coupled-oscillator" version of the clo model.
+#' Plots of the system variable predicted from the full coupled version of the clo model.
 #'
 #' Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own frequency and damping/amplification parameter estimates and low and high levels of the partner's influence on their frequency and damping/amplification parameter estimates.
 #' 
@@ -741,154 +856,14 @@ coupleSysVarOutPlots <- function(basedata, centFreqSelf0, centDampSelf0, centFre
 }
 
 
-#' Plots of the system variable predicted from the "damp-only" version of the clo model.
-#'
-#' Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own damping/amplification parameter estimates and low and high levels of the partner's influence on their damping/amplification parameter estimates.
-#' 
-#' @param basedata A dataframe containing the clo parameter estimates produced by the "indivClo" function.
-#' @param centFreqSelf0 A vector of low, medium and high centering values for the frequency parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of frequency for the 0-level partner).
-#' @param centDampSelf0 A vector of low, medium and high centering values for the damping/amplification parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of damping/amplification for the 0-level partner).
-#' @param centFreqPart0 A vector of low, medium and high centering values for the partner influence on frequency parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of partner influence on frequency for the 0-level partner).
-#' @param centDampPart0 A vector of low, medium and high centering values for the partner influence on damping/amplification parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of partner influence on damping/amplification for the 0-level partner).
-#' @param centFreqSelf1 A vector of low, medium and high centering values for the frequency parameter estimates for the 1-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of frequency for the 1-level partner).
-#' @param centDampSelf1 A vector of low, medium and high centering values for the damping/amplification parameter estimates for the 1-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of damping/amplification for the 1-level partner).
-#' @param centFreqPart1 A vector of low, medium and high centering values for the partner influence on frequency parameter estimates for the 1-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of partner influence on frequency for the 1-level partner).
-#' @param centDampPart1 A vector of low, medium and high centering values for the partner influence on damping/amplification parameter estimates for the 1-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of partner influence on damping/amplification for the 1-level partner).
-#' @param sysVarName A name for the system variable being predicted (e.g., "Satisfaction").
-#' @param dist A number indicating which level of the distinguishing variable to produce plots for. Must be either 0 or 1.
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
-
-#' @import ggplot2
-#' @export
-
-dampSysVarOutPlots <- function(basedata, centFreqSelf0, centDampSelf0, centFreqPart0, centDampPart0, centFreqSelf1, centDampSelf1, centFreqPart1, centDampPart1, sysVarName, dist, dist0name, dist1name)
-{
-	if(dist==0)
-	{
-		basedata <- basedata[basedata$dist0==1, ]
-		distName <- dist0name
-	} else if (dist==1)
-		{
-			basedata <- basedata[basedata$dist0 == 0, ]
-			distName <- dist1name
-		}else {cat("\n error: dist must be 0 or 1\n")
-			 	stop(call.=F)}
-	
-	if(dist==0)
-	{
-	dampSData <- basedata
-	dampSData$dampL <- basedata$d1_0 - centDampSelf0[1]
-	dampSData$dampH <- basedata$d1_0 - centDampSelf0[3]
-	dampSData$p_dampM <- basedata$p_d1_0 - centDampPart0[2]
-	
-	dampPData <- basedata
-	dampPData$p_dampL <- basedata$p_d1_0 - centDampPart0[1]
-	dampPData$p_dampH <- basedata$p_d1_0 - centDampPart0[3]
-	dampPData$dampM <- basedata$d1_0 - centDampSelf0[2]
-	
-	dampSL <- lm(sysVar ~ dampL + p_dampM, data=dampSData)
-	dampSH <- lm(sysVar ~ dampH + p_dampM, data=dampSData)
-	dampPL <- lm(sysVar ~ dampM + p_dampL, data=dampPData)
-	dampPH <- lm(sysVar ~ dampM + p_dampH, data=dampPData)
-	
-	estDampSL <- summary(dampSL)$coefficients[1,1]
-	errDampSL <- summary(dampSL)$coefficients[1,2]
-	estDampSH <- summary(dampSH)$coefficients[1,1]
-	errDampSH <- summary(dampSH)$coefficients[1,2]
-	
-	estDampPL <- summary(dampPL)$coefficients[1,1]
-	errDampPL <- summary(dampPL)$coefficients[1,2]
-	estDampPH <- summary(dampPH)$coefficients[1,1]
-	errDampPH <- summary(dampPH)$coefficients[1,2]
-
-	dampSLdata <- c(1,1,estDampSL,errDampSL)
-	dampSHdata <- c(1,2,estDampSH,errDampSH)
-	dampPLdata <- c(2,1,estDampPL,errDampPL)
-	dampPHdata <- c(2,2,estDampPH,errDampPH)
-		
-	plotData <- as.data.frame(rbind(dampSLdata, dampSHdata, dampPLdata, dampPHdata))
-	names(plotData) <- c("Parameter","Level","sysVar","SE")
-	plotData$Parameter <- factor(plotData$Parameter, labels=c("Damp-Self", "Damp-Part"))
-	plotData$Level <- factor(plotData$Level, labels=c("Low","High"))
-	plotData$errMin <- plotData[ ,3] - plotData[ ,4]
-	plotData$errMax <- plotData[ ,3] + plotData[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	damp <- ggplot(plotData, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Damp-Only", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))
-	
-	} else if (dist==1)
-	
-	{
-	dampSData <- basedata
-	dampSData$dampL <- basedata$d1_1 - centDampSelf1[1]
-	dampSData$dampH <- basedata$d1_1 - centDampSelf1[3]
-	dampSData$p_dampM <- basedata$p_d1_1 - centDampPart1[2]
-	
-	dampPData <- basedata
-	dampPData$p_dampL <- basedata$p_d1_1 - centDampPart1[1]
-	dampPData$p_dampH <- basedata$p_d1_1 - centDampPart1[3]
-	dampPData$dampM <- basedata$d1_1 - centDampSelf1[2]
-	
-	dampSL <- lm(sysVar ~ dampL + p_dampM, data=dampSData)
-	dampSH <- lm(sysVar ~ dampH + p_dampM, data=dampSData)
-	dampPL <- lm(sysVar ~ dampM + p_dampL, data=dampPData)
-	dampPH <- lm(sysVar ~ dampM + p_dampH, data=dampPData)
-	
-	estDampSL <- summary(dampSL)$coefficients[1,1]
-	errDampSL <- summary(dampSL)$coefficients[1,2]
-	estDampSH <- summary(dampSH)$coefficients[1,1]
-	errDampSH <- summary(dampSH)$coefficients[1,2]
-	
-	estDampPL <- summary(dampPL)$coefficients[1,1]
-	errDampPL <- summary(dampPL)$coefficients[1,2]
-	estDampPH <- summary(dampPH)$coefficients[1,1]
-	errDampPH <- summary(dampPH)$coefficients[1,2]
-
-	dampSLdata <- c(1,1,estDampSL,errDampSL)
-	dampSHdata <- c(1,2,estDampSH,errDampSH)
-	dampPLdata <- c(2,1,estDampPL,errDampPL)
-	dampPHdata <- c(2,2,estDampPH,errDampPH)
-		
-	plotData <- as.data.frame(rbind(dampSLdata, dampSHdata, dampPLdata, dampPHdata))
-	names(plotData) <- c("Parameter","Level","sysVar","SE")
-	plotData$Parameter <- factor(plotData$Parameter, labels=c("Damp-Self", "Damp-Part"))
-	plotData$Level <- factor(plotData$Level, labels=c("Low","High"))
-	plotData$errMin <- plotData[ ,3] - plotData[ ,4]
-	plotData$errMax <- plotData[ ,3] + plotData[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	damp <- ggplot(plotData, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Damp-Only", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))
-	
-	}
-	plots <- damp
-}
-
-
 #' Plots the state variable's clo model predicted temporal trajectory 
 #' 
-#' Produces plots of the state variable's predicted temporal trajectory based on 3 versions of the clo model. The first is the "average" model, with all parameters centered on the sample averages. The other two are specified by the user by providing centering values for any desired parameters. For example, if prior analyses showed that the system variable was predicted by the damping parameter for the 0-level of the distinguishing variable, then a logical pair of models to compare would be one with that parameter centered at a low value, such as 1SD below the mean, and one with it centered at a high value, such as 1SD above the mean. 
+#' Produces plots of the state variable's predicted temporal trajectory based on 3 versions of the clo model. The first is the "average" model, with all parameters centered on the sample averages. The other two are specified by the user by providing centering values for any desired parameters. For example, if prior analyses showed that the system variable was predicted by the damping parameter for the 0-level of the distinguishing variable, then a logical pair of models to compare would be one with that parameter centered at a low value, such as 1SD below the mean, and one with it centered at a high value, such as 1SD above the mean. All other parameters would be centered at the sample averages.
 #' 
 #' @param origdata A dataframe produced by the "dataPrep" function.
 #' @param paramData A dataframe produced by the "indivClo" function.
-#' @paramM1 vector of centering values for the first comparison model
-#' @paramM2 vector of centering values for the second comparison model
+#' @param paramM1 A vector of centering values for the first comparison model.
+#' @param paramM2 A vector of centering values for the second comparison model.
 #' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
 #' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the state variable (e.g., "Emotional Experience").
@@ -921,7 +896,7 @@ cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1n
 	ave_p_d1_1 <- median(paramData$p_d1_1)
 	paramAve <- list(obs_0=ave_obs_0, obs_1=ave_obs_1, d1_0=ave_d1_0, d1_1=ave_d1_1, p_obs_0=ave_p_obs_0, p_obs_1=ave_p_obs_1, p_d1_0=ave_p_d1_0, p_d1_1=ave_p_d1_1)
 
-	tempAve <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloOde, parms= paramAve))
+	tempAve <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupleOde, parms= paramAve))
 	temp2 <- subset(tempAve, select=-c(y2, y4))
 	names(temp2) <- c("time","d0.pred","d1.pred")
 	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
@@ -938,7 +913,7 @@ cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1n
 				theme(plot.title=element_text(size=11))
 	
 	paramM1 <- ifelse(!is.na(paramM1), paramM1, paramAve)			
-	tempM1 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloOde, parms= paramM1))
+	tempM1 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupleOde, parms= paramM1))
 	temp2 <- subset(tempM1, select=-c(y2, y4))
 	names(temp2) <- c("time","d0.pred","d1.pred")
 	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
@@ -955,7 +930,7 @@ cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1n
 				theme(plot.title=element_text(size=11))
 
 	paramM2 <- ifelse(!is.na(paramM2), paramM2, paramAve)	
-	tempM2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloOde, parms= paramM2))
+	tempM2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupleOde, parms= paramM2))
 	temp2 <- subset(tempM2, select=-c(y2, y4))
 	names(temp2) <- c("time","d0.pred","d1.pred")
 	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")

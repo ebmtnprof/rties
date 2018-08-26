@@ -2,7 +2,7 @@
 % Please edit documentation in R/clo.R
 \name{coupleSysVarOutPlots}
 \alias{coupleSysVarOutPlots}
-\title{Plots of the system variable predicted from the full "coupled-oscillator" version of the clo model.}
+\title{Plots of the system variable predicted from the full coupled version of the clo model.}
 \usage{
 coupleSysVarOutPlots(basedata, centFreqSelf0, centDampSelf0, centFreqPart0,
   centDampPart0, centFreqSelf1, centDampSelf1, centFreqPart1, centDampPart1,

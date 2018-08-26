@@ -2,7 +2,7 @@
 % Please edit documentation in R/clo.R
 \name{cloSysVarOutCompare}
 \alias{cloSysVarOutCompare}
-\title{Compares clo models for predicting the system variable from the dynamic parameters.}
+\title{Compares coupled and uncoupled clo models for predicting the system variable from the dynamic parameters.}
 \usage{
 cloSysVarOutCompare(basedata, dist0name, dist1name, sysVarName)
 }
@@ -19,5 +19,5 @@ cloSysVarOutCompare(basedata, dist0name, dist1name, sysVarName)
 The function returns a list including: 1) the lm objects containing the full results for each model for each level of the distinguishing variable (called "models0" and "models1"), 2) anova output for each model for each level of the distinguishing variable (called "anovas0" and "anovas1"), 3) summary output for each model for each level of the distinguishing variable (called "summaries0" and "summaries1") and 4) adjusted R^2 information for each model for each level of the distinguishing variable (called "adjustR20" and "adjustR21"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model.
 }
 \description{
-The dynamic parameters used in these models come from a set including people's own and partner's influence on their frequency (freqS0, freqS1, freqP0, freqP1) and own and partner's influence on their damping/amplification (dampS0, dampS1, dampP0, dampP1). The 3 models compared are the self-only (freqS + dampS), damp-only (dampS + dampP), and the full coupled model (freqS + dampS + freqP + dampP). These are estimated separately for each level of the distinguishing variable.
+The dynamic parameters used in these models come from a set including people's own and partner's influence on their frequency (freqS0, freqS1, freqP0, freqP1) and own and partner's influence on their damping/amplification (dampS0, dampS1, dampP0, dampP1). The 2 models compared are the uncoupled, self-only CLO (freqS + dampS) and the full coupled CLO (freqS + dampS + freqP + dampP). These are estimated separately for each level of the distinguishing variable.
 }

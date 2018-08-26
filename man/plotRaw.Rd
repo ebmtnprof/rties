@@ -4,16 +4,22 @@
 \alias{plotRaw}
 \title{Plots of observed variable over time by dyad.}
 \usage{
-plotRaw(basedata, dist0name, dist1name, obsName)
+plotRaw(basedata, dyad, obs, dist, time_name, dist0name, dist1name)
 }
 \arguments{
-\item{basedata}{A dataframe produced by "dataPrep".}
+\item{basedata}{A dataframe.}
+
+\item{dyad}{The name of the column in the dataframe that has the dyad-level identifier.}
+
+\item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
+
+\item{dist}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
+
+\item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
 \item{dist0name}{A name for the 0-level of the distinguishing variable (e.g., "Women").}
 
 \item{dist1name}{A name for the 1-level of the distinguishing variable (e.g., "Men").}
-
-\item{obsName}{A name for the observed variable being plotted (e.g., "Emotional Experience").}
 }
 \description{
 Produces plots of the observed variable for each dyad over time to check for data errors, etc.
