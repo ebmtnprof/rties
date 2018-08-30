@@ -4,10 +4,12 @@
 \alias{indivCloCouple}
 \title{Estimates a "coupled oscillator" model for each dyad.}
 \usage{
-indivCloCouple(basedata, dist0name, dist1name, obsName)
+indivCloCouple(basedata, idConvention, dist0name, dist1name, obsName)
 }
 \arguments{
 \item{basedata}{A dataframe that was produced with the "estDerivs" function.}
+
+\item{idConvention}{The number that was added to the dist0 partner to get the ID number for the dist1 partner.}
 
 \item{dist0name}{A name for the 0-level of the distinguishing variable (e.g., "Women").}
 
