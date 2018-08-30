@@ -272,6 +272,7 @@ indivCloCouple <- function(basedata, idConvention, dist0name, dist1name, obsName
 #' The second derivatives of the observed state variables (with linear trends removed) are predicted from each person's own observed state variable (again with linear trends removed), as well as each person's own first derivatives of the observed state variables (again with linear trends removed).
 #'
 #' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' @param idConvention The number that was added to the dist0 partner to get the ID number for the dist1 partner.
 #' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
 #' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
@@ -280,7 +281,7 @@ indivCloCouple <- function(basedata, idConvention, dist0name, dist1name, obsName
 
 #' @import ggplot2
 #' @export
-indivCloUncouple <- function(basedata, dist0name, dist1name, obsName)
+indivCloUncouple <- function(basedata, idConvention, dist0name, dist1name, obsName)
 {
 	newDiD <- unique(factor(basedata$dyad))
 	basedata <- basedata[complete.cases(basedata), ]
@@ -321,7 +322,7 @@ indivCloUncouple <- function(basedata, dist0name, dist1name, obsName)
 			names(temp2) <- c("time","d0.pred","d1.pred")
 			temp2$dyad <- statedatai$dyad
 			temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
-			temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad+500)
+			temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad + idConvention)
 			temp4 <- suppressMessages(plyr::join(datai, temp3))
 			temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
 			
