@@ -396,114 +396,127 @@ cloUncoupleOde <- function(t, state, parameters)
 cloIndivCompare <- function(basedata)
 {
 	newDiD <- unique(factor(basedata$dyad))
-	basedata <- basedata[complete.cases(basedata), ]
 
-	r2uncouple <- vector()
-	r2couple <- vector()
-	r2dif <- vector()
+	R2uncouple <- vector()
+	R2couple <- vector()
+	R2dif <- vector()
 	
 		for (i in 1:length(newDiD))
 		{
 			datai <- basedata[basedata$dyad == newDiD[i], ]
 			uncouple <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1, na.action=na.exclude, data=datai)
 			couple <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1-1, na.action=na.exclude, data=datai)	
-			r2uncouple[[i]] <- summary(uncouple)$adj.r.squared
-			r2couple[[i]] <- summary(couple)$adj.r.squared	
-			r2dif[[i]] <- r2couple[[i]] - r2uncouple[[i]]
+			R2uncouple[[i]] <- summary(uncouple)$adj.r.squared
+			R2couple[[i]] <- summary(couple)$adj.r.squared	
+			R2dif[[i]] <- R2couple[[i]] - R2uncouple[[i]]
 		}			
-		output <- list(r2uncouple=r2uncouple, r2couple=r2couple, r2dif=r2dif)
+		output <- list(R2uncouple=R2uncouple, R2couple=R2couple, R2dif=R2dif)
 		}
 
 
-#' Compares coupled and uncoupled clo models for predicting the system variable from the dynamic parameters.
+#' Compares a base line "intercept only" model to coupled and uncoupled oscillator models for predicting the system variable from the dynamic parameters.
 #' 
-#' The dynamic parameters used in these models come from a set including people's own and partner's influence on their frequency (freqS0, freqS1, freqP0, freqP1) and own and partner's influence on their damping/amplification (dampS0, dampS1, dampP0, dampP1). The 2 models compared are the uncoupled, self-only CLO (freqS + dampS) and the full coupled CLO (freqS + dampS + freqP + dampP). These are estimated separately for each level of the distinguishing variable. 
+#' The dynamic parameters used in these models come from the set of clo parameter: obs_0, obs_1, d1_0, d1_1, p_obs_0, p_obs_1, p_d1_0, p_d1_1. The 3 models compared are the baseline intercept-only, the uncoupled CLO (obs_0, obs_1, d1_0, d1_1), and the full coupled CLO. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the system variable are included. To make it easier to read the output, the dynamic parameters are renamed as follows: obs = freq, d1 = damp, p_obs = freqCoupling, p_d1 = dampCoupling.
+
 #' 
-#' @param basedata A dataframe containing the coupled oscillator parameter estimates produced by the "indivClo" function.
+#' @param basedata A dataframe containing the coupled oscillator parameter estimates produced by the "indivCloCouple" function.
+#' @param sysVarType Whether the system variable is "dyad", which means both partners have the same socre, or "indiv" which means the partners can have different scores
 #' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
 #' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
 #' @param sysVarName A name for the system variable being predicted (e.g., "Satisfaction").
 #' 
-#' @return The function returns a list including: 1) the lm objects containing the full results for each model for each level of the distinguishing variable (called "models0" and "models1"), 2) anova output for each model for each level of the distinguishing variable (called "anovas0" and "anovas1"), 3) summary output for each model for each level of the distinguishing variable (called "summaries0" and "summaries1") and 4) adjusted R^2 information for each model for each level of the distinguishing variable (called "adjustR20" and "adjustR21"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model. 
+#' @return The function returns a list including: 1) the lm objects containing the full results for each model(called "models"), and 2) adjusted R^2 information for each model  (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model. 
 
 #' @export
-cloSysVarOutCompare <- function(basedata, dist0name, dist1name, sysVarName)
+cloSysVarOut <- function(basedata, sysVarType, dist0name, dist1name, sysVarName)
 {
-	basedata <- basedata[complete.cases(basedata), ] 
-	basedata0 <- subset(basedata, dist0==1)
-	basedata1 <- subset(basedata, dist0==0)
-
-	freqSname <- paste("freq","self", sep="_")
-	dampSname <- paste("damp","self", sep="_")
-	freqPname <- paste("freq","partner", sep="_")
-	dampPname <- paste("damp","partner", sep="_")
-
-	uncoupled0 <- lm(sysVar ~ obs_0 + d1_0 , data= basedata0)
-	names(uncoupled0$coefficients) <- c("intercept", freqSname, dampSname)
-	uncoupled1 <- lm(sysVar ~ obs_1 + d1_1 , data= basedata1)
-	names(uncoupled1$coefficients) <- c("intercept", freqSname, dampSname)
+	basedata$dist1 <- ifelse(basedata$dist0 == 1, 0, 1)
 	
-	couple0 <- lm(sysVar ~ obs_0 + d1_0 + p_obs_0 + p_d1_0, data= basedata0)
-	names(couple0$coefficients) <- c("intercept", freqSname, dampSname, freqPname, dampPname)
-	couple1 <- lm(sysVar ~ obs_1 + d1_1 + p_obs_1 + p_d1_1, data= basedata1)
-	names(couple1$coefficients) <- c("intercept", freqSname, dampSname, freqPname, dampPname)
+	# Names for model parameters
+	freq0name <- paste("freq",dist0name, sep="_")
+	freq1name <- paste("freq",dist1name, sep="_")
+	damp0name <- paste("damp",dist0name, sep="_")
+	damp1name <- paste("damp",dist1name, sep="_")
 	
-	uncoupled0Anova <- car::Anova(uncoupled0, type="III")
-	uncoupled0Summary <- summary(uncoupled0)
-	couple0Anova <- car::Anova(couple0, type="III")
-	couple0Summary <- summary(couple0)
+	freqCouple0name <- paste("freqCoupling",dist0name, sep="_")
+	freqCouple1name <- paste("freqCoupling",dist1name, sep="_")
+	dampCouple0name <- paste("dampCoupling",dist0name, sep="_")
+	dampCouple1name <- paste("dampCoupling",dist1name, sep="_")
+
 	
-	uncoupled1Anova <- car::Anova(uncoupled1, type="III")
-	uncoupled1Summary <- summary(uncoupled1)
-	couple1Anova <- car::Anova(couple1, type="III")
-	couple1Summary <- summary(couple1)
-
-	uncoupled0Pred <- predict(uncoupled0)
-	uncoupled0R2 <- summary(uncoupled0)$adj.r.squared
-	couple0Pred <- predict(couple0)
-	couple0R2 <- summary(couple0)$adj.r.squared
+	if(sysVarType != "indiv" & sysVarType != "dyad") 
+    {
+	stop("the sysVarType must be either indiv or dyad")
+	}
 	
-	uncoupled1Pred <- predict(uncoupled1)
-	uncoupled1R2 <- summary(uncoupled1)$adj.r.squared
-	couple1Pred <- predict(couple1)
-	couple1R2 <- summary(couple1)$adj.r.squared
+	else if (sysVarType == "dyad")
+ 	{	
+ 	basedata <- basedata[!duplicated(basedata$dyad), ]
 
-	min0 <- min(basedata0$sysVar, na.rm=T)
-	max0 <- max(basedata0$sysVar, na.rm=T)
-	min1 <- min(basedata1$sysVar, na.rm=T)
-	max1 <- max(basedata1$sysVar, na.rm=T)
+	base <- lm(sysVar ~ 1, data= basedata)
+	names(base$coefficients) <- c("intercept")
 
-	ylabName <- paste(sysVarName, "obs", sep=" ")
-	xlabName <- paste(sysVarName, "pred", sep=" ")
-	uncoupled0name <- paste("Uncoupled (Self Only)", dist0name, sep=" ")
-	uncoupled1name <- paste("Uncoupled (Self Only)", dist1name, sep="_")
-	couple0name <- paste("Coupled (Self & Partner)", dist0name, sep=" ")
-	couple1name <- paste("Coupled (Self & Partner)", dist1name, sep=" ")
+	uncoupled <- lm(sysVar ~ obs_0 + d1_0 + obs_1 + d1_1, data= basedata)
+	names(uncoupled$coefficients) <- c("intercept", freq0name, damp0name, freq1name, damp1name)
+		
+	coupled <- lm(sysVar ~ obs_0 + d1_0 + obs_1 + d1_1 + p_obs_0 + p_d1_0 + p_obs_1 + p_d1_1, data= basedata)
+	names(coupled$coefficients) <- c("intercept", freq0name, damp0name, freq1name, damp1name, freqCouple0name, dampCouple0name, freqCouple1name, dampCouple1name)
+		
+	basePred <- predict(base)## all predictions will be the mean
+	uncoupledPred <- predict(uncoupled)
+	coupledPred <- predict(coupled)
+	
+	baseR2 <- summary(base)$adj.r.squared # will be zero
+	uncoupledR2 <- summary(uncoupled)$adj.r.squared 
+	coupledR2 <- summary(coupled)$adj.r.squared
+	}
+	
+	else if (sysVarType == "indiv")
+	{	
+	base <- nlme::lme(sysVar ~ dist0, random= ~ 1 | dyad, data= basedata, na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"))
+	names(base$coefficients$fixed) <- c("intercept", dist0name)
+	
+	uncoupled <- nlme::lme(sysVar ~ dist0:obs_0 + dist0:d1_0 + dist1:obs_1 + dist1:d1_0 , random= ~ 1 | dyad, data= basedata, na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"))
+	names(uncoupled$coefficients$fixed) <- c("intercept", freq0name, damp0name, freq1name, damp1name)
+		
+	coupled <- nlme::lme(sysVar ~ dist0:obs_0 + dist0:d1_0 + dist1:obs_1 + dist1:d1_1 + 
+								dist0:obs_1 + dist0:d1_1 + dist1:obs_0 + dist1:d1_0, random= ~ 1 | dyad, data= basedata, na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"))
+	names(coupled$coefficients$fixed) <- c("intercept", freq0name, damp0name, freq1name, damp1name, freqCouple0name, dampCouple0name, freqCouple1name, dampCouple1name)
+	
+	basePred <- predict(base)
+	uncoupledPred <- predict(uncoupled)
+	coupledPred <- predict(coupled)
+	
+	obs <- basedata$sysVar
+	baseR2 <- summary(lm(obs ~ basePred))$adj.r.squared
+	uncoupledR2 <- summary(lm(obs ~ uncoupledPred))$adj.r.squared
+	coupledR2 <- summary(lm(obs ~ coupledPred))$adj.r.squared
+	}
+	
+	
+	min <- min(basedata$sysVar, na.rm=T)
+	max <- max(basedata$sysVar, na.rm=T)
+	
+	ylabName <- paste(sysVarName, "observed", sep="_")
+	xlabName <- paste(sysVarName, "predicted", sep="_")
 
 	par(mfrow=c(2,1))
-	hist(residuals(uncoupled0))
-	plot(basedata0$sysVar ~ uncoupled0Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=uncoupled0name)
-	par(mfrow=c(2,1))
-	hist(residuals(couple0))
-	plot(basedata0$sysVar ~ couple0Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=couple0name)
-	
-	par(mfrow=c(2,1))
-	hist(residuals(uncoupled1))
-	plot(basedata1$sysVar ~ uncoupled1Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=uncoupled1name)
-	par(mfrow=c(2,1))
-	hist(residuals(couple1))
-	plot(basedata1$sysVar ~ couple1Pred, xlim=c(min0, max0), ylim=c(min0, max0), ylab=ylabName, xlab=xlabName, main=couple1name)
+	hist(residuals(base))
+	plot(basedata$sysVar ~ basePred, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Baseline Model")
 
-	models0 <- list(uncoupled0=uncoupled0, couple0=couple0)
-	models1 <- list(uncoupled1=uncoupled1, couple1=couple1)
-	anovas0 <- list(uncoupled0Anova=uncoupled0Anova, couple0Anova=couple0Anova)
-	anovas1 <- list(uncoupled1Anova=uncoupled1Anova, couple1Anova=couple1Anova)
-	summaries0 <- list(uncoupled0Summary=uncoupled0Summary, couple0Summary=couple0Summary)
-	summaries1 <- list(uncoupled1Summary=uncoupled1Summary, couple1Summary=couple1Summary)	
-	r20 <- list(uncoupled0R2=uncoupled0R2, couple0R2=couple0R2)
-	r21 <- list(uncoupled1R2=uncoupled1R2, couple1R2=couple1R2)
+	par(mfrow=c(2,1))
+	hist(residuals(uncoupled))
+	plot(basedata$sysVar ~ uncoupledPred, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Uncoupled Oscillator")
 	
-	output <- list(models0=models0, models1=models1, anovas0=anovas0, summaries0=summaries0, adjustR20=r20, anovas1=anovas1, summaries1=summaries1, adjustR21=r21)
+	par(mfrow=c(2,1))
+	hist(residuals(coupled))
+	plot(basedata$sysVar ~ coupledPred, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Coupled Oscillator")
+	
+
+	models <- list(base=base, uncoupled=uncoupled, coupled=coupled)
+	R2 <- list(baseR2=baseR2, uncoupledR2=uncoupledR2, coupledR2=coupledR2)
+		
+	output <- list(models=models, R2=R2)
 }
 
 #' Plots of the system variable predicted from the uncoupled version of the clo model.
@@ -953,4 +966,155 @@ cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1n
 
 
 
+
+#' Compares a baseline "intercepts only" model to one including the system variable for predicting the dynamic parameters of the coupled oscillator model.
+#' 
+#' Multivariate models are used to predict the set of coupled oscillator parameters (obs_0, obs_1, d1_0, d1_1, p_obs_0, p_obs_1, p_d1_0, p_d1_1) from the system variable. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the system variable are included. To make it easier to read the output, the dynamic parameters are renamed as follows: obs = freq, d1 = damp, p_obs = freqCoupling, p_d1 = dampCoupling.
+#' 
+#' @param basedata A dataframe containing the coupled oscillator parameter estimates produced by the "indivCloCouple" function.
+#' @param sysVarType Whether the system variable is "dyad", which means both partners have the same socre, or "indiv" which means the partners can have different scores
+#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
+#' 
+#' @return The function returns a list including: 1) the lm objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model. 
+
+#' @export
+cloSysVarIn <- function(basedata, sysVarType, dist0name, dist1name)
+{
+     basedata <- basedata[complete.cases(basedata), ] 
+     
+     # Names for intercepts
+    freqInt0name <- paste("freq",dist0name, sep="_")
+	freqInt1name <- paste("freq",dist1name, sep="_")
+	dampInt0name <- paste("damp",dist0name, sep="_")
+	dampInt1name <- paste("damp",dist1name, sep="_")
+	freqCouplingInt0name <- paste("freqCoupling",dist0name, sep="_")
+	freqCouplingInt1name <- paste("freqCoupling",dist1name, sep="_")
+	dampCouplingInt0name <- paste("dampCoupling",dist0name, sep="_")
+	dampCouplingInt1name <- paste("dampCoupling",dist1name, sep="_")
+
+     
+     # Names for indiv model parameters
+	aFreq0name <- paste("a_freq_sysVar",dist0name, sep="_")
+	pFreq0name <- paste("p_freq_sysVar",dist0name, sep="_")
+	aFreq1name <- paste("a_freq_sysVar",dist1name, sep="_")
+	pFreq1name <- paste("p_freq_sysVar",dist1name, sep="_")
+	aDamp0name <- paste("a_damp_sysVar",dist0name, sep="_")
+	pDamp0name <- paste("p_damp_sysVar",dist0name, sep="_")
+	aDamp1name <- paste("a_damp_sysVar",dist1name, sep="_")
+	pDamp1name <- paste("p_damp_sysVar",dist1name, sep="_")
+	
+	aFreqCoupling0name <- paste("a_freqCoupling_sysVar",dist0name, sep="_")
+	pFreqCoupling0name <- paste("p_freqCoupling_sysVar",dist0name, sep="_")
+	aFreqCoupling1name <- paste("a_freqCoupling_sysVar",dist1name, sep="_")
+	pFreqCoupling1name <- paste("p_freqCoupling_sysVar",dist1name, sep="_")
+	aDampCoupling0name <- paste("a_dampCoupling_sysVar",dist0name, sep="_")
+	pDampCoupling0name <- paste("p_dampCoupling_sysVar",dist0name, sep="_")
+	aDampCoupling1name <- paste("a_dampCoupling_sysVar",dist1name, sep="_")
+	pDampCoupling1name <- paste("p_dampCoupling_sysVar",dist1name, sep="_")
+
+
+	# Names for dyad model parameters
+
+	freqSysVar0name <- paste("freq_SysVar",dist0name, sep="_")
+	freqSysVar1name <- paste("freq_SysVar",dist1name, sep="_")
+	dampSysVar0name <- paste("damp_SysVar",dist0name, sep="_")
+	dampSysVar1name <- paste("damp_SysVar",dist1name, sep="_")
+	freqCouplingSysVar0name <- paste("freqCoupling_SysVar",dist0name, sep="_")
+	freqCouplingSysVar1name <- paste("freqCoupling_SysVar",dist1name, sep="_")
+	dampCouplingSysVar0name <- paste("dampCoupling_SysVar",dist0name, sep="_")
+	dampCouplingSysVar1name <- paste("dampCoupling_SysVar",dist1name, sep="_")
+
+      if(sysVarType != "indiv" & sysVarType != "dyad") 
+   {
+			stop("the sysVarType must be either indiv or dyad")
+	}
+ 	else if(sysVarType=="indiv")
+   {
+	## Case with individual level sysVar
+
+	data1 <- subset(basedata, select=c(dyad, sysVar, dist0))
+	data2 <- stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")
+	data3 <- subset(basedata, select=c(dyad, obs_0:p_d1_1))
+	data4 <- data3[!duplicated(data3$dyad), ]
+	data5 <- plyr::join(data4, data2)
+	colnames(data5) <- c("dyad", "paramEst1", "paramEst2", "paramEst3", "paramEst4", "paramEst5", "paramEst6", "paramEst7", "paramEst8","sysVar1", "sysVar0")
+
+	data6 <- stats::reshape(data5, varying=c("paramEst1", "paramEst2", "paramEst3", "paramEst4","paramEst5", "paramEst6", "paramEst7", "paramEst8"), timevar="parameter", idvar="dyad", direction="long", sep="")
+	data7 <- data6[complete.cases(data6), ] 
+
+	data7$parameter <- factor(data7$parameter, levels = c(1:8), labels=c("freq0","damp0","freqCoupling0", "dampCoupling0", "freq1","damp1","freqCoupling1", "dampCoupling1"))
+	data7$freq0 <- ifelse(data7$parameter == "freq0", 1, 0) 
+	data7$damp0 <- ifelse(data7$parameter == "damp0", 1, 0) 
+	data7$freqCoupling0 <- ifelse(data7$parameter == "freqCoupling0", 1, 0) 
+	data7$dampCoupling0 <- ifelse(data7$parameter == "dampCoupling0", 1, 0) 
+	data7$freq1 <- ifelse(data7$parameter == "freq1", 1, 0) 
+	data7$damp1 <- ifelse(data7$parameter == "damp1", 1, 0) 
+	data7$freqCoupling1 <- ifelse(data7$parameter == "freqCoupling1", 1, 0) 
+	data7$dampCoupling1 <- ifelse(data7$parameter == "dampCoupling1", 1, 0) 
+
+
+		base <- nlme::gls(paramEst ~ freq0 + damp0 + freqCoupling0 + dampCoupling0 + freq1 + damp1 + freqCoupling1 + dampCoupling1 -1, correlation=nlme::corCompSymm(form= ~ 1 |dyad), weights=nlme::varIdent(form = ~ 1|parameter), na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"), data=data7)
+	names(base$coefficients) <- c(freqInt0name, dampInt0name, freqCouplingInt0name, dampCouplingInt0name, freqInt1name, dampInt1name, freqCouplingInt1name, dampCouplingInt1name)
+
+
+	sysVarIn <- nlme::gls(paramEst ~ freq0 + damp0 + freqCoupling0 + dampCoupling0 + freq1 + damp1 + freqCoupling1 + dampCoupling1 +
+		freq0:sysVar0 + freq0:sysVar1 + damp0:sysVar0 + damp0:sysVar1 + freqCoupling0:sysVar0 + freqCoupling0:sysVar1 + dampCoupling0:sysVar0 + dampCoupling0:sysVar1 + 
+	freq1:sysVar1 + freq1:sysVar0 + damp1:sysVar1 + damp1:sysVar0 + freqCoupling1:sysVar1 + freqCoupling1:sysVar0 + dampCoupling1:sysVar1 + dampCoupling1:sysVar0 -1,
+	correlation=nlme::corCompSymm(form= ~ 1 |dyad), weights=nlme::varIdent(form = ~ 1|parameter), na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"), data=data7)
+	names(sysVarIn$coefficients) <- c(freqInt0name, dampInt0name, freqCouplingInt0name, dampCouplingInt0name, freqInt1name, dampInt1name, freqCouplingInt1name, dampCouplingInt1name,   aFreq0name, pFreq0name, aDamp0name, pDamp0name, aFreqCoupling0name, pFreqCoupling0name, aDampCoupling0name, pDampCoupling0name,   aFreq1name, pFreq1name, aDamp1name, pDamp1name, aFreqCoupling1name, pFreqCoupling1name, aDampCoupling1name, pDampCoupling1name )
+
+	
+	obs <- data7$paramEst
+			
+	basePred <- predict(base)
+	baseR2 <- summary(lm(obs ~ basePred))$adj.r.squared
+	sysVarInPred <- predict(sysVarIn)
+	sysVarInR2 <- summary(lm(obs ~ sysVarInPred))$adj.r.squared
+	
+	models <- list(base=base, sysVarIn=sysVarIn)
+	R2 <- list(baseR2=baseR2, sysVarInR2=sysVarInR2)
+				
+	output <- list(models=models, R2=R2)
+	}
+	
+	else if(sysVarType=="dyad")
+	{
+		## Case with dyadic level sysVar
+
+	data1 <- basedata[!duplicated(basedata$dyad), ]
+	data2 <- subset(data1, select=-c(id, dist0))
+	colnames(data2) <- c("paramEst1", "paramEst2", "paramEst3", "paramEst4","paramEst5","paramEst6","paramEst7","paramEst8", "dyad", "sysVar")
+	data3 <- stats::reshape(data2, varying=c("paramEst1", "paramEst2", "paramEst3", "paramEst4","paramEst5","paramEst6","paramEst7","paramEst8"), timevar="parameter", idvar="dyad", direction="long", sep="")
+
+	data3$parameter <- factor(data3$parameter, levels = c(1:8), labels=c("freq0","damp0","freqCoupling0", "dampCoupling0", "freq1","damp1","freqCoupling1", "dampCoupling1"))
+	data3$freq0 <- ifelse(data3$parameter == "freq0", 1, 0) 
+	data3$damp0 <- ifelse(data3$parameter == "damp0", 1, 0) 
+	data3$freqCoupling0 <- ifelse(data3$parameter == "freqCoupling0", 1, 0) 
+	data3$dampCoupling0 <- ifelse(data3$parameter == "dampCoupling0", 1, 0) 
+	data3$freq1 <- ifelse(data3$parameter == "freq1", 1, 0) 
+	data3$damp1 <- ifelse(data3$parameter == "damp1", 1, 0) 
+	data3$freqCoupling1 <- ifelse(data3$parameter == "freqCoupling1", 1, 0) 
+	data3$dampCoupling1 <- ifelse(data3$parameter == "dampCoupling1", 1, 0) 
+
+
+	base <- nlme::gls(paramEst ~ freq0 + damp0 + freqCoupling0 + dampCoupling0 + freq1 + damp1 + freqCoupling1 + dampCoupling1 -1, correlation=nlme::corCompSymm(form= ~ 1 |dyad), weights=nlme::varIdent(form = ~ 1|parameter), na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"), data=data3)
+	names(base$coefficients) <- c(freqInt0name, dampInt0name, freqCouplingInt0name, dampCouplingInt0name, freqInt1name, dampInt1name, freqCouplingInt1name, dampCouplingInt1name)
+
+	sysVarIn <- nlme::gls(paramEst ~ freq0 + damp0 + freqCoupling0 + dampCoupling0 + freq1 + damp1 + freqCoupling1 + dampCoupling1 + sysVar:freq0 + sysVar:damp0 + sysVar:freqCoupling0 + sysVar:dampCoupling0 + sysVar:freq1 + sysVar:damp1 + sysVar:freqCoupling1 + sysVar:dampCoupling1 -1, correlation=nlme::corCompSymm(form= ~ 1 |dyad), weights=nlme::varIdent(form = ~ 1|parameter), na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"), data=data3)
+	names(sysVarIn$coefficients) <- c(freqInt0name, dampInt0name, freqCouplingInt0name, dampCouplingInt0name, freqInt1name, dampInt1name, freqCouplingInt1name, dampCouplingInt1name, freqSysVar0name, dampSysVar0name, freqCouplingSysVar0name, dampCouplingSysVar0name, freqSysVar1name, dampSysVar1name, freqCouplingSysVar1name, dampCouplingSysVar1name)
+		
+	obs <- data3$paramEst
+			
+	basePred <- predict(base)
+	baseR2 <- summary(lm(obs ~ basePred))$adj.r.squared
+	sysVarInPred <- predict(sysVarIn)
+	sysVarInR2 <- summary(lm(obs ~ sysVarInPred))$adj.r.squared
+	
+	models <- list(base=base, sysVarIn=sysVarIn)
+	R2 <- list(baseR2=baseR2, sysVarInR2=sysVarInR2)
+				
+	output <- list(models=models, R2=R2)
+	} 	
+}
 

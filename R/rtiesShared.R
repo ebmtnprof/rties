@@ -43,8 +43,7 @@ dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, c
      # check distinguishing variable is numeric 
     if (!is.numeric(basedata$dist1))		
 	  {
-		cat("\n error: the distinguishing variable must be a 0/1 numeric variable\n")
-		stop(call.=F)
+		stop("the distinguishing variable must be a 0/1 numeric variable")
     }
 
     ## create the dist0 variable
@@ -61,9 +60,8 @@ dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, c
 		}				
 	if (length(notEqual) > 0)		
 	{
-		cat("\n error: the partners in these dyads have unequal number of observations\n")
 		print(notEqual)
-		stop(call.=F)
+		stop("the partners in these dyads have unequal number of observations")
 		rm(notEqual, envir = .GlobalEnv)
 	}
 	    
@@ -138,17 +136,15 @@ histAll <- function(basedata)
 
 #' @export
 
-plotRaw <- function(basedata,dyad,obs,dist,time_name, dist0name, dist1name) 
+plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name, dist1name) 
 {
   obs_name <- obs 
-  basedata <- subset(basedata, select=c(dyad, obs, dist, time_name))
-  names(basedata)[1] <- "dyad"
-  names(basedata)[2] <- "obs"
-  names(basedata)[3] <- "dist"
-  names(basedata)[4] <- "time"
-  
- lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
+  basedata <- basedata[ ,c(dyad, obs, dist, time_name) ]
+  names(basedata) <- c("dyad", "obs", "dist", "time")
+ 
+  lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
   }
+
 
 # Plots of linear regression lines for both people in each dyad
 #'
