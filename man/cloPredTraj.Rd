@@ -16,9 +16,9 @@ cloPredTraj(origdata, paramData, paramM1, paramM2, dist0name, dist1name,
 
 \item{paramM2}{A vector of centering values for the second comparison model.}
 
-\item{dist0name}{A name for the 0-level of the distinguishing variable (e.g., "Women").}
+\item{dist0name}{A name for the level-0 of the distinguishing variable (e.g., "Women").}
 
-\item{dist1name}{A name for the 1-level of the distinguishing variable (e.g., "Men").}
+\item{dist1name}{A name for the level-1 of the distinguishing variable (e.g., "Men").}
 
 \item{obsName}{A name for the state variable (e.g., "Emotional Experience").}
 
@@ -27,5 +27,5 @@ cloPredTraj(origdata, paramData, paramM1, paramM2, dist0name, dist1name,
 \item{m2Name}{A name for the second user-specified model.}
 }
 \description{
-Produces plots of the state variable's predicted temporal trajectory based on 3 versions of the clo model. The first is the "average" model, with all parameters centered on the sample averages. The other two are specified by the user by providing centering values for any desired parameters. For example, if prior analyses showed that the system variable was predicted by the damping parameter for the 0-level of the distinguishing variable, then a logical pair of models to compare would be one with that parameter centered at a low value, such as 1SD below the mean, and one with it centered at a high value, such as 1SD above the mean. All other parameters would be centered at the sample averages.
+Produces plots of the state variable's predicted temporal trajectory based on 3 versions of the clo model. The first is the "average" model, with all parameters centered on the sample averages. The other two are specified by the user by providing centering values for any desired parameters. For example, if prior analyses showed that the system variable was predicted by the damping parameter for the level-0 of the distinguishing variable, then a logical pair of models to compare would be one with that parameter centered at a low value, such as 1SD below the mean, and one with it centered at a high value, such as 1SD above the mean. All other parameters would be centered at the sample averages.
 }

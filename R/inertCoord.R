@@ -7,8 +7,8 @@
 #' The observed state variables (with linear trends removed) are predicted from each person's intercept and each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed)
 #'
 #' @param basedata A dataframe that was produced with the "dataPrep" function.
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
+#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
 #' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf"
@@ -67,8 +67,8 @@ indivInert <- function(basedata, dist0name, dist1name, obsName)
 #' The observed state variables (with linear trends removed) are predicted from each person's intercept and each person's partner's concurrent state variable (again with linear trends removed).
 #' 
 #' @param basedata A dataframe that was produced with the "dataPrep" function.
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
+#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
 #' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "coordPlots.pdf"
@@ -127,8 +127,8 @@ indivCoord <- function(basedata, dist0name, dist1name, obsName)
 #' The observed state variables (with linear trends removed) are predicted from each person's intercept, each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), and each person's partner's concurrent state variable (again with linear trends removed).
 #' 
 #' @param basedata A dataframe that was produced with the "dataPrep" function.
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
+#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
 #' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertCoordPlots.pdf"
@@ -222,17 +222,17 @@ inertCoordIndivCompare <- function(basedata)
 		output <- list(R2inert=R2inert, R2coord=R2coord, R2inertCoord=R2inertCoord, R2dif_I_C=R2dif_I_C, R2dif_IC_I=R2dif_IC_I, R2dif_IC_C=R2dif_IC_C)
 		}
 
-#' Compares inertia-coordination models for predicting the system variable from the dynamic parameters.
+#' Compares variants of the inertia-coordination model for predicting the system variable from the dynamic parameters.
 #' 
-#' The dynamic parameters used in these models come from a set including both people's inertia (inert0 and inert1) and coordination (coord0 and coord1) estimates. The 3 models compared are the inertia-only (inert0 + inert1), coordination-only (coord0 + coord1) and the full inertia-coordination (inert0 + inert1 + coord0 + coord1) models. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the dynamic parameters are included. 
+#' The dynamic parameters used in these models come from a set including both people's inertia (inert0 and inert1) and coordination (coord0 and coord1) estimates. The 4 models compared are a baseline intercept-only, inertia-only (inert0 + inert1), coordination-only (coord0 + coord1) and full inertia-coordination (inert0 + inert1 + coord0 + coord1) models. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the dynamic parameters are included. 
 #' 
 #' @param basedata A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.
 #' @param sysVarType Whether the system variable is "dyad", which means both partners have the same socre, or "indiv" which means the partners can have different scores
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
+#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' @param sysVarName A name for the system variable being predicted (e.g., "Satisfaction").
 #' 
-#' @return The function returns a list including: 1) the lm objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model. 
+#' @return The function returns a list including: 1) the lm or lme objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model. 
 
 #' @export
 inertCoordSysVarOut <- function(basedata, sysVarType, dist0name, dist1name, sysVarName)
@@ -263,7 +263,7 @@ inertCoordSysVarOut <- function(basedata, sysVarType, dist0name, dist1name, sysV
 	
  	else if (sysVarType == "dyad")
  	{	
-	basedata <- basedata[!duplicated(basedata$dyad), ]
+	#basedata <- basedata[!duplicated(basedata$dyad), ]
 	
 	# Base dyadic sysVar
 	base <- lm(sysVar ~ 1, data= basedata)
@@ -354,531 +354,16 @@ inertCoordSysVarOut <- function(basedata, sysVarType, dist0name, dist1name, sysV
 }
 
 
-#' Plots of the system variable predicted from the inertia parameter estimates.
-#'
-#' Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) inertia parameter estimates.
-#' 
-#' @param basedata A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.
-#' @param centInert0 A vector of low, medium and high centering values for the inertia parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of inertia for the 0-level partner).
-#' @param centInert1 A vector of low, medium and high centering values for the inertia parameter estimates for the 1-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of inertia for the 1-level partner).
-#' @param sysVarName A name for the system variable being predicted (e.g., "Satisfaction").
-#' @param dist A number indicating which level of the distinguishing variable to produce plots for. Must be either 0 or 1.
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
-
-#' @import ggplot2
-#' @export
-inertSysVarOutPlots <- function(basedata, centInert0, centInert1, sysVarName, dist, dist0name, dist1name)
-{
-	if(dist==0)
-	{
-		basedata <- basedata[basedata$dist0==1, ]
-		distName <- dist0name
-	} else if (dist==1)
-		{
-			basedata <- basedata[basedata$dist0 == 0, ]
-			distName <- dist1name
-		}else {cat("\n error: dist must be 0 or 1\n")
-			 	stop(call.=F)}
-	
-	if(dist==0)
-	{
-	inertAData <- basedata
-	inertAData$inert0L <- basedata$inert0 - centInert0[1]
-	inertAData$inert1M <- basedata$inert1 - centInert1[2]
-	inertAData$inert0H <- basedata$inert0 - centInert0[3]
-	inertAData$inert1M <- basedata$inert1 - centInert1[2]
-	
-	inertPData <- basedata
-	inertPData$inert0M <- basedata$inert0 - centInert0[2]
-	inertPData$inert1L <- basedata$inert1 - centInert1[1]
-	inertPData$inert0M <- basedata$inert0 - centInert0[2]
-	inertPData$inert1H <- basedata$inert1 - centInert1[3]
-	
-	inertAL <- lm(sysVar ~ inert0L + inert1M, data=inertAData)
-	inertAH <- lm(sysVar ~ inert0H + inert1M, data=inertAData)
-	inertPL <- lm(sysVar ~ inert0M + inert1L, data=inertPData)
-	inertPH <- lm(sysVar ~ inert0M + inert1H, data=inertPData)
-	
-	estInertAL <- summary(inertAL)$coefficients[1,1]
-	errInertAL <- summary(inertAL)$coefficients[1,2]
-	estInertAH <- summary(inertAH)$coefficients[1,1]
-	errInertAH <- summary(inertAH)$coefficients[1,2]
-	
-	estInertPL <- summary(inertPL)$coefficients[1,1]
-	errInertPL <- summary(inertPL)$coefficients[1,2]
-	estInertPH <- summary(inertPH)$coefficients[1,1]
-	errInertPH <- summary(inertPH)$coefficients[1,2]
-
-	inertALdata <- c(1,1,estInertAL,errInertAL)
-	inertAHdata <- c(1,2,estInertAH,errInertAH)
-	inertPLdata <- c(2,1,estInertPL,errInertPL)
-	inertPHdata <- c(2,2,estInertPH,errInertPH)
-		
-	plotData <- as.data.frame(rbind(inertALdata, inertAHdata, inertPLdata, inertPHdata))
-	names(plotData) <- c("Parameter","Level","sysVar","SE")
-	plotData$Parameter <- factor(plotData$Parameter, labels=c("Actor", "Partner"))
-	plotData$Level <- factor(plotData$Level, labels=c("Low","High"))
-	plotData$errMin <- plotData[ ,3] - plotData[ ,4]
-	plotData$errMax <- plotData[ ,3] + plotData[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	inert <- ggplot(plotData, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Inertia", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))
-	
-	} else if (dist==1)
-	
-	{
-	inertAData <- basedata
-	inertAData$inert0M <- basedata$inert0 - centInert0[2]
-	inertAData$inert1L <- basedata$inert1 - centInert1[1]
-	inertAData$inert0M <- basedata$inert0 - centInert0[2]
-	inertAData$inert1H <- basedata$inert1 - centInert1[3]
-	
-	inertPData <- basedata
-	inertPData$inert0L <- basedata$inert0 - centInert0[1]
-	inertPData$inert1M <- basedata$inert1 - centInert1[2]
-	inertPData$inert0H <- basedata$inert0 - centInert0[3]
-	inertPData$inert1M <- basedata$inert1 - centInert1[2]
-	
-	inertAL <- lm(sysVar ~ inert0M + inert1L, data=inertAData)
-	inertAH <- lm(sysVar ~ inert0M + inert1H, data=inertAData)
-	inertPL <- lm(sysVar ~ inert0L + inert1M, data=inertPData)
-	inertPH <- lm(sysVar ~ inert0H + inert1M, data=inertPData)
-	
-	estInertAL <- summary(inertAL)$coefficients[1,1]
-	errInertAL <- summary(inertAL)$coefficients[1,2]
-	estInertAH <- summary(inertAH)$coefficients[1,1]
-	errInertAH <- summary(inertAH)$coefficients[1,2]
-	
-	estInertPL <- summary(inertPL)$coefficients[1,1]
-	errInertPL <- summary(inertPL)$coefficients[1,2]
-	estInertPH <- summary(inertPH)$coefficients[1,1]
-	errInertPH <- summary(inertPH)$coefficients[1,2]
-
-	inertALdata <- c(1,1,estInertAL,errInertAL)
-	inertAHdata <- c(1,2,estInertAH,errInertAH)
-	inertPLdata <- c(2,1,estInertPL,errInertPL)
-	inertPHdata <- c(2,2,estInertPH,errInertPH)
-		
-	plotData <- as.data.frame(rbind(inertALdata, inertAHdata, inertPLdata, inertPHdata))
-	names(plotData) <- c("Parameter","Level","sysVar","SE")
-	plotData$Parameter <- factor(plotData$Parameter, labels=c("Actor", "Partner"))
-	plotData$Level <- factor(plotData$Level, labels=c("Low","High"))
-	plotData$errMin <- plotData[ ,3] - plotData[ ,4]
-	plotData$errMax <- plotData[ ,3] + plotData[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	inert <- ggplot(plotData, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Inertia", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))	
-	}
-	plots <- inert
-}
-
-#' Plots of the system variable predicted from the coordination parameter estimates.
-#'
-#' Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) coordination parameter estimates.
-#' 
-#' @param basedata A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.
-#' @param centCoord0 A vector of low, medium and high centering values for the coordination parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of coordination for the 0-level partner).
-#' @param centCoord1 A vector of low, medium and high centering values for the coordination parameter estimates for the 1-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of coordination for the 1-level partner).
-#' @param sysVarName A name for the system variable being predicted (e.g., "Satisfaction").
-#' @param dist A number indicating which level of the distinguishing variable to produce plots for. Must be either 0 or 1.
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
-
-#' @import ggplot2
-#' @export
-coordSysVarOutPlots <- function(basedata, centCoord0, centCoord1, sysVarName, dist, dist0name, dist1name)
-{
-	if(dist==0)
-	{
-		basedata <- basedata[basedata$dist0==1, ]
-		distName <- dist0name
-	} else if (dist==1)
-		{
-			basedata <- basedata[basedata$dist0 == 0, ]
-			distName <- dist1name
-		}else {cat("\n error: dist must be 0 or 1\n")
-			 	stop(call.=F)}
-	
-	if(dist==0)
-	{
-	coordAData <- basedata
-	coordAData$coord0L <- basedata$coord0 - centCoord0[1]
-	coordAData$coord1M <- basedata$coord1 - centCoord1[2]
-	coordAData$coord0H <- basedata$coord0 - centCoord0[3]
-	coordAData$coord1M <- basedata$coord1 - centCoord1[2]
-	
-	coordPData <- basedata
-	coordPData$coord0M <- basedata$coord0 - centCoord0[2]
-	coordPData$coord1L <- basedata$coord1 - centCoord1[1]
-	coordPData$coord0M <- basedata$coord0 - centCoord0[2]
-	coordPData$coord1H <- basedata$coord1 - centCoord1[3]
-	
-	coordAL <- lm(sysVar ~ coord0L + coord1M, data=coordAData)
-	coordAH <- lm(sysVar ~ coord0H + coord1M, data=coordAData)
-	coordPL <- lm(sysVar ~ coord0M + coord1L, data=coordPData)
-	coordPH <- lm(sysVar ~ coord0M + coord1H, data=coordPData)
-	
-	estcoordAL <- summary(coordAL)$coefficients[1,1]
-	errcoordAL <- summary(coordAL)$coefficients[1,2]
-	estcoordAH <- summary(coordAH)$coefficients[1,1]
-	errcoordAH <- summary(coordAH)$coefficients[1,2]
-	
-	estcoordPL <- summary(coordPL)$coefficients[1,1]
-	errcoordPL <- summary(coordPL)$coefficients[1,2]
-	estcoordPH <- summary(coordPH)$coefficients[1,1]
-	errcoordPH <- summary(coordPH)$coefficients[1,2]
-
-	coordALdata <- c(1,1,estcoordAL,errcoordAL)
-	coordAHdata <- c(1,2,estcoordAH,errcoordAH)
-	coordPLdata <- c(2,1,estcoordPL,errcoordPL)
-	coordPHdata <- c(2,2,estcoordPH,errcoordPH)
-		
-	plotData <- as.data.frame(rbind(coordALdata, coordAHdata, coordPLdata, coordPHdata))
-	names(plotData) <- c("Parameter","Level","sysVar","SE")
-	plotData$Parameter <- factor(plotData$Parameter, labels=c("Actor", "Partner"))
-	plotData$Level <- factor(plotData$Level, labels=c("Low","High"))
-	plotData$errMin <- plotData[ ,3] - plotData[ ,4]
-	plotData$errMax <- plotData[ ,3] + plotData[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	coord <- ggplot(plotData, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Coordination", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))
-	
-	} else if (dist==1)
-	
-	{
-	coordAData <- basedata
-	coordAData$coord0M <- basedata$coord0 - centCoord0[2]
-	coordAData$coord1L <- basedata$coord1 - centCoord1[1]
-	coordAData$coord0M <- basedata$coord0 - centCoord0[2]
-	coordAData$coord1H <- basedata$coord1 - centCoord1[3]
-	
-	coordPData <- basedata
-	coordPData$coord0L <- basedata$coord0 - centCoord0[1]
-	coordPData$coord1M <- basedata$coord1 - centCoord1[2]
-	coordPData$coord0H <- basedata$coord0 - centCoord0[3]
-	coordPData$coord1M <- basedata$coord1 - centCoord1[2]
-	
-	coordAL <- lm(sysVar ~ coord0M + coord1L, data=coordAData)
-	coordAH <- lm(sysVar ~ coord0M + coord1H, data=coordAData)
-	coordPL <- lm(sysVar ~ coord0L + coord1M, data=coordPData)
-	coordPH <- lm(sysVar ~ coord0H + coord1M, data=coordPData)
-	
-	estcoordAL <- summary(coordAL)$coefficients[1,1]
-	errcoordAL <- summary(coordAL)$coefficients[1,2]
-	estcoordAH <- summary(coordAH)$coefficients[1,1]
-	errcoordAH <- summary(coordAH)$coefficients[1,2]
-	
-	estcoordPL <- summary(coordPL)$coefficients[1,1]
-	errcoordPL <- summary(coordPL)$coefficients[1,2]
-	estcoordPH <- summary(coordPH)$coefficients[1,1]
-	errcoordPH <- summary(coordPH)$coefficients[1,2]
-
-	coordALdata <- c(1,1,estcoordAL,errcoordAL)
-	coordAHdata <- c(1,2,estcoordAH,errcoordAH)
-	coordPLdata <- c(2,1,estcoordPL,errcoordPL)
-	coordPHdata <- c(2,2,estcoordPH,errcoordPH)
-		
-	plotData <- as.data.frame(rbind(coordALdata, coordAHdata, coordPLdata, coordPHdata))
-	names(plotData) <- c("Parameter","Level","sysVar","SE")
-	plotData$Parameter <- factor(plotData$Parameter, labels=c("Actor", "Partner"))
-	plotData$Level <- factor(plotData$Level, labels=c("Low","High"))
-	plotData$errMin <- plotData[ ,3] - plotData[ ,4]
-	plotData$errMax <- plotData[ ,3] + plotData[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	coord <- ggplot(plotData, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Coordination", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))
-	
-	}
-	plots <- coord
-}
-
-#' Plots of the system variable predicted from the inertia and coordination parameter estimates.
-#'
-#' Displays bar plots for one level of the distinguishing variable, showing model predicted means and standard errors of the system variable at low and high levels of a person's own (actor) and partner's (partner) inertia and coordination parameter estimates.
-#' 
-#' @param basedata A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.
-#' @param centInert0 A vector of low, medium and high centering values for the inertia parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of inertia for the 0-level partner).
-#' @param centInert1 A vector of low, medium and high centering values for the inertia parameter estimates for the 1-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of inertia for the 1-level partner).
-#' @param centCoord0 A vector of low, medium and high centering values for the coordination parameter estimates for the 0-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of coordination for the 0-level partner).
-#' @param centCoord1 A vector of low, medium and high centering values for the coordination parameter estimates for the 1-level of the distinguishing variable (e.g., values that indicate typical low, medium and high values of coordination for the 1-level partner).
-#' @param sysVarName A name for the system variable being predicted (e.g., "Satisfaction").
-#' @param dist A number indicating which level of the distinguishing variable to produce plots for. Must be either 0 or 1.
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
-
-#' @import ggplot2
-#' @export
-
-inertCoordSysVarOutPlots <- function(basedata, centInert0, centInert1, centCoord0, centCoord1, sysVarName, dist, dist0name, dist1name)
-{
-	if(dist==0)
-	{
-		basedata <- basedata[basedata$dist0==1, ]
-		distName <- dist0name
-	} else if (dist==1)
-		{
-			basedata <- basedata[basedata$dist0 == 0, ]
-			distName <- dist1name
-		}else {cat("\n error: dist must be 0 or 1\n")
-			 	stop(call.=F)}
-	
-	if(dist==0)
-	{
-	
-	inertAData <- basedata
-	inertAData$inert0L <- basedata$inert0 - centInert0[1]
-	inertAData$inert1M <- basedata$inert1 - centInert1[2]
-	inertAData$inert0H <- basedata$inert0 - centInert0[3]
-	inertAData$inert1M <- basedata$inert1 - centInert1[2]
-	
-	inertPData <- basedata
-	inertPData$inert0M <- basedata$inert0 - centInert0[2]
-	inertPData$inert1L <- basedata$inert1 - centInert1[1]
-	inertPData$inert0M <- basedata$inert0 - centInert0[2]
-	inertPData$inert1H <- basedata$inert1 - centInert1[3]
-	
-	inertAL <- lm(sysVar ~ inert0L + inert1M, data=inertAData)
-	inertAH <- lm(sysVar ~ inert0H + inert1M, data=inertAData)
-	inertPL <- lm(sysVar ~ inert0M + inert1L, data=inertPData)
-	inertPH <- lm(sysVar ~ inert0M + inert1H, data=inertPData)
-	
-	estInertAL <- summary(inertAL)$coefficients[1,1]
-	errInertAL <- summary(inertAL)$coefficients[1,2]
-	estInertAH <- summary(inertAH)$coefficients[1,1]
-	errInertAH <- summary(inertAH)$coefficients[1,2]
-	
-	estInertPL <- summary(inertPL)$coefficients[1,1]
-	errInertPL <- summary(inertPL)$coefficients[1,2]
-	estInertPH <- summary(inertPH)$coefficients[1,1]
-	errInertPH <- summary(inertPH)$coefficients[1,2]
-
-	inertALdata <- c(1,1,estInertAL,errInertAL)
-	inertAHdata <- c(1,2,estInertAH,errInertAH)
-	inertPLdata <- c(2,1,estInertPL,errInertPL)
-	inertPHdata <- c(2,2,estInertPH,errInertPH)
-		
-	plotDataInert <- as.data.frame(rbind(inertALdata, inertAHdata, inertPLdata, inertPHdata))
-	names(plotDataInert) <- c("Parameter","Level","sysVar","SE")
-	plotDataInert$Parameter <- factor(plotDataInert$Parameter, labels=c("Actor", "Partner"))
-	plotDataInert$Level <- factor(plotDataInert$Level, labels=c("Low","High"))
-	plotDataInert$errMin <- plotDataInert[ ,3] - plotDataInert[ ,4]
-	plotDataInert$errMax <- plotDataInert[ ,3] + plotDataInert[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	inert <- ggplot(plotDataInert, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Inertia", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))
-	
-
-	coordAData <- basedata
-	coordAData$coord0L <- basedata$coord0 - centCoord0[1]
-	coordAData$coord1M <- basedata$coord1 - centCoord1[2]
-	coordAData$coord0H <- basedata$coord0 - centCoord0[3]
-	coordAData$coord1M <- basedata$coord1 - centCoord1[2]
-	
-	coordPData <- basedata
-	coordPData$coord0M <- basedata$coord0 - centCoord0[2]
-	coordPData$coord1L <- basedata$coord1 - centCoord1[1]
-	coordPData$coord0M <- basedata$coord0 - centCoord0[2]
-	coordPData$coord1H <- basedata$coord1 - centCoord1[3]
-	
-	coordAL <- lm(sysVar ~ coord0L + coord1M, data=coordAData)
-	coordAH <- lm(sysVar ~ coord0H + coord1M, data=coordAData)
-	coordPL <- lm(sysVar ~ coord0M + coord1L, data=coordPData)
-	coordPH <- lm(sysVar ~ coord0M + coord1H, data=coordPData)
-	
-	estcoordAL <- summary(coordAL)$coefficients[1,1]
-	errcoordAL <- summary(coordAL)$coefficients[1,2]
-	estcoordAH <- summary(coordAH)$coefficients[1,1]
-	errcoordAH <- summary(coordAH)$coefficients[1,2]
-	
-	estcoordPL <- summary(coordPL)$coefficients[1,1]
-	errcoordPL <- summary(coordPL)$coefficients[1,2]
-	estcoordPH <- summary(coordPH)$coefficients[1,1]
-	errcoordPH <- summary(coordPH)$coefficients[1,2]
-
-	coordALdata <- c(1,1,estcoordAL,errcoordAL)
-	coordAHdata <- c(1,2,estcoordAH,errcoordAH)
-	coordPLdata <- c(2,1,estcoordPL,errcoordPL)
-	coordPHdata <- c(2,2,estcoordPH,errcoordPH)
-		
-	plotDataCoord <- as.data.frame(rbind(coordALdata, coordAHdata, coordPLdata, coordPHdata))
-	names(plotDataCoord) <- c("Parameter","Level","sysVar","SE")
-	plotDataCoord$Parameter <- factor(plotDataCoord$Parameter, labels=c("Actor", "Partner"))
-	plotDataCoord$Level <- factor(plotDataCoord$Level, labels=c("Low","High"))
-	plotDataCoord$errMin <- plotDataCoord[ ,3] - plotDataCoord[ ,4]
-	plotDataCoord$errMax <- plotDataCoord[ ,3] + plotDataCoord[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	coord <- ggplot(plotDataCoord, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Coordination", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))
-	
-	} else if (dist==1)
-	
-	{
-	
-	inertAData <- basedata
-	inertAData$inert0M <- basedata$inert0 - centInert0[2]
-	inertAData$inert1L <- basedata$inert1 - centInert1[1]
-	inertAData$inert0M <- basedata$inert0 - centInert0[2]
-	inertAData$inert1H <- basedata$inert1 - centInert1[3]
-	
-	inertPData <- basedata
-	inertPData$inert0L <- basedata$inert0 - centInert0[1]
-	inertPData$inert1M <- basedata$inert1 - centInert1[2]
-	inertPData$inert0H <- basedata$inert0 - centInert0[3]
-	inertPData$inert1M <- basedata$inert1 - centInert1[2]
-	
-	inertAL <- lm(sysVar ~ inert0M + inert1L, data=inertAData)
-	inertAH <- lm(sysVar ~ inert0M + inert1H, data=inertAData)
-	inertPL <- lm(sysVar ~ inert0L + inert1M, data=inertPData)
-	inertPH <- lm(sysVar ~ inert0H + inert1M, data=inertPData)
-	
-	estInertAL <- summary(inertAL)$coefficients[1,1]
-	errInertAL <- summary(inertAL)$coefficients[1,2]
-	estInertAH <- summary(inertAH)$coefficients[1,1]
-	errInertAH <- summary(inertAH)$coefficients[1,2]
-	
-	estInertPL <- summary(inertPL)$coefficients[1,1]
-	errInertPL <- summary(inertPL)$coefficients[1,2]
-	estInertPH <- summary(inertPH)$coefficients[1,1]
-	errInertPH <- summary(inertPH)$coefficients[1,2]
-
-	inertALdata <- c(1,1,estInertAL,errInertAL)
-	inertAHdata <- c(1,2,estInertAH,errInertAH)
-	inertPLdata <- c(2,1,estInertPL,errInertPL)
-	inertPHdata <- c(2,2,estInertPH,errInertPH)
-		
-	plotDataInert <- as.data.frame(rbind(inertALdata, inertAHdata, inertPLdata, inertPHdata))
-	names(plotDataInert) <- c("Parameter","Level","sysVar","SE")
-	plotDataInert$Parameter <- factor(plotDataInert$Parameter, labels=c("Actor", "Partner"))
-	plotDataInert$Level <- factor(plotDataInert$Level, labels=c("Low","High"))
-	plotDataInert$errMin <- plotDataInert[ ,3] - plotDataInert[ ,4]
-	plotDataInert$errMax <- plotDataInert[ ,3] + plotDataInert[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	inert <- ggplot(plotDataInert, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Inertia", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))
-
-	coordAData <- basedata
-	coordAData$coord0M <- basedata$coord0 - centCoord0[2]
-	coordAData$coord1L <- basedata$coord1 - centCoord1[1]
-	coordAData$coord0M <- basedata$coord0 - centCoord0[2]
-	coordAData$coord1H <- basedata$coord1 - centCoord1[3]
-	
-	coordPData <- basedata
-	coordPData$coord0L <- basedata$coord0 - centCoord0[1]
-	coordPData$coord1M <- basedata$coord1 - centCoord1[2]
-	coordPData$coord0H <- basedata$coord0 - centCoord0[3]
-	coordPData$coord1M <- basedata$coord1 - centCoord1[2]
-	
-	coordAL <- lm(sysVar ~ coord0M + coord1L, data=coordAData)
-	coordAH <- lm(sysVar ~ coord0M + coord1H, data=coordAData)
-	coordPL <- lm(sysVar ~ coord0L + coord1M, data=coordPData)
-	coordPH <- lm(sysVar ~ coord0H + coord1M, data=coordPData)
-	
-	estcoordAL <- summary(coordAL)$coefficients[1,1]
-	errcoordAL <- summary(coordAL)$coefficients[1,2]
-	estcoordAH <- summary(coordAH)$coefficients[1,1]
-	errcoordAH <- summary(coordAH)$coefficients[1,2]
-	
-	estcoordPL <- summary(coordPL)$coefficients[1,1]
-	errcoordPL <- summary(coordPL)$coefficients[1,2]
-	estcoordPH <- summary(coordPH)$coefficients[1,1]
-	errcoordPH <- summary(coordPH)$coefficients[1,2]
-
-	coordALdata <- c(1,1,estcoordAL,errcoordAL)
-	coordAHdata <- c(1,2,estcoordAH,errcoordAH)
-	coordPLdata <- c(2,1,estcoordPL,errcoordPL)
-	coordPHdata <- c(2,2,estcoordPH,errcoordPH)
-		
-	plotDataCoord <- as.data.frame(rbind(coordALdata, coordAHdata, coordPLdata, coordPHdata))
-	names(plotDataCoord) <- c("Parameter","Level","sysVar","SE")
-	plotDataCoord$Parameter <- factor(plotDataCoord$Parameter, labels=c("Actor", "Partner"))
-	plotDataCoord$Level <- factor(plotDataCoord$Level, labels=c("Low","High"))
-	plotDataCoord$errMin <- plotDataCoord[ ,3] - plotDataCoord[ ,4]
-	plotDataCoord$errMax <- plotDataCoord[ ,3] + plotDataCoord[ ,4]
-		
-	Ymin <- min(basedata$sysVar, na.rm=T)
-	Ymax <- max(basedata$sysVar, na.rm=T)
-			
-	coord <- ggplot(plotDataCoord, aes(x=Parameter, y=sysVar, fill=Level)) +
-		geom_bar(position=position_dodge(), stat="identity") +
-		geom_errorbar(aes(ymin=errMin, ymax=errMax), width=.2, position=position_dodge(.9)) +
-		coord_cartesian(ylim=c(Ymin, Ymax)) +
-		labs(title="Coordination", subtitle= distName) +
-		ylab(sysVarName) +
-		theme(plot.title=element_text(size=12))
-	
-	}
-	plotsTemp <- list(inert=inert, coord=coord)
-	plots <- gridExtra::grid.arrange(grobs=plotsTemp, nrow=1, ncol=2)
-
-}
-
 #' Compares a baseline "intercepts only" model to one including the system variable for predicting the dynamic parameters of the inertia coordination model.
 #' 
-#' Multivariate models are used to predict the set of inertia-coordination parameters (inert0, inert1, coord0, coord1) from the system variable. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the system variable are included. 
+#' Multivariate correlated residuals dyadic models are used to predict the set of inertia-coordination parameters (inert0, inert1, coord0, coord1) from the system variable. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the system variable are included and are indicated by a_ and p_ preceding the variable names. 
 #' 
 #' @param basedata A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.
 #' @param sysVarType Whether the system variable is "dyad", which means both partners have the same socre, or "indiv" which means the partners can have different scores
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
+#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' 
-#' @return The function returns a list including: 1) the lm objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model. 
+#' @return The function returns a list including: 1) the gls objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2").  
 
 #' @export
 inertCoordSysVarIn <- function(basedata, sysVarType, dist0name, dist1name)

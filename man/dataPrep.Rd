@@ -4,8 +4,7 @@
 \alias{dataPrep}
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
-dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name, time_lag = NULL,
-  center = NULL)
+dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name, time_lag = NULL)
 }
 \arguments{
 \item{basedata}{A user-provided dataframe.}
@@ -23,8 +22,6 @@ dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name, time_lag = NULL,
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
 \item{time_lag}{An optional argument for the number of lags for the lagged observable.}
-
-\item{center.}{An optional vector of centering values for the system variable, for use with versions of the models that use it as a moderator, rather than an outcome.}
 }
 \value{
 The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:
@@ -38,7 +35,7 @@ The function returns a dataframe that has all the variables needed for rties mod
 \item dist0 = 0/1 variable where the 1's indicate the 0's in the original distinguishing variable
 \item obs_deTrend = the observed state variable with each person's linear trend removed
 \item p_ = all the same variables, but for a person's partner rather than themselves
-\item if the centering option is used, it will also return sysVarL, sysVarM, and sysVarH which are centered versions of the system variable}
+}
 }
 \description{
 In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations.

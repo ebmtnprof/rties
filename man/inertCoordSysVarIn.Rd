@@ -11,13 +11,13 @@ inertCoordSysVarIn(basedata, sysVarType, dist0name, dist1name)
 
 \item{sysVarType}{Whether the system variable is "dyad", which means both partners have the same socre, or "indiv" which means the partners can have different scores}
 
-\item{dist0name}{A name for the 0-level of the distinguishing variable (e.g., "Women").}
+\item{dist0name}{A name for the level-0 of the distinguishing variable (e.g., "Women").}
 
-\item{dist1name}{A name for the 1-level of the distinguishing variable (e.g., "Men").}
+\item{dist1name}{A name for the level-1 of the distinguishing variable (e.g., "Men").}
 }
 \value{
-The function returns a list including: 1) the lm objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model.
+The function returns a list including: 1) the gls objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2").
 }
 \description{
-Multivariate models are used to predict the set of inertia-coordination parameters (inert0, inert1, coord0, coord1) from the system variable. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the system variable are included.
+Multivariate correlated residuals dyadic models are used to predict the set of inertia-coordination parameters (inert0, inert1, coord0, coord1) from the system variable. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the system variable are included and are indicated by a_ and p_ preceding the variable names.
 }

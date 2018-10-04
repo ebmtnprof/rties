@@ -10,7 +10,7 @@ cloIndivCompare(basedata)
 \item{basedata}{A dataframe that was produced with the "estDerivs" function.}
 }
 \value{
-The function returns a named list including: 1) the adjusted R^2 for the uncoupled model for each dyad (called "r2uncouple"), 2) the adjusted R^2 for the coupled model for each dyad (called "r2couple"), and 3) the difference between the R-squares for each dyad (coupled - uncoupled, called "r2dif").
+The function returns a named list including: 1) the adjusted R^2 for the uncoupled model for each dyad (called "R2uncouple"), 2) the adjusted R^2 for the coupled model for each dyad (called "R2couple"), and 3) the difference between the R-squares for each dyad (coupled - uncoupled, called "R2dif").
 }
 \description{
 Fits an uncoupled and coupled oscillator model to each dyad's observed state variables and returns the adjusted R-squares, along with the difference between them (coupled - uncoupled, so positive values indicate better fit for the more complex model).

@@ -14,7 +14,6 @@
 #' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param time_lag An optional argument for the number of lags for the lagged observable.
-#' @param center. An optional vector of centering values for the system variable, for use with versions of the models that use it as a moderator, rather than an outcome.
 #'
 #' @return The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:
 #' \itemize{
@@ -27,10 +26,10 @@
 #' \item dist0 = 0/1 variable where the 1's indicate the 0's in the original distinguishing variable
 #' \item obs_deTrend = the observed state variable with each person's linear trend removed
 #' \item p_ = all the same variables, but for a person's partner rather than themselves
-#' \item if the centering option is used, it will also return sysVarL, sysVarM, and sysVarH which are centered versions of the system variable}
+#'}
 
 #' @export
-dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, center=NULL) 
+dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL) 
 {
   basedata <- subset(basedata, select=c(id, dyad, obs, sysVar, dist, time_name))
   names(basedata)[1] <- "id"
@@ -131,8 +130,8 @@ histAll <- function(basedata)
 #' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
+#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 
 #' @export
 
@@ -254,7 +253,7 @@ sysVarByParam <- function(paramData, colToPlot, sysVarName)
 #'
 #' Useful for cleaning data if some dyads have extensive missing or otherwise problematic data.
 #'
-#' @param basedata A dataframe produced by "dataPrep"
+#' @param basedata A dataframe.
 #' @param dyads A vector of dyad IDs to remove.
 #' @param dyadID The variable in the dataframe specifying dyad ID; should be in the form dataframe_name$variable_name (e.g., data$couple).
 #'

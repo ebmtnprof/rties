@@ -2,7 +2,7 @@
 % Please edit documentation in R/inertCoord.R
 \name{inertCoordSysVarOut}
 \alias{inertCoordSysVarOut}
-\title{Compares inertia-coordination models for predicting the system variable from the dynamic parameters.}
+\title{Compares variants of the inertia-coordination model for predicting the system variable from the dynamic parameters.}
 \usage{
 inertCoordSysVarOut(basedata, sysVarType, dist0name, dist1name, sysVarName)
 }
@@ -11,15 +11,15 @@ inertCoordSysVarOut(basedata, sysVarType, dist0name, dist1name, sysVarName)
 
 \item{sysVarType}{Whether the system variable is "dyad", which means both partners have the same socre, or "indiv" which means the partners can have different scores}
 
-\item{dist0name}{A name for the 0-level of the distinguishing variable (e.g., "Women").}
+\item{dist0name}{A name for the level-0 of the distinguishing variable (e.g., "Women").}
 
-\item{dist1name}{A name for the 1-level of the distinguishing variable (e.g., "Men").}
+\item{dist1name}{A name for the level-1 of the distinguishing variable (e.g., "Men").}
 
 \item{sysVarName}{A name for the system variable being predicted (e.g., "Satisfaction").}
 }
 \value{
-The function returns a list including: 1) the lm objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model.
+The function returns a list including: 1) the lm or lme objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model.
 }
 \description{
-The dynamic parameters used in these models come from a set including both people's inertia (inert0 and inert1) and coordination (coord0 and coord1) estimates. The 3 models compared are the inertia-only (inert0 + inert1), coordination-only (coord0 + coord1) and the full inertia-coordination (inert0 + inert1 + coord0 + coord1) models. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the dynamic parameters are included.
+The dynamic parameters used in these models come from a set including both people's inertia (inert0 and inert1) and coordination (coord0 and coord1) estimates. The 4 models compared are a baseline intercept-only, inertia-only (inert0 + inert1), coordination-only (coord0 + coord1) and full inertia-coordination (inert0 + inert1 + coord0 + coord1) models. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the dynamic parameters are included.
 }

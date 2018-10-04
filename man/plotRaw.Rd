@@ -17,9 +17,9 @@ plotRaw(basedata, dyad, obs, dist, time_name, dist0name, dist1name)
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
-\item{dist0name}{A name for the 0-level of the distinguishing variable (e.g., "Women").}
+\item{dist0name}{A name for the level-0 of the distinguishing variable (e.g., "Women").}
 
-\item{dist1name}{A name for the 1-level of the distinguishing variable (e.g., "Men").}
+\item{dist1name}{A name for the level-1 of the distinguishing variable (e.g., "Men").}
 }
 \description{
 Produces plots of the observed variable for each dyad over time to check for data errors, etc.

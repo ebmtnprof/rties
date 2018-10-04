@@ -9,9 +9,9 @@ indivCoord(basedata, dist0name, dist1name, obsName)
 \arguments{
 \item{basedata}{A dataframe that was produced with the "dataPrep" function.}
 
-\item{dist0name}{A name for the 0-level of the distinguishing variable (e.g., "Women").}
+\item{dist0name}{A name for the level-0 of the distinguishing variable (e.g., "Women").}
 
-\item{dist1name}{A name for the 1-level of the distinguishing variable (e.g., "Men").}
+\item{dist1name}{A name for the level-1 of the distinguishing variable (e.g., "Men").}
 
 \item{obsName}{A name for the observed state variables being plotted (e.g., "Emotional Experience").}
 }
