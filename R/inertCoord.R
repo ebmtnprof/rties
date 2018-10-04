@@ -11,7 +11,7 @@
 #' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf"
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf"
 
 #' @import ggplot2
 #' @export
@@ -58,7 +58,7 @@ indivInert <- function(basedata, dist0name, dist1name, obsName)
 		inertPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
 		ggsave('inertPlots.pdf', inertPlots)
 
-	results <- list(r2=r2, paramData=paramData, plots=plots)
+	results <- list(R2=r2, paramData=paramData, plots=plots)
 }
 
 
@@ -71,7 +71,7 @@ indivInert <- function(basedata, dist0name, dist1name, obsName)
 #' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "coordPlots.pdf"
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "coordPlots.pdf"
 
 #' @import ggplot2
 #' @export
@@ -118,7 +118,7 @@ indivCoord <- function(basedata, dist0name, dist1name, obsName)
 		coordPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
 		ggsave('coordPlots.pdf', coordPlots)
 
-	results <- list(r2=r2, paramData=paramData, plots=plots)
+	results <- list(R2=r2, paramData=paramData, plots=plots)
 }
 
 
@@ -131,7 +131,7 @@ indivCoord <- function(basedata, dist0name, dist1name, obsName)
 #' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertCoordPlots.pdf"
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertCoordPlots.pdf"
 
 #' @import ggplot2
 #' @export
@@ -178,7 +178,7 @@ indivInertCoord <- function(basedata, dist0name, dist1name, obsName)
 		inertCoordPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
 		ggsave('inertCoordPlots.pdf', inertCoordPlots)
 
-	results <- list(r2=r2, paramData=paramData, plots=plots)
+	results <- list(R2=r2, paramData=paramData, plots=plots)
 }
 
 #' Compares model fit for the inertia-only, coordination-only and full inertia-coordination model for each dyad's state trajectories using an R-square comparison. 

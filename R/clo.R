@@ -184,7 +184,7 @@ estDerivs <- function(basedata, taus, embeds, delta)
 #' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "cloPlotsCouple.pdf"
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "cloPlotsCouple.pdf"
 
 #' @import ggplot2
 #' @export
@@ -261,7 +261,7 @@ indivCloCouple <- function(basedata, idConvention, dist0name, dist1name, obsName
 		cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
 		ggsave('cloPlotsCouple.pdf', cloPlots)
 
-	results <- list(r2=r2, paramData=paramData, plots=plots)
+	results <- list(R2=r2, paramData=paramData, plots=plots)
 }
 
 
@@ -277,7 +277,7 @@ indivCloCouple <- function(basedata, idConvention, dist0name, dist1name, obsName
 #' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
 #' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "cloPlotsUncouple.pdf"
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "cloPlotsUncouple.pdf"
 
 #' @import ggplot2
 #' @export
@@ -350,7 +350,7 @@ indivCloUncouple <- function(basedata, idConvention, dist0name, dist1name, obsNa
 		cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
 		ggsave('cloPlotsUncouple.pdf', cloPlots)
 
-	results <- list(r2=r2, paramData=paramData, plots=plots)
+	results <- list(R2=r2, paramData=paramData, plots=plots)
 }
 
 

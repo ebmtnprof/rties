@@ -14,6 +14,7 @@
 #' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param time_lag An optional argument for the number of lags for the lagged observable.
+#' @param center An optional vector of centering values for the system variable.
 #'
 #' @return The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:
 #' \itemize{
@@ -29,7 +30,7 @@
 #'}
 
 #' @export
-dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL) 
+dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, center=NULL) 
 {
   basedata <- subset(basedata, select=c(id, dyad, obs, sysVar, dist, time_name))
   names(basedata)[1] <- "id"

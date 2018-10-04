@@ -4,7 +4,8 @@
 \alias{dataPrep}
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
-dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name, time_lag = NULL)
+dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name, time_lag = NULL,
+  center = NULL)
 }
 \arguments{
 \item{basedata}{A user-provided dataframe.}
@@ -22,6 +23,8 @@ dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name, time_lag = NULL)
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
 \item{time_lag}{An optional argument for the number of lags for the lagged observable.}
+
+\item{center}{An optional vector of centering values for the system variable.}
 }
 \value{
 The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:

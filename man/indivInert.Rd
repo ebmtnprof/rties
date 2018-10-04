@@ -16,7 +16,7 @@ indivInert(basedata, dist0name, dist1name, obsName)
 \item{obsName}{A name for the observed state variables being plotted (e.g., "Emotional Experience").}
 }
 \value{
-The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "r2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf"
+The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf"
 }
 \description{
 The observed state variables (with linear trends removed) are predicted from each person's intercept and each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed)
