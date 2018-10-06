@@ -263,7 +263,7 @@ inertCoordSysVarOut <- function(basedata, sysVarType, dist0name, dist1name, sysV
 	
  	else if (sysVarType == "dyad")
  	{	
-	#basedata <- basedata[!duplicated(basedata$dyad), ]
+	basedata <- basedata[!duplicated(basedata$dyad), ]
 	
 	# Base dyadic sysVar
 	base <- lm(sysVar ~ 1, data= basedata)
