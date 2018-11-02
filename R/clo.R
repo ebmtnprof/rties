@@ -536,12 +536,13 @@ cloSysVarOut <- function(basedata, sysVarType, dist0name, dist1name, sysVarName)
 
 #' @import ggplot2
 #' @export
+
 cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1name, obsName, m1Name, m2Name)
 {
 	statedata0 <- origdata[origdata$dist0 == 1 & origdata$time ==1,] 
-	start0 <- median(statedata0$obs_deTrend)
+	start0 <- median(statedata0$obs_deTrend, na.rm=T)
   	statedata1 <- origdata[origdata$dist0 == 0 & origdata$time ==1,] 
-	start1 <- median(statedata1$obs_deTrend)
+	start1 <- median(statedata1$obs_deTrend, na.rm=T)
   	
   	maxtime <- quantile(origdata$time, prob=.75)
 	plotTimes <- seq(1, maxtime, by=1)
