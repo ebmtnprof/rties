@@ -551,14 +551,14 @@ cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1n
 
 	state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
 	
-	ave_obs_0 <- median(paramData$obs_0)
-	ave_obs_1 <- median(paramData$obs_1)
-	ave_p_obs_0 <- median(paramData$p_obs_0)
-	ave_p_obs_1 <- median(paramData$p_obs_1)
-	ave_d1_0 <- median(paramData$d1_0)
-	ave_d1_1 <- median(paramData$d1_1)
-	ave_p_d1_0 <- median(paramData$p_d1_0)
-	ave_p_d1_1 <- median(paramData$p_d1_1)
+	ave_obs_0 <- median(paramData$obs_0, na.rm=T)
+	ave_obs_1 <- median(paramData$obs_1, na.rm=T)
+	ave_p_obs_0 <- median(paramData$p_obs_0, na.rm=T)
+	ave_p_obs_1 <- median(paramData$p_obs_1, na.rm=T)
+	ave_d1_0 <- median(paramData$d1_0, na.rm=T)
+	ave_d1_1 <- median(paramData$d1_1, na.rm=T)
+	ave_p_d1_0 <- median(paramData$p_d1_0, na.rm=T)
+	ave_p_d1_1 <- median(paramData$p_d1_1, na.rm=T)
 	paramAve <- list(obs_0=ave_obs_0, obs_1=ave_obs_1, d1_0=ave_d1_0, d1_1=ave_d1_1, p_obs_0=ave_p_obs_0, p_obs_1=ave_p_obs_1, p_d1_0=ave_p_d1_0, p_d1_1=ave_p_d1_1)
 
 	tempAve <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupleOde, parms= paramAve))
