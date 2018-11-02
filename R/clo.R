@@ -192,8 +192,8 @@ indivCloCouple <- function(basedata, idConvention, dist0name, dist1name, obsName
 {
 	newDiD <- unique(factor(basedata$dyad))
 	basedata <- basedata[complete.cases(basedata), ]
-	min <- min(basedata$obs_deTrend, na.rm=T)
-	max <- max(basedata$obs_deTrend, na.rm=T)
+	min <- quantile(basedata$obs_deTrend, .1, na.rm=T)
+	max <- quantile(basedata$obs_deTrend, .9,  na.rm=T)
 	
 	r2 <- vector()
 	param <- list()
@@ -285,9 +285,9 @@ indivCloUncouple <- function(basedata, idConvention, dist0name, dist1name, obsNa
 {
 	newDiD <- unique(factor(basedata$dyad))
 	basedata <- basedata[complete.cases(basedata), ]
-	min <- min(basedata$obs_deTrend, na.rm=T)
-	max <- max(basedata$obs_deTrend, na.rm=T)
-	
+	min <- quantile(basedata$obs_deTrend, .1, na.rm=T)
+	max <- quantile(basedata$obs_deTrend, .9,  na.rm=T)
+		
 	r2 <- vector()
 	param <- list()
 	plots <- list()
@@ -546,8 +546,8 @@ cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1n
   	
   	maxtime <- quantile(origdata$time, prob=.75)
 	plotTimes <- seq(1, maxtime, by=1)
-	min <- min(origdata$obs_deTrend, na.rm=T)
-	max <- max(origdata$obs_deTrend, na.rm=T)
+	min <- quantile(origdata$obs_deTrend, .1, na.rm=T)
+	max <- quantile(origdata$obs_deTrend, .9,  na.rm=T)
 
 	state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
 	
