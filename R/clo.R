@@ -570,8 +570,8 @@ cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1n
 	plotData <- temp3[complete.cases(temp3), ]	
 				
 	aveCloPlot <- ggplot(plotData, aes(x=time)) +
-				geom_line(aes(y= pred, color=roleNew), linetype="dotted", size= .8, na.rm=T) +
-				scale_color_manual(name="Role", values=c("red","blue")) +
+				geom_line(aes(y= pred, color=roleNew), linetype="solid", size=1, na.rm=T) +
+				scale_color_manual(name="Role", values=c("black","gray47")) +
 				ylab(obsName) +
 				ylim(min, max) +
 				labs(title="Predicted Trajectory", subtitle= "Average Model") +
@@ -587,8 +587,8 @@ cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1n
 	plotData <- temp3[complete.cases(temp3), ]	
 				
 	m1CloPlot <- ggplot(plotData, aes(x=time)) +
-				geom_line(aes(y= pred, color=roleNew), linetype="dotted", size= .8, na.rm=T) +
-				scale_color_manual(name="Role", values=c("red","blue")) +
+				geom_line(aes(y= pred, color=roleNew), linetype="solid", size= 1, na.rm=T) +
+				scale_color_manual(name="Role", values=c("black","gray47")) +
 				ylab(obsName) +
 				ylim(min, max) +
 				labs(title="Predicted Trajectory", subtitle= m1Name) +
@@ -604,8 +604,8 @@ cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1n
 	plotData <- temp3[complete.cases(temp3), ]	
 				
 	m2CloPlot <- ggplot(plotData, aes(x=time)) +
-				geom_line(aes(y= pred, color=roleNew), linetype="dotted", size= .8, na.rm=T) +
-				scale_color_manual(name="Role", values=c("red","blue")) +
+				geom_line(aes(y= pred, color=roleNew), linetype="solid", size= 1, na.rm=T) +
+				scale_color_manual(name="Role", values=c("black","gray47")) +
 				ylab(obsName) +
 				ylim(min, max) +
 				labs(title="Predicted Trajectory", subtitle= m2Name) +
