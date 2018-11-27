@@ -2,22 +2,18 @@
 % Please edit documentation in R/inertCoord.R
 \name{indivInertCoord}
 \alias{indivInertCoord}
-\title{Estimates the full "inertia-coordination" model for each dyad.}
+\title{Estimates versions of the inertia-coordination model for each dyad.}
 \usage{
-indivInertCoord(basedata, dist0name, dist1name, obsName)
+indivInertCoord(basedata, whichModel)
 }
 \arguments{
 \item{basedata}{A dataframe that was produced with the "dataPrep" function.}
 
-\item{dist0name}{A name for the level-0 of the distinguishing variable (e.g., "Women").}
-
-\item{dist1name}{A name for the level-1 of the distinguishing variable (e.g., "Men").}
-
-\item{obsName}{A name for the observed state variables being plotted (e.g., "Emotional Experience").}
+\item{whichModel}{Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").}
 }
 \value{
-The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertCoordPlots.pdf"
+The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2") and 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable).
 }
 \description{
-The observed state variables (with linear trends removed) are predicted from each person's intercept, each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), and each person's partner's concurrent state variable (again with linear trends removed).
+The user specifies which of 3 models are to be estimated. Each model predicts the observed state variables (with linear trends removed) from either: 1) Inertia only ("inert")- each person's intercept and each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), 2) Coordination only ("coord")- each person's intercept and each person's partner's concurrent state variable (again with linear trends removed), or 3) Full inertia-coordination model ("inertCoord") - each person's intercept, each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), and each person's partner's concurrent state variable (again with linear trends removed).
 }

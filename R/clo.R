@@ -174,213 +174,89 @@ estDerivs <- function(basedata, taus, embeds, delta)
    derivOut <- list("data"=derivD, "fitTable"= fitTable)
 }
 
-#' Estimates a "coupled oscillator" model for each dyad.
-#' 
-#' The second derivatives of the observed state variables (with linear trends removed) are predicted from each person's own and partner's observed state variables (again with linear trends removed), as well as each person's own and partner's first derivatives of the observed state variables (again with linear trends removed).
-#'
-#' @param basedata A dataframe that was produced with the "estDerivs" function.
-#' @param idConvention The number that was added to the dist0 partner to get the ID number for the dist1 partner.
-#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
-#' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
-#' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "cloPlotsCouple.pdf"
-
-#' @import ggplot2
-#' @export
-indivCloCouple <- function(basedata, idConvention, dist0name, dist1name, obsName)
-{
-	newDiD <- unique(factor(basedata$dyad))
-	basedata <- basedata[complete.cases(basedata), ]
-	min <- quantile(basedata$obs_deTrend, .1, na.rm=T)
-	max <- quantile(basedata$obs_deTrend, .9,  na.rm=T)
-	
-	r2 <- vector()
-	param <- list()
-	plots <- list()
-	
-		for (i in 1:length(newDiD))
-		{
-			statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,] 
-  			maxtime <- max(statedatai$time) 
- 			plotTimes <- seq(1, maxtime, by=1)
- 			start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))
-			y1 <- mean(start$obs_deTrend, na.rm=T)
- 			y2 <- 0
-			y3 <- mean(start$p_obs_deTrend, na.rm=T)
- 			y4 <- 0
- 			statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)
-			
-			datai <- basedata[basedata$dyad == newDiD[i], ]
-			m <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1, na.action=na.exclude, data=datai)
-			r2[[i]] <- summary(m)$adj.r.squared
-			param[[i]] <- round(as.numeric(m$coefficients), 5)
-			numParam <- length(m$coefficients)
-			param[[i]][numParam + 1] <- unique(datai$dyad)
-			
-			obs_0 <- param[[i]][1]	
-			d1_0 <- param[[i]][2]
-			p_obs_0 <- param[[i]][3]
-			p_d1_0 <- param[[i]][4]
-			obs_1 <- param[[i]][5]
-			d1_1 <- param[[i]][6]
-			p_obs_1 <- param[[i]][7]
-			p_d1_1 <- param[[i]][8]
-			paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)
-			
-			temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloCoupleOde, parms= paramClo))
-			temp2 <- subset(temp, select=-c(y2, y4))
-			names(temp2) <- c("time","d0.pred","d1.pred")
-			temp2$dyad <- statedatai$dyad
-			temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
-			temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad + idConvention)
-			temp4 <- suppressMessages(plyr::join(datai, temp3))
-			temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
-			
-			plotData <- temp4[complete.cases(temp4), ]	
-			plotTitle <- as.character(unique(datai$dyad))
-						
-			plots[[i]] <- ggplot(plotData, aes(x=time)) +
-				geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +
-				geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + 
-				scale_color_manual(name="Role", values=c("red","blue")) +
-				ylab(obsName) +
-				ylim(min, max) +
-				annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=3) +
-				labs(title= "Dyad ID:", subtitle= plotTitle) +
-				theme(plot.title=element_text(size=11)) +
-				theme(plot.subtitle=element_text(size=10))			
-		}
-	
-		param <- as.data.frame(do.call(rbind, param))
-		colnames(param) <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")
-		temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))
-		temp2 <- unique(temp)
-		paramData <- suppressMessages(plyr::join(param, temp2))
-		
-		cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
-		ggsave('cloPlotsCouple.pdf', cloPlots)
-
-	results <- list(R2=r2, paramData=paramData, plots=plots)
-}
-
-
-#############################
-
-#' Estimates an "un-coupled oscillator" model (e.g., only self frequency and damping with no coupling) for each dyad.
-#' 
-#' The second derivatives of the observed state variables (with linear trends removed) are predicted from each person's own observed state variable (again with linear trends removed), as well as each person's own first derivatives of the observed state variables (again with linear trends removed).
-#'
-#' @param basedata A dataframe that was produced with the "estDerivs" function.
-#' @param idConvention The number that was added to the dist0 partner to get the ID number for the dist1 partner.
-#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
-#' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
-#' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "cloPlotsUncouple.pdf"
-
-#' @import ggplot2
-#' @export
-indivCloUncouple <- function(basedata, idConvention, dist0name, dist1name, obsName)
-{
-	newDiD <- unique(factor(basedata$dyad))
-	basedata <- basedata[complete.cases(basedata), ]
-	min <- quantile(basedata$obs_deTrend, .1, na.rm=T)
-	max <- quantile(basedata$obs_deTrend, .9,  na.rm=T)
-		
-	r2 <- vector()
-	param <- list()
-	plots <- list()
-	
-		for (i in 1:length(newDiD))
-		{
-			statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,] 
-  			maxtime <- max(statedatai$time) 
- 			plotTimes <- seq(1, maxtime, by=1)
- 			start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))
-			y1 <- mean(start$obs_deTrend, na.rm=T)
- 			y2 <- 0
-			y3 <- mean(start$p_obs_deTrend, na.rm=T)
- 			y4 <- 0
- 			statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)
-			
-			datai <- basedata[basedata$dyad == newDiD[i], ]
-			m <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1, na.action=na.exclude, data=datai)
-			r2[[i]] <- summary(m)$adj.r.squared
-			param[[i]] <- round(as.numeric(m$coefficients), 5)
-			numParam <- length(m$coefficients)
-			param[[i]][numParam + 1] <- unique(datai$dyad)
-			
-			obs_0 <- param[[i]][1]	
-			d1_0 <- param[[i]][2]
-			obs_1 <- param[[i]][3]
-			d1_1 <- param[[i]][4]
-			paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)
-			
-			temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloUncoupleOde, parms= paramClo))
-			temp2 <- subset(temp, select=-c(y2, y4))
-			names(temp2) <- c("time","d0.pred","d1.pred")
-			temp2$dyad <- statedatai$dyad
-			temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
-			temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad + idConvention)
-			temp4 <- suppressMessages(plyr::join(datai, temp3))
-			temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
-			
-			plotData <- temp4[complete.cases(temp4), ]	
-			plotTitle <- as.character(unique(datai$dyad))
-						
-			plots[[i]] <- ggplot(plotData, aes(x=time)) +
-				geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +
-				geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + 
-				scale_color_manual(name="Role", values=c("red","blue")) +
-				ylab(obsName) +
-				ylim(min, max) +
-				annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=3) +
-				labs(title= "Dyad ID:", subtitle= plotTitle) +
-				theme(plot.title=element_text(size=11)) +
-				theme(plot.subtitle=element_text(size=10))			
-		}
-	
-		param <- as.data.frame(do.call(rbind, param))
-		colnames(param) <- c("obs_0","d1_0","obs_1","d1_1","dyad")
-		temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))
-		temp2 <- unique(temp)
-		paramData <- suppressMessages(plyr::join(param, temp2))
-		
-		cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
-		ggsave('cloPlotsUncouple.pdf', cloPlots)
-
-	results <- list(R2=r2, paramData=paramData, plots=plots)
-}
-
-
 #' Provides the equation for a coupled oscillator model for the differential equation solver (ode) to plot
 
-cloCoupleOde <- function(t, state, parameters)
+cloCoupledOde <- function(t, state, parameters)
 {
-	with(as.list(c(state, parameters)), 
-	{
-		dy1 <- y2
-		dy2 <- y1*obs_0 + y2*d1_0 + y3*p_obs_0 + y4*p_d1_0
-		dy3 <- y4
-		dy4 <- y3*obs_1 + y4*d1_1 + y1*p_obs_1 + y2*p_d1_1
-		list(c(dy1, dy2, dy3, dy4))		
-	})
+  with(as.list(c(state, parameters)), {
+	dy1 <- y2
+	dy2 <- y1*obs_0 + y2*d1_0 + y3*p_obs_0 + y4*p_d1_0
+	dy3 <- y4
+	dy4 <- y3*obs_1 + y4*d1_1 + y1*p_obs_1 + y2*p_d1_1
+	list(c(dy1, dy2, dy3, dy4))		
+  })
 }
-
 
 #' Provides the equation for an un-coupled oscillator model for the differential equation solver (ode) to plot
 
-cloUncoupleOde <- function(t, state, parameters)
+cloUncoupledOde <- function(t, state, parameters)
 {
-	with(as.list(c(state, parameters)), 
-	{
-		dy1 <- y2
-		dy2 <- y1*obs_0 + y2*d1_0 
-		dy3 <- y4
-		dy4 <- y3*obs_1 + y4*d1_1 
-		list(c(dy1, dy2, dy3, dy4))		
-	})
+  with(as.list(c(state, parameters)), {
+	dy1 <- y2
+	dy2 <- y1*obs_0 + y2*d1_0 
+	dy3 <- y4
+	dy4 <- y3*obs_1 + y4*d1_1 
+	list(c(dy1, dy2, dy3, dy4))		
+  })
+}
+
+
+#' Estimates either an uncoupled or coupled oscillator model for each dyad.
+#' 
+#' Both models predict the second derivatives of the observed state variables (with linear trends removed). For the uncoupled oscillator, the predictors are each person's own observed state variables (again with linear trends removed), as well as each person's own first derivatives of the observed state variables (again with linear trends removed. For the coupled oscillator, the predictors are each person's own and partner's observed state variables (again with linear trends removed), as well as each person's own and partner's first derivatives of the observed state variables (again with linear trends removed).
+#'
+#' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' @param whichModel Whether the model to be estimated is the "uncoupled" or "coupled" oscillator.
+#' 
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), and 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable).
+
+#' @export
+
+indivClo <- function(basedata, whichModel)
+{
+  param <- list()
+  
+  if(whichModel != "uncoupled" & whichModel != "coupled") {
+  	stop("the model type must be either uncoupled or coupled")
+	
+	} else if (whichModel == "uncoupled"){
+	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
+	  obs_0 <- param[1]	
+	  d1_0 <- param[2]
+	  obs_1 <- param[3]
+	  d1_1 <- param[4]
+	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)
+	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")
+
+      } else if (whichModel == "coupled"){
+      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
+      	obs_0 <- param[1]	
+		d1_0 <- param[2]
+		p_obs_0 <- param[3]
+		p_d1_0 <- param[4]
+	    obs_1 <- param[5]
+		d1_1 <- param[6]
+		p_obs_1 <- param[7]
+		p_d1_1 <- param[8]
+		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)
+		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")
+  }	
+
+  newDiD <- unique(factor(basedata$dyad))
+  basedata <- basedata[complete.cases(basedata), ]
+  R2 <- vector()
+  	
+  for (i in 1:length(newDiD)){
+    datai <- basedata[basedata$dyad == newDiD[i], ]
+	m <- lm(model, na.action=na.exclude, data=datai)
+	R2[[i]] <- summary(m)$adj.r.squared
+	param[[i]] <- round(as.numeric(m$coefficients), 5)
+	numParam <- length(m$coefficients)
+	param[[i]][numParam + 1] <- unique(datai$dyad)
+  }			
+  paramData <- as.data.frame(do.call(rbind, param))
+  colnames(paramData) <- paramNames	
+  results <- list(R2=R2, paramData=paramData)
 }
 
 
@@ -393,25 +269,149 @@ cloUncoupleOde <- function(t, state, parameters)
 #' @return The function returns a named list including: 1) the adjusted R^2 for the uncoupled model for each dyad (called "R2uncouple"), 2) the adjusted R^2 for the coupled model for each dyad (called "R2couple"), and 3) the difference between the R-squares for each dyad (coupled - uncoupled, called "R2dif").
 
 #' @export
-cloIndivCompare <- function(basedata)
+indivCloCompare <- function(basedata)
 {
-	newDiD <- unique(factor(basedata$dyad))
+  newDiD <- unique(factor(basedata$dyad))
+  R2uncouple <- vector()
+  R2couple <- vector()
+  R2dif <- vector()
+  
+  for (i in 1:length(newDiD)){
+	datai <- basedata[basedata$dyad == newDiD[i], ]
+	m1 <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
+	uncouple <- lm(m1, na.action=na.exclude, data=datai)
+	m2 <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1-1)
+	couple <- lm(m2, na.action=na.exclude, data=datai)	
+	R2uncouple[[i]] <- summary(uncouple)$adj.r.squared
+	R2couple[[i]] <- summary(couple)$adj.r.squared	
+	R2dif[[i]] <- R2couple[[i]] - R2uncouple[[i]]
+  }			
+		
+  output <- list(R2uncouple=R2uncouple, R2couple=R2couple, R2dif=R2dif)
+}
 
-	R2uncouple <- vector()
-	R2couple <- vector()
-	R2dif <- vector()
+
+#' Produces plots of either an uncoupled or coupled oscillator model-predicted trajectories overlaid on raw data for each dyad.
+#' 
+#' The observed and CLO-model predicted state variables (with linear trends removed) are plotted for each dyad individually.  
+#'
+#' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' @param whichModel Whether the model to be estimated is the "uncoupled" or "coupled" oscillator.
+#' @param idConvention The number that was added to the dist0 partner to get the ID number for the dist1 partner.
+#' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
+#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
+#' @param obsName An optional name for the observed state variables being plotted (e.g., "Emotional Experience"). Default is observed.
+#' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. Default is to use the minimum and maximum observed values of the state variables.
+#' 
+#' @return The function returns plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf", or "coordPlots.pdf" or "inertCoordPlots.pdf"
+
+#' @import ggplot2
+#' @export
+
+indivCloPlots <- function(basedata, whichModel, idConvention, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+{
+  param <- list()
+  
+  if(is.null(dist0name)){dist0name <- "dist0"}
+  if(is.null(dist1name)){dist1name <- "dist1"}
+  if(is.null(obsName)){obsName <- "observed"}
+  
+  if(whichModel != "uncoupled" & whichModel != "coupled") {
+  	stop("the model type must be either uncoupled or coupled")
 	
-		for (i in 1:length(newDiD))
-		{
-			datai <- basedata[basedata$dyad == newDiD[i], ]
-			uncouple <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1, na.action=na.exclude, data=datai)
-			couple <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1-1, na.action=na.exclude, data=datai)	
-			R2uncouple[[i]] <- summary(uncouple)$adj.r.squared
-			R2couple[[i]] <- summary(couple)$adj.r.squared	
-			R2dif[[i]] <- R2couple[[i]] - R2uncouple[[i]]
-		}			
-		output <- list(R2uncouple=R2uncouple, R2couple=R2couple, R2dif=R2dif)
-		}
+	} else if (whichModel == "uncoupled"){
+	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
+	  obs_0 <- param[1]	
+	  d1_0 <- param[2]
+	  obs_1 <- param[3]
+	  d1_1 <- param[4]
+	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)
+	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")
+	  plotFileName <- "uncoupledCloPlots.pdf"
+	  odeFunction <- cloUncoupledOde
+
+      } else if (whichModel == "coupled"){
+      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
+      	obs_0 <- param[1]	
+		d1_0 <- param[2]
+		p_obs_0 <- param[3]
+		p_d1_0 <- param[4]
+	    obs_1 <- param[5]
+		d1_1 <- param[6]
+		p_obs_1 <- param[7]
+		p_d1_1 <- param[8]
+		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)
+		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")
+		plotFileName <- "coupledCloPlots.pdf"
+		odeFunction <- cloCoupledOde
+  }	
+   
+  if(is.null(minMax)){
+    min <- min(basedata$obs_deTrend, na.rm=T)
+    max <- max(basedata$obs_deTrend, na.rm=T)
+  } else {
+  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)
+	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
+  }
+
+  newDiD <- unique(factor(basedata$dyad))
+  basedata <- basedata[complete.cases(basedata), ]
+  plots <- list()
+	
+  for (i in 1:length(newDiD)){
+    statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,] 
+  	maxtime <- max(statedatai$time) 
+ 	plotTimes <- seq(1, maxtime, by=1)
+ 	start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))
+	y1 <- mean(start$obs_deTrend, na.rm=T)
+ 	y2 <- 0
+	y3 <- mean(start$p_obs_deTrend, na.rm=T)
+ 	y4 <- 0
+ 	statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)
+			
+	datai <- basedata[basedata$dyad == newDiD[i], ]
+	m <- lm(model, na.action=na.exclude, data=datai)
+	param[[i]] <- round(as.numeric(m$coefficients), 5)
+	numParam <- length(m$coefficients)
+	param[[i]][numParam + 1] <- unique(datai$dyad)
+    names(param[[i]]) <- paramNames
+
+	temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func= odeFunction, parms= param[[i]]))
+	temp2 <- subset(temp, select=-c(y2, y4))
+	names(temp2) <- c("time","d0.pred","d1.pred")
+	temp2$dyad <- statedatai$dyad
+	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
+	temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad + idConvention)
+	temp4 <- suppressMessages(plyr::join(datai, temp3))
+	temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
+			
+	plotData <- temp4[complete.cases(temp4), ]	
+	plotTitle <- as.character(unique(datai$dyad))
+						
+	plots[[i]] <- ggplot(plotData, aes(x=time)) +
+	  geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +
+	  geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + 
+	  scale_color_manual(name="Role", values=c("red","blue")) +
+	  ylab(obsName) +
+	  ylim(min, max) +
+	  annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=3) +
+	  labs(title= "Dyad ID:", subtitle= plotTitle) +
+	  theme(plot.title=element_text(size=11)) +
+	  theme(plot.subtitle=element_text(size=10))			
+  }
+  		
+  cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
+  ggsave(plotFileName, cloPlots)
+  results <- list(plots=plots)
+}
+
+
+
+
+
+
+
+
 
 
 #' Compares a base line "intercept only" model to coupled and uncoupled oscillator models for predicting the system variable from the dynamic parameters.

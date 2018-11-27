@@ -2,6 +2,9 @@
 
 ######### The "rtiesShared" file includes functions that support all the rties analyses
 
+
+################ Data manipulation functions
+
 #' Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling
 #'
 #' In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations.
@@ -30,8 +33,8 @@
 #'}
 
 #' @export
-dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, center=NULL) 
-{
+dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, center=NULL){
+  
   basedata <- subset(basedata, select=c(id, dyad, obs, sysVar, dist, time_name))
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
@@ -40,48 +43,43 @@ dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, c
   names(basedata)[5] <- "dist1"
   names(basedata)[6] <- "time"
   
-     # check distinguishing variable is numeric 
-    if (!is.numeric(basedata$dist1))		
-	  {
-		stop("the distinguishing variable must be a 0/1 numeric variable")
-    }
+  # check distinguishing variable is numeric 
+  if (!is.numeric(basedata$dist1)){
+	stop("the distinguishing variable must be a 0/1 numeric variable")
+  }
 
-    ## create the dist0 variable
-    basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)
+  # create the dist0 variable
+  basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)
     
-   # check partners have same number of observations and exit with error message if not
-    	notEqual <- vector()
-    	t <- table(basedata$dist1, basedata$dyad)
-    	for(i in 1:ncol(t))
-    	{		if (t[1,i] != t[2,i])
-			{
-			notEqual <- append(notEqual, as.numeric(dimnames(t)[[2]][i]))
-			}
-		}				
-	if (length(notEqual) > 0)		
-	{
-		print(notEqual)
-		stop("the partners in these dyads have unequal number of observations")
-		rm(notEqual, envir = .GlobalEnv)
+  # check partners have same number of observations 
+  notEqual <- vector()
+  t <- table(basedata$dist1, basedata$dyad)
+  for(i in 1:ncol(t)){		
+    if (t[1,i] != t[2,i]){
+	notEqual <- append(notEqual, as.numeric(dimnames(t)[[2]][i]))
+	}
+  }				
+	if (length(notEqual) > 0){
+	  print(notEqual)
+	  stop("the partners in these dyads have unequal number of observations")
+      rm(notEqual, envir = .GlobalEnv)
 	}
 	    
-	 basedata <- lineCenterById(basedata)
+  basedata <- lineCenterById(basedata)
 
-	 if(!is.null(center))
-	 {
-	    basedata$sysVarL <- basedata$sysVar - center[1]
-	    basedata$sysVarM <- basedata$sysVar - center[2]
-	    basedata$sysVarH <- basedata$sysVar - center[3]
-	 }
+  if(!is.null(center)){
+	basedata$sysVarL <- basedata$sysVar - center[1]
+	basedata$sysVarM <- basedata$sysVar - center[2]
+	basedata$sysVarH <- basedata$sysVar - center[3]
+  }
 	   
-	  if(!is.null(time_lag))
-	  {
-	   lag <- time_lag
-	   basedata <- DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag)
-	  }
-	    basedata <- actorPartnerDataTime(basedata, basedata$dyad, basedata$id)
-	    
-	   return(basedata)
+  if(!is.null(time_lag)){
+	lag <- time_lag
+	basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))
+  }
+  
+  basedata <- actorPartnerDataTime(basedata, basedata$dyad, basedata$id)  
+  return(basedata)
 }
 
 ############### lineCenterById
@@ -90,163 +88,15 @@ dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, c
 
 lineCenterById <- function(basedata)
 {
-	newId <- unique(factor(basedata$id))
-	dataCent <- list()
-	for(i in 1:length(newId))
-	{
-		datai <- basedata[basedata$id == newId[i],]
-		datai$obs_deTrend <- resid(lm(obs ~ time, data=datai, na.action=na.exclude))
-		dataCent[[i]] <- datai
-	}		
-	basedata <- as.data.frame(do.call(rbind, dataCent)) 	
+  newId <- unique(factor(basedata$id))
+  dataCent <- list()
+  for(i in 1:length(newId)){
+	datai <- basedata[basedata$id == newId[i],]
+	datai$obs_deTrend <- resid(lm(obs ~ time, data=datai, na.action=na.exclude))
+	dataCent[[i]] <- datai
+  }		
+  basedata <- as.data.frame(do.call(rbind, dataCent)) 	
 }		
-
-
-############# plotting functions: The following are a set of useful basic plots
-
-#' Histograms for all numeric variables in a dataframe.
-#'
-#' Useful for checking distributions of potential system variables to assess normality
-#'
-#' @param basedata A user-provided dataframe.
-
-#' @export
-histAll <- function(basedata)
-{
-	nums <- sapply(basedata, is.numeric)
-	numdata <- basedata[ ,nums]
-	par(mfrow=c(4,4))
-	for(i in 1:length(numdata))
-	{
-		hist(numdata[,i], xlab=NULL, main=names(numdata[i]))
-	}
-}
-
-#' Plots of observed variable over time by dyad.
-#'
-#' Produces plots of the observed variable for each dyad over time to check for data errors, etc. 
-#'
-#' @param basedata A dataframe.
-#' @param dyad The name of the column in the dataframe that has the dyad-level identifier.
-#' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
-#' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
-#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
-#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
-
-#' @export
-
-plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name, dist1name) 
-{
-  obs_name <- obs 
-  basedata <- basedata[ ,c(dyad, obs, dist, time_name) ]
-  names(basedata) <- c("dyad", "obs", "dist", "time")
- 
-  lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
-  }
-
-
-# Plots of linear regression lines for both people in each dyad
-#'
-#' Produces plots of temporal trajectories predicted by linear dyadic growth models. 
-#'
-#' @param basedata A dataframe produced by "dataPrep".
-#' @param dist0name A name for the 0-level of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the 1-level of the distinguishing variable (e.g., "Men").
-#' @param obsName A name for the observed variable being plotted (e.g., "Emotional Experience").
-
-#' @export
-plotLinear <- function(basedata, dist0name, dist1name, obsName){
-	lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist1, type=c("r"), ylab=obsName, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
-}
-
-# This function plots curvlinear (loess smoothed) lines for each person in each dyad
-
-plotCurve <- function(basedata, dist0name, dist1name, obsName){
-	lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist1, type=c("smooth"), ylab=obsName, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
-}
-
-### orderedPlotsLinearAve: This function produces plots of the linear fits of the observed variable for each dyad in ascending order of the dyad averages on the sysVar variable, which is jittered to deal with matching values. 
-
-orderedPlotsLinearAve <- function(basedata)
-{
-	temp <- aggregate(basedata$sysVar, by=list(basedata$dyad), FUN="mean", na.rm=TRUE)
-	colnames(temp) <- c("dyad", "sysVarAve")
-	temp$sysVarAveJ <- round(jitter(temp$sysVarAve), 5)
-	newData <- join(basedata, temp)
-
-	lattice::xyplot(obs~time|as.factor(sysVarAveJ), data = newData,group=dist1,type=c("r"), col=c("blue", "red"),
-			as.table=T, layout = c(3,3))
-}
-
-
-## orderedPlotsLinearDist: This function produces plots of the linear fits of the observed variable for each dyad in ascending order of one of the partner's scores on the sysVar variable, which is jittered to deal with matching values. Which partner is used is determined by the dist argument, which must be zero or one to correspond with the options for the distinguishing variable
-
-orderedPlotsLinearDist <- function(basedata, dist)
-{
-	if(dist==0)
-	{
-	temp <- basedata[basedata$time == 1 & basedata$dist0 == 1, ]
-	} else if(dist==1)
-			{temp <- basedata[basedata$time == 1 & basedata$dist1 == 1, ]}
-			 else {cat("\n error: dist must be 0 or 1\n")
-			 	stop(call.=F)}
-	temp$sysVarJ <- round(jitter(temp$sysVar), 5)
-	temp <- subset(temp, select=c(dyad, sysVarJ))
-	data <- plyr::join(basedata, temp)
-	
-	lattice::xyplot(obs ~time|as.factor(sysVarJ), data = data, group=dist1, type=c("r"), col=c("red", "blue"),
-			as.table=T, layout = c(3,3))
-}
-
-
-### orderedPlotsDetrendAve: This function produces plots of the trajectories of the detrended observed variable for each dyad in ascending order of the dyad averages on the sysVar variable, which is jittered to deal with matching values. 
-
-orderedPlotsDetrendAve <- function(basedata)
-{
-	temp <- aggregate(basedata$sysVar, by=list(basedata$dyad), FUN="mean", na.rm=TRUE)
-	colnames(temp) <- c("dyad", "sysVarAve")
-	temp$sysVarAveJ <- round(jitter(temp$sysVarAve), 5)
-	data <- plyr::join(basedata, temp)
-
-	lattice::xyplot(obs_deTrend ~time|as.factor(sysVarAveJ), data = data, group=dist1, type=c("l"), col=c("red", "blue"),
-			as.table=T, layout = c(3,3))
-}
-
-
-### orderedPlotsDetrendDist: This function produces plots of the trajectories of the detrended observed variable for each dyad in ascending order of one of the partner's scores on the sysVar variable, which is jittered to deal with matching values. Which partner is used is determined by the dist argument, which must be zero or one to correspond with the options for the distinguishing variable
-
-orderedPlotsDetrendDist <- function(basedata, dist)
-{
-	if(dist==0)
-	{
-	temp <- basedata[basedata$time == 1 & basedata$dist0 == 1, ]
-	} else if(dist==1)
-			{temp <- basedata[basedata$time == 1 & basedata$dist1 == 1, ]}
-			 else {cat("\n error: dist must be 0 or 1\n")
-			 	stop(call.=F)}
-	temp$sysVarJ <- round(jitter(temp$sysVar), 5)
-	temp <- subset(temp, select=c(dyad, sysVarJ))
-	data <- plyr::join(basedata, temp)
-	
-	lattice::xyplot(obs_deTrend ~time|as.factor(sysVarJ), data = data, group=dist1, type=c("l"), col=c("red", "blue"),
-			as.table=T, layout = c(3,3))
-}
-
- 
-
-sysVarByParam <- function(paramData, colToPlot, sysVarName)
-{
-	ymin <- min(paramData$sysVar, na.rm=T)
-	ymax <- max(paramData$sysVar, na.rm=T)
-	par(mfrow=c(4,4))
-	for(i in colToPlot)
-	{
-		xmin <- min(paramData[i], na.rm=T)
-		xmax <- max(paramData[i], na.rm=T)
-		plot(paramData$sysVar ~ paramData[,i], xlab="", ylab=sysVarName, ylim=c(ymin, ymax), xlim=c(xmin, xmax), main=names(paramData[i]))
-	}	
-}
 
 ########### removeDyads
 
@@ -266,7 +116,6 @@ removeDyads <- function (basedata, dyads, dyadID){
 	return(basedata)
 }
 
-
 ## actorPartnerDataCross: This function takes individual cross-sectional data from dyads and turns it into actor-partner format
 
 # Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads
@@ -280,8 +129,10 @@ removeDyads <- function (basedata, dyads, dyadID){
 # dataAP <- actorPartnerDataCross(data, data$dyad, data$person)
 
 actorPartnerDataCross <- function(basedata, dyadID, personID){
-	basedata$d <- dyadID
-	basedata$p <- personID
+	
+	basedata$d <- basedata[, dyadID]
+	basedata$p <- basedata[, personID]
+	basedata <- basedata[order(basedata$p), ]
 	dataA <- basedata
 	
 	P1 <- subset(basedata, basedata$d == basedata$p)
@@ -296,7 +147,6 @@ actorPartnerDataCross <- function(basedata, dyadID, personID){
 	return(dataAP)		
 }
 
-
 ## actorPartnerDataTime: This function takes individual repeated measures data from dyads and turns it into actor-partner format
 
 # Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads
@@ -308,11 +158,12 @@ actorPartnerDataCross <- function(basedata, dyadID, personID){
 # Example:
 # dataAP <- actorPartnerDataTime(data, data$Dyad, data$Person)
 
-actorPartnerDataTime <- function(basedata, dyadID, personID)
-{
-    basedata$d <- dyadID
-    basedata$p <- personID
-    dID <- unique(factor(dyadID))
+actorPartnerDataTime <- function(basedata, dyadID, personID){
+		
+    basedata$d <- basedata[, dyadID]
+    basedata$p <- basedata[, personID]
+    basedata <- basedata[order(basedata$p), ]
+    dID <- unique(factor(basedata$d))
 	dataAP <- list()
 
 	for(i in 1:length(dID))
@@ -332,4 +183,70 @@ actorPartnerDataTime <- function(basedata, dyadID, personID)
 		}		
 	dataAP <- as.data.frame(do.call(rbind, dataAP))
 } 	
+
+
+################ Plotting functions
+
+#' Histograms for all numeric variables in a dataframe.
+#'
+#' Useful for checking distributions of potential system variables to assess normality
+#'
+#' @param basedata A user-provided dataframe.
+
+#' @export
+histAll <- function(basedata)
+{
+  nums <- sapply(basedata, is.numeric)
+  numdata <- basedata[ ,nums]
+
+  par(mfrow=c(4,4))
+  for(i in 1:length(numdata)){
+	hist(numdata[,i], xlab=NULL, main=names(numdata[i]))
+  }
+  par(mfrow=c(1,1))
+}
+
+#' Plots of observed variable over time by dyad.
+#'
+#' Produces plots of the observed variable for each dyad over time to check for data errors, etc. 
+#'
+#' @param basedata A dataframe.
+#' @param dyad The name of the column in the dataframe that has the dyad-level identifier.
+#' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
+#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
+#' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
+#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
+
+#' @export
+
+plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name=NULL, dist1name=NULL) 
+{
+  obs_name <- obs 
+  basedata <- basedata[ ,c(dyad, obs, dist, time_name) ]
+  names(basedata) <- c("dyad", "obs", "dist", "time")
+  
+  if(is.null(dist0name)){dist0name <- "dist0"}
+  if(is.null(dist1name)){dist1name <- "dist1"}
+ 
+  lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
+
+  par(mfrow=c(1,1))
+}
+
+ 
+
+sysVarByParam <- function(paramData, colToPlot, sysVarName)
+{
+	ymin <- min(paramData$sysVar, na.rm=T)
+	ymax <- max(paramData$sysVar, na.rm=T)
+	par(mfrow=c(4,4))
+	for(i in colToPlot)
+	{
+		xmin <- min(paramData[i], na.rm=T)
+		xmax <- max(paramData[i], na.rm=T)
+		plot(paramData$sysVar ~ paramData[,i], xlab="", ylab=sysVarName, ylim=c(ymin, ymax), xlim=c(xmin, xmax), main=names(paramData[i]))
+	}	
+}
+
 

@@ -2,184 +2,57 @@
 
 ######## This file includes all the functions needed for an inertia-coordination analysis
 
-#' Estimates an "inertia only" model for each dyad.
+#' Estimates versions of the inertia-coordination model for each dyad.
 #' 
-#' The observed state variables (with linear trends removed) are predicted from each person's intercept and each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed)
+#' The user specifies which of 3 models are to be estimated. Each model predicts the observed state variables (with linear trends removed) from either: 1) Inertia only ("inert")- each person's intercept and each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), 2) Coordination only ("coord")- each person's intercept and each person's partner's concurrent state variable (again with linear trends removed), or 3) Full inertia-coordination model ("inertCoord") - each person's intercept, each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), and each person's partner's concurrent state variable (again with linear trends removed).
 #'
 #' @param basedata A dataframe that was produced with the "dataPrep" function.
-#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
-#' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
+#' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf"
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2") and 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable).
 
-#' @import ggplot2
 #' @export
-indivInert <- function(basedata, dist0name, dist1name, obsName)
-{
-	newDiD <- unique(factor(basedata$dyad))
-	min <- min(basedata$obs_deTrend, na.rm=T)
-	max <- max(basedata$obs_deTrend, na.rm=T)
-	
-	r2 <- vector()
-	param <- list()
-	plots <- list()
-	
-		for (i in 1:length(newDiD))
-		{
-			datai <- basedata[basedata$dyad == newDiD[i], ]
-			m <- lm(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag, na.action=na.exclude, data=datai)
-			r2[[i]] <- summary(m)$adj.r.squared
-			param[[i]] <- round(as.numeric(m$coefficients), 5)
-			numParam <- length(m$coefficients)
-			param[[i]][numParam + 1] <- unique(datai$dyad)
-			datai$obsPred <- predict(m)
-			datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) 
-			plotTitle <- as.character(unique(datai$dyad))
-						
-			plots[[i]] <- ggplot(datai, ggplot2::aes(x=time)) +
-				geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +
-				geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + 
-				scale_color_manual(name="Role", values=c("blue","red")) +
-				ylab(obsName) +
-				ylim(min, max) +
-				annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +
-				labs(title= "Dyad ID:", subtitle= plotTitle) +
-				theme(plot.title=element_text(size=11)) +
-				theme(plot.subtitle=element_text(size=10))			
-		}
-	
-		param <- as.data.frame(do.call(rbind, param))
-		colnames(param) <- c("int0","int1","inert0","inert1","dyad")
-		temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))
-		temp2 <- unique(temp)
-		paramData <- plyr::join(param, temp2)
-		
-		inertPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
-		ggsave('inertPlots.pdf', inertPlots)
 
-	results <- list(R2=r2, paramData=paramData, plots=plots)
+indivInertCoord <- function(basedata, whichModel)
+{	
+  if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
+  	stop("the model type must be either inert, coord or inertCoord")
+	
+	} else if (whichModel == "inert"){
+	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
+	  paramNames <- c("int0","int1","inert0","inert1","dyad") 
+      
+      } else if (whichModel == "coord"){
+      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend)
+      	paramNames <- c("int0","int1","coord0","coord1","dyad")
+        
+        } else {
+          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend)
+          paramNames <- c("int0","int1","inert0","coord0","inert1","coord1","dyad")
+  }
+  
+  newDiD <- unique(factor(basedata$dyad))
+  r2 <- vector()
+  param <- list()
+	
+  for (i in 1:length(newDiD)){  
+    datai <- basedata[basedata$dyad == newDiD[i], ]
+	m <- lm(model, na.action=na.exclude, data=datai)
+	r2[[i]] <- summary(m)$adj.r.squared
+	param[[i]] <- round(as.numeric(m$coefficients), 5)
+	numParam <- length(m$coefficients)
+	param[[i]][numParam + 1] <- unique(datai$dyad)
+  }
+  
+  param <- as.data.frame(do.call(rbind, param))
+  colnames(param) <- paramNames
+  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))
+  temp2 <- unique(temp)
+  paramData <- suppressMessages(plyr::join(param, temp2))
+  
+  results <- list(R2=r2, paramData=paramData)
 }
 
-
-#' Estimates a "coordination only" model for each dyad.
-#' 
-#' The observed state variables (with linear trends removed) are predicted from each person's intercept and each person's partner's concurrent state variable (again with linear trends removed).
-#' 
-#' @param basedata A dataframe that was produced with the "dataPrep" function.
-#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
-#' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
-#' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "coordPlots.pdf"
-
-#' @import ggplot2
-#' @export
-indivCoord <- function(basedata, dist0name, dist1name, obsName)
-{
-	newDiD <- unique(factor(basedata$dyad))
-	min <- min(basedata$obs_deTrend, na.rm=T)
-	max <- max(basedata$obs_deTrend, na.rm=T)
-	
-	r2 <- vector()
-	param <- list()
-	plots <- list()
-	
-		for (i in 1:length(newDiD))
-		{
-			datai <- basedata[basedata$dyad == newDiD[i], ]
-			m <- lm(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend, na.action=na.exclude, data=datai)
-			r2[[i]] <- summary(m)$adj.r.squared
-			param[[i]] <- round(as.numeric(m$coefficients), 5)
-			numParam <- length(m$coefficients)
-			param[[i]][numParam + 1] <- unique(datai$dyad)
-			datai$obsPred <- predict(m)
-			datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) 
-			plotTitle <- as.character(unique(datai$dyad))
-						
-			plots[[i]] <- ggplot(datai, aes(x=time)) +
-				geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +
-				geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + 
-				scale_color_manual(name="Role", values=c("blue","red")) +
-				ylab(obsName) +
-				ylim(min, max) +
-				annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +
-				labs(title= "Dyad ID:", subtitle= plotTitle) +
-				theme(plot.title=element_text(size=11)) +
-				theme(plot.subtitle=element_text(size=10))			
-		}
-	
-		param <- as.data.frame(do.call(rbind, param))
-		colnames(param) <- c("int0","int1","coord0","coord1","dyad")
-		temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))
-		temp2 <- unique(temp)
-		paramData <- plyr::join(param, temp2)
-		
-		coordPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
-		ggsave('coordPlots.pdf', coordPlots)
-
-	results <- list(R2=r2, paramData=paramData, plots=plots)
-}
-
-
-#' Estimates the full "inertia-coordination" model for each dyad.
-#' 
-#' The observed state variables (with linear trends removed) are predicted from each person's intercept, each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), and each person's partner's concurrent state variable (again with linear trends removed).
-#' 
-#' @param basedata A dataframe that was produced with the "dataPrep" function.
-#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
-#' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
-#' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable), and 3) plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertCoordPlots.pdf"
-
-#' @import ggplot2
-#' @export
-indivInertCoord <- function(basedata, dist0name, dist1name, obsName)
-{
-	newDiD <- unique(factor(basedata$dyad))
-	min <- min(basedata$obs_deTrend, na.rm=T)
-	max <- max(basedata$obs_deTrend, na.rm=T)
-	
-	r2 <- vector()
-	param <- list()
-	plots <- list()
-	
-		for (i in 1:length(newDiD))
-		{
-			datai <- basedata[basedata$dyad == newDiD[i], ]
-			m <- lm(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend, na.action=na.exclude, data=datai)
-			r2[[i]] <- summary(m)$adj.r.squared
-			param[[i]] <- round(as.numeric(m$coefficients), 5)
-			numParam <- length(m$coefficients)
-			param[[i]][numParam + 1] <- unique(datai$dyad)
-			datai$obsPred <- predict(m)
-			datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) 
-			plotTitle <- as.character(unique(datai$dyad))
-						
-			plots[[i]] <- ggplot(datai, aes(x=time)) +
-				geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +
-				geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + 
-				scale_color_manual(name="Role", values=c("blue","red")) +
-				ylab(obsName) +
-				ylim(min, max) +
-				annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +
-				labs(title= "Dyad ID:", subtitle= plotTitle) +
-				theme(plot.title=element_text(size=11)) +
-				theme(plot.subtitle=element_text(size=10))			
-		}
-	
-		param <- as.data.frame(do.call(rbind, param))
-		colnames(param) <- c("int0","int1","inert0","coord0","inert1","coord1","dyad")
-		temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))
-		temp2 <- unique(temp)
-		paramData <- plyr::join(param, temp2)
-		
-		inertCoordPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
-		ggsave('inertCoordPlots.pdf', inertCoordPlots)
-
-	results <- list(R2=r2, paramData=paramData, plots=plots)
-}
 
 #' Compares model fit for the inertia-only, coordination-only and full inertia-coordination model for each dyad's state trajectories using an R-square comparison. 
 #' 
@@ -190,37 +63,103 @@ indivInertCoord <- function(basedata, dist0name, dist1name, obsName)
 #' @return The function returns a named list including: 1) the adjusted R^2 for the inertia model for each dyad (called "R2inert"), 2) the adjusted R^2 for the coordination model for each dyad (called "R2coord"), 3) the adjusted R^2 for the full inertia-coordination model for each dyad (called "R2inertCoord"), 4) the difference between the R-squares for each dyad for inertia minus coordination (called "R2dif_I_C"), 5) the difference for the full model minus inertia (called "R2dif_IC_I"), and 6) the difference for the full model minus coordination (called "R2dif_IC_C")
 #' @export
 
-inertCoordIndivCompare <- function(basedata)
+indivInertCoordCompare <- function(basedata)
 {
-	newDiD <- unique(factor(basedata$dyad))
-	
-	R2inert <- vector()
-	R2coord <- vector()
-	R2inertCoord <- vector()
-	R2dif_I_C <- vector()
-	R2dif_IC_I <- vector()
-	R2dif_IC_C <- vector()
+  newDiD <- unique(factor(basedata$dyad))
+  R2inert <- vector()
+  R2coord <- vector()
+  R2inertCoord <- vector()
+  R2dif_I_C <- vector()
+  R2dif_IC_I <- vector()
+  R2dif_IC_C <- vector()
 
-		for (i in 1:length(newDiD))
-		{
-			datai <- basedata[basedata$dyad == newDiD[i], ]
+  for (i in 1:length(newDiD)){
+    datai <- basedata[basedata$dyad == newDiD[i], ]
+	m1 <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
+	inert <- lm(m1, na.action=na.exclude, data=datai)
+	m2 <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend)
+	coord <- lm(m2, na.action=na.exclude, data=datai)
+    m3 <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend)
+    inertCoord <- lm(m3, na.action=na.exclude, data=datai)
 			
-			inert <- lm(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag, na.action=na.exclude, data=datai)
-	
-			coord <- lm(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend, na.action=na.exclude, data=datai)
+	R2inert[[i]] <- summary(inert)$adj.r.squared
+	R2coord[[i]] <- summary(coord)$adj.r.squared	
+	R2inertCoord[[i]] <- summary(inertCoord)$adj.r.squared
+			
+	R2dif_I_C[[i]] <- R2inert[[i]] - R2coord[[i]]
+	R2dif_IC_I[[i]] <- R2inertCoord[[i]] - R2inert[[i]]
+	R2dif_IC_C[[i]] <- R2inertCoord[[i]] - R2coord[[i]]
+  }			
+  
+  output <- list(R2inert=R2inert, R2coord=R2coord, R2inertCoord=R2inertCoord, R2dif_I_C=R2dif_I_C, R2dif_IC_I=R2dif_IC_I, R2dif_IC_C=R2dif_IC_C)
+}
 
-			inertCoord <- lm(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend, na.action=na.exclude, data=datai)
-			
-			R2inert[[i]] <- summary(inert)$adj.r.squared
-			R2coord[[i]] <- summary(coord)$adj.r.squared	
-			R2inertCoord[[i]] <- summary(inertCoord)$adj.r.squared
-			
-			R2dif_I_C[[i]] <- R2inert[[i]] - R2coord[[i]]
-			R2dif_IC_I[[i]] <- R2inertCoord[[i]] - R2inert[[i]]
-			R2dif_IC_C[[i]] <- R2inertCoord[[i]] - R2coord[[i]]
-		}			
-		output <- list(R2inert=R2inert, R2coord=R2coord, R2inertCoord=R2inertCoord, R2dif_I_C=R2dif_I_C, R2dif_IC_I=R2dif_IC_I, R2dif_IC_C=R2dif_IC_C)
-		}
+
+#' Produces plots of versions of the inertia-coordination model-predicted trajectories overlaid on raw data for each dyad.
+#' 
+#' The observed state variables (with linear trends removed) are predicted from one of the 3 versions of the inertia-coordination model (inertia only, "inert"; coordination only, "coord"; full inertia-coordination, "inertCoord") for each dyad individually. The predicted trajectories are plotted overlaid on the observed trajectories. 
+#'
+#' @param basedata A dataframe that was produced with the "dataPrep" function.
+#' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
+#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
+#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
+#' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
+#' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
+#' 
+#' @return The function returns plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf", or "coordPlots.pdf" or "inertCoordPlots.pdf"
+
+#' @import ggplot2
+#' @export
+indivInertCoordPlots <- function(basedata, whichModel, dist0name, dist1name, obsName, minMax=NULL)
+{
+  if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
+  	stop("the model type must be either inert, coord or inertCoord")
+	} else if (whichModel == "inert"){
+	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
+	  plotFileName <- "inertPlots.pdf"
+      } else if (whichModel == "coord"){
+      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend)
+      	plotFileName <- "coordPlots.pdf"
+        } else {
+          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend)
+          plotFileName <- "inertCoordPlots.pdf"
+        }
+
+  if(is.null(minMax)){
+  	min <- min(basedata$obs_deTrend, na.rm=T)
+	max <- max(basedata$obs_deTrend, na.rm=T)
+  } else {
+  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)
+	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
+  }
+
+  newDiD <- unique(factor(basedata$dyad))
+  plots <- list()
+	
+  for (i in 1:length(newDiD)){
+	datai <- basedata[basedata$dyad == newDiD[i], ]
+	m <- lm(model, na.action=na.exclude, data=datai)
+	datai$obsPred <- predict(m)
+	datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) 
+	plotTitle <- as.character(unique(datai$dyad))
+						
+	plots[[i]] <- ggplot(datai, ggplot2::aes(x=time)) +
+	geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +
+	geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + 
+	scale_color_manual(name="Role", values=c("blue","red")) +
+	ylab(obsName) +
+	ylim(min, max) +
+	annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +
+	labs(title= "Dyad ID:", subtitle= plotTitle) +
+	theme(plot.title=element_text(size=11)) +
+	theme(plot.subtitle=element_text(size=10))			
+  }
+	
+  modelPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
+  ggsave(plotFileName, modelPlots)
+  results <- list(plots=plots)
+}
+
 
 #' Compares variants of the inertia-coordination model for predicting the system variable from the dynamic parameters.
 #' 
