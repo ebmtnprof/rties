@@ -6,7 +6,7 @@
 \usage{
 inertCoordSysVarOut(basedata, sysVarType, dist0name = NULL,
   dist1name = NULL, sysVarName = NULL, minMax = NULL,
-  family = NULL, plots = T)
+  family = NULL, printPlots = T)
 }
 \arguments{
 \item{basedata}{A dataframe containing the LPA profile memberships.}
