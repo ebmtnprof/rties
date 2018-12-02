@@ -4,8 +4,8 @@
 \alias{dataPrep}
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
-dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name, time_lag = NULL,
-  center = NULL)
+dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name,
+  time_lag = NULL, center = NULL)
 }
 \arguments{
 \item{basedata}{A user-provided dataframe.}

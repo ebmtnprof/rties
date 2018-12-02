@@ -2,24 +2,30 @@
 % Please edit documentation in R/inertCoord.R
 \name{inertCoordSysVarOut}
 \alias{inertCoordSysVarOut}
-\title{Compares variants of the inertia-coordination model for predicting the system variable from the dynamic parameters.}
+\title{Provides results for predicting the system variable from latent profiles of the inertia-coordination model parameters (obtained from latent profile analysis(LPA)).}
 \usage{
-inertCoordSysVarOut(basedata, sysVarType, dist0name, dist1name, sysVarName)
+inertCoordSysVarOut(basedata, sysVarType, dist0name = NULL,
+  dist1name = NULL, sysVarName = NULL, minMax = NULL,
+  family = NULL, plots = T)
 }
 \arguments{
-\item{basedata}{A dataframe containing the inertia-coordination parameter estimates produced by the "indivInertCoord" function.}
+\item{basedata}{A dataframe containing the LPA profile memberships.}
 
-\item{sysVarType}{Whether the system variable is "dyad", which means both partners have the same socre, or "indiv" which means the partners can have different scores}
+\item{sysVarType}{Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores}
 
-\item{dist0name}{A name for the level-0 of the distinguishing variable (e.g., "Women").}
+\item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
 
-\item{dist1name}{A name for the level-1 of the distinguishing variable (e.g., "Men").}
+\item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
 
-\item{sysVarName}{A name for the system variable being predicted (e.g., "Satisfaction").}
+\item{sysVarName}{An optional name for the system variable being predicted (e.g., "Satisfaction"). Default is sysVar.}
+
+\item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
+
+\item{family}{An optional argument specifying the error distribution and link function to be used in the model. Any of the "family" options supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available. Default is gaussian.}
 }
 \value{
-The function returns a list including: 1) the lm or lme objects containing the full results for each model (called "models"), and 2) adjusted R^2 information for each model (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model.
+For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). Similarly, for non-normal system variables, the function returns a list of the glm or glmmPQL objects containing the full results for the models. By default, the function also displays histograms of the residuals and plots of the predicted values against observed values for each model, but these can be turned off by setting plots=F.
 }
 \description{
-The dynamic parameters used in these models come from a set including both people's inertia (inert0 and inert1) and coordination (coord0 and coord1) estimates. The 4 models compared are a baseline intercept-only, inertia-only (inert0 + inert1), coordination-only (coord0 + coord1) and full inertia-coordination (inert0 + inert1 + coord0 + coord1) models. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). If it is individual then both actor and partner effects of the dynamic parameters are included.
+The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership, 2) main effects of profile membership and the distinguishing variable, and 3) the interaction of profile membership and the distinguishing variable. If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution.
 }

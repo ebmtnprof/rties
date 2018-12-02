@@ -78,7 +78,7 @@ dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, c
 	basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))
   }
   
-  basedata <- actorPartnerDataTime(basedata, basedata$dyad, basedata$id)  
+  basedata <- actorPartnerDataTime(basedata, "dyad", "id")  
   return(basedata)
 }
 
@@ -126,7 +126,7 @@ removeDyads <- function (basedata, dyads, dyadID){
 # function will return a data file in actor-partner format
 
 # Example:
-# dataAP <- actorPartnerDataCross(data, data$dyad, data$person)
+# dataAP <- actorPartnerDataCross(data, "dyad", "person")
 
 actorPartnerDataCross <- function(basedata, dyadID, personID){
 	
@@ -156,7 +156,7 @@ actorPartnerDataCross <- function(basedata, dyadID, personID){
 # function will create a data file in actor-partner format
 
 # Example:
-# dataAP <- actorPartnerDataTime(data, data$Dyad, data$Person)
+# dataAP <- actorPartnerDataTime(data, "Dyad", "Person")
 
 actorPartnerDataTime <- function(basedata, dyadID, personID){
 		
@@ -230,11 +230,8 @@ plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name=NULL, dist1n
   if(is.null(dist1name)){dist1name <- "dist1"}
  
   lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
-
-  par(mfrow=c(1,1))
 }
 
- 
 
 sysVarByParam <- function(paramData, colToPlot, sysVarName)
 {
@@ -249,4 +246,26 @@ sysVarByParam <- function(paramData, colToPlot, sysVarName)
 	}	
 }
 
+######################### Miscellaneous functions
 
+
+biserialCor <- function (x, y, level = 1) 
+{
+    if (!is.numeric(x)) 
+        stop("'x' must be a numeric variable.\n")
+    y <- as.factor(y)
+    if (length(levs <- levels(y)) > 2) 
+        stop("'y' must be a dichotomous variable.\n")
+    if (length(x) != length(y)) 
+        stop("'x' and 'y' do not have the same length")
+    
+        cc.ind <- complete.cases(x, y)
+        x <- x[cc.ind]
+        y <- y[cc.ind]
+    
+    ind <- y == levs[level]
+    diff.mu <- mean(x[ind]) - mean(x[!ind])
+    prob <- mean(ind)
+    sd.pop <- sd(x) * sqrt((length(x) - 1)/length(x))
+    diff.mu * sqrt(prob * (1 - prob))/sd.pop
+}
