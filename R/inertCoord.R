@@ -2,6 +2,86 @@
 
 ######## This file includes all the functions needed for an inertia-coordination analysis
 
+
+#' Produces auto-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
+#' 
+#' @param basedata A dataframe that has the variables needed for the dataPrep function, either in the right order or as named arguments (e.g., the order and names are: id, dyad, obs, sysVar, dist, time_name). See documentation for the dataPrep function for more detail.
+
+#' @export
+
+autoCorPlots <- function(basedata)
+{
+  names(basedata)[1] <- "id"
+  names(basedata)[2] <- "dyad"
+  names(basedata)[3] <- "obs"
+  names(basedata)[4] <- "sysVar"
+  names(basedata)[5] <- "dist1"
+  names(basedata)[6] <- "time"
+
+  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- lineCenterById(basedata)
+  basedata <- actorPartnerDataTime(basedata, "dyad", "id")
+  
+  newDiD <- unique(factor(basedata$dyad))
+  acf <- list()
+  plotTitle <- list()
+	
+  for (i in 1:length(newDiD)){
+	datai <- basedata[basedata$dyad == newDiD[i], ]
+	datai_ts <- zoo::zoo(datai[,7])
+	d <- acf(datai_ts, plot=F, na.action=na.exclude, lag.max=20)
+    acf[[i]] <- d
+    plotTitle[[i]] <- as.character(unique(datai$dyad))
+  }  
+  
+  par(mfrow=c(3,3))
+  for(j in 1:length(newDiD))
+  plot(acf[[j]], main=paste("AutoCorr_Dyad", plotTitle[j], sep="_"))
+  par(mfrow=c(1,1))
+  return(acf)
+}
+
+#' Produces cross-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
+#' 
+#' @param basedata A dataframe that has the variables needed for the dataPrep function, either in the right order or as named arguments (e.g., the order and names are: id, dyad, obs, sysVar, dist, time_name). See documentation for the dataPrep function for more detail.
+
+#' @export
+
+crossCorPlots <- function(basedata)
+{
+  names(basedata)[1] <- "id"
+  names(basedata)[2] <- "dyad"
+  names(basedata)[3] <- "obs"
+  names(basedata)[4] <- "sysVar"
+  names(basedata)[5] <- "dist1"
+  names(basedata)[6] <- "time"
+
+  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- lineCenterById(basedata)
+  basedata <- actorPartnerDataTime(basedata, "dyad", "id")
+  
+  newDiD <- unique(factor(basedata$dyad))
+  ccf <- list()
+  plotTitle <- list()
+	
+  for (i in 1:length(newDiD)){
+	datai <- basedata[basedata$dyad == newDiD[i], ]
+	datai_ts1 <- zoo::zoo(datai[ ,7])
+	datai_ts2 <- zoo::zoo(datai[ ,14])
+	d <- ccf(datai_ts1, datai_ts2, type="correlation", plot=F, na.action=na.exclude, lag.max=20)
+    ccf[[i]] <- d
+    plotTitle[[i]] <- as.character(unique(datai$dyad))
+  }  
+  
+  par(mfrow=c(3,3))
+  for(j in 1:length(newDiD))
+  plot(ccf[[j]], main=paste("CrossCorr_Dyad", plotTitle[j], sep="_"))
+  par(mfrow=c(1,1))
+  return(acf)
+}
+
+
+
 #' Estimates versions of the inertia-coordination model for each dyad.
 #' 
 #' The user specifies which of 3 models are to be estimated. Each model predicts the observed state variables (with linear trends removed) from either: 1) Inertia only ("inert")- each person's intercept and each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), 2) Coordination only ("coord")- each person's intercept and each person's partner's state variable lagged at the amount specified (again with linear trends removed), or 3) Full inertia-coordination model ("inertCoord") - each person's intercept, each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), and each person's partner's state variable lagged at the amount specified (again with linear trends removed).
