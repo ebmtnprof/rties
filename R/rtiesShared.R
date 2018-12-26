@@ -198,7 +198,7 @@ histAll <- function(basedata)
   nums <- sapply(basedata, is.numeric)
   numdata <- basedata[ ,nums]
 
-  par(mfrow=c(4,4))
+  par(mfrow=c(2,2))
   for(i in 1:length(numdata)){
 	hist(numdata[,i], xlab=NULL, main=names(numdata[i]))
   }
