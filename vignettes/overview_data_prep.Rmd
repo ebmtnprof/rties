@@ -1,0 +1,50 @@
+---
+title: "overview_data_prep"
+author: "Emily Butler"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{overview_data_prep}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The rties package streamlines and simplifies testing whether a set of bivariate temporal patterns either predict, or are predicted by, global variables of interest. Although we focus on time-series data from both people in dyads, the models are appropriate for any bivariate normal time-series data (e.g., heart rate and skin conductance from one person over time). The analysis starts with an observed variable that is assumed to be a valid indicator of some underlying phenomenon (e.g., emotion), assessed repeatedly over time for both partners in a sample of dyads. We provide a set of models that represent different aspects of the bivariate dynamics of the observed variable (note, the observed variable must be roughly normally distributed). The parameter estimates from those models are then used as input variables for a latent profile analysis and the predicted profile membership for each dyad is used either to predict, or be predicted by, cross-sectional variables of interest (e.g., each person’s global health). Currently the package includes 2 models: 1) the “Inertia-Coordination” model, which can represent within-person inertia and between-person in-phase or anti-phase coordination (Figure 1), and 2) a “Coupled-Oscillator” model, which can represent between-person damping and amplification of coupled oscillations (Figure 2).
+```
+Figure 1: Patterns represented by the Inertia-Coordination model. The y-axis represents whatever the bivariate time-series variable is. Panel A shows low and high inertia. Panel B shows in-phase coordination. Panel C shows anti-phase coordination.
+```
+![Alt text](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/inertia.png) ![](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/inphase.png) ![](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/antiphase.png)
+```
+Figure 2: Patterns represented by the Coupled-Oscillator model. The y-axis represents whatever the bivariate time-series variable is. Panel A shows between-person damping of oscillations (a.k.a. coregulation). Panel B shows between-person amplification of oscillations (a.k.a. co-dysregulation).
+```
+![Alt text](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/coreg.png) ![](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/codysreg.png) 
+
+
+## General Procedure
+
+The first step in our method is to choose the observed variable, which must take the form of a bivariate normal time-series. In the language of dynamic systems, the pair of observed responses are indicative of the underlying (latent) states of the system across time. In rties we refer to the two time-series of observed responses as the “state” variables, and seek to represent their dynamics with a mathematical model. The temporal unit of observation (e.g., seconds, minutes, days), minimum number of observations per dyad and minimum number of dyads required for these analyses depend on theory about the process of interest, in combination with the model chosen. More information is given in the documentation for each model.   
+
+The second step is to choose which of the model(s) include parameters representing relevant aspects of the system that you think characterizes the observed state variables. For example, imagine a very simple model that only has intercepts and linear slopes for each partner (e.g., we theorize that the system can be characterized by two independent lines, which is clearly over-simplified and not “interpersonal” at all, but useful for understanding our general approach). We then estimate the parameters for that model separately for each dyad. In our example, we would use our data to estimate the 4 parameters of the model (2 intercepts and 2 slopes) for each dyad.  
+
+In the third step we use the set of parameter estimates (e.g., each dyad’s intercept and slope estimates) as input variables for a latent profile analysis. In the fourth and final step, the resulting predicted profile memberships are then used either as predictors, or outcomes, of some variable of interest across all dyads. We refer to these global variables as “system” variables because they are theoretically related to the system being studied, but change slower than the state variables used to assess the dynamics of the system (for examples of other research groups using similar approaches see: Felmlee, 2007; Ferrer, Chen, Chow, & Hsieh, 2010; Ferrer & Steele, 2014; Hollenstein, 2013; Steele, Ferrer, & Nesselroade, 2014; Steenbeek & van Geert, 2005). The system variable can be assessed at either the dyad level (e.g., both partners have the same score, such as relationship length) or the individual level (e.g., the partners can have different scores, as in a personality measure).
+
+## Getting Started
+
+To get started, install rties from GitHub (it is not yet available on CRAN) and load it in R.
+```{r}
+devtools::install_github("ebmtnprof/rties")
+library(rties)
+```
+
+You can then assign the example data to a dataframe and list the contents.
+```{r}
+data1 <- rties_ExampleData_1
+str(data1)
+```

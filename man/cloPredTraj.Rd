@@ -2,30 +2,36 @@
 % Please edit documentation in R/clo.R
 \name{cloPredTraj}
 \alias{cloPredTraj}
-\title{Plots the state variable's clo model predicted temporal trajectory}
+\title{Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters.}
 \usage{
-cloPredTraj(origdata, paramData, paramM1, paramM2, dist0name, dist1name,
-  obsName, m1Name, m2Name)
+cloPredTraj(origData, lpaData, lpaParams, n_profiles, time_length = NULL,
+  dist0name = NULL, dist1name = NULL, obsName = NULL,
+  minMax = NULL, printPlots = T)
 }
 \arguments{
-\item{origdata}{A dataframe produced by the "dataPrep" function.}
+\item{origData}{A dataframe that was produced with the "dataPrep" function.}
 
-\item{paramData}{A dataframe produced by the "indivClo" function.}
+\item{lpaData}{A dataframe containing the LPA profile memberships.}
 
-\item{paramM1}{A vector of centering values for the first comparison model.}
+\item{lpaParams}{A matrix containing the clo parameter estimates associated with each of the latent profiles.}
 
-\item{paramM2}{A vector of centering values for the second comparison model.}
+\item{n_profiles}{The number of latent profiles.}
 
-\item{dist0name}{A name for the level-0 of the distinguishing variable (e.g., "Women").}
+\item{time_length}{An optional value specifying how many time points to plot across. Default is the 75th percentile for the observed time variable.}
 
-\item{dist1name}{A name for the level-1 of the distinguishing variable (e.g., "Men").}
+\item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
 
-\item{obsName}{A name for the state variable (e.g., "Emotional Experience").}
+\item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
 
-\item{m1Name}{A name for the first user-specified model.}
+\item{obsName}{An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.}
 
-\item{m2Name}{A name for the second user-specified model.}
+\item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
+
+\item{printPlots}{An optional argument specifying whether the plots should be automatically printed. Default is TRUE.}
+}
+\value{
+The function returns the plots as a list.
 }
 \description{
-Produces plots of the state variable's predicted temporal trajectory based on 3 versions of the clo model. The first is the "average" model, with all parameters centered on the sample averages. The other two are specified by the user by providing centering values for any desired parameters. For example, if prior analyses showed that the system variable was predicted by the damping parameter for the level-0 of the distinguishing variable, then a logical pair of models to compare would be one with that parameter centered at a low value, such as 1SD below the mean, and one with it centered at a high value, such as 1SD above the mean. All other parameters would be centered at the sample averages.
+Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters.
 }

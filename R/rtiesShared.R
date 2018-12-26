@@ -116,17 +116,16 @@ removeDyads <- function (basedata, dyads, dyadID){
 	return(basedata)
 }
 
-## actorPartnerDataCross: This function takes individual cross-sectional data from dyads and turns it into actor-partner format
+#' actorPartnerDataCross: This function takes individual cross-sectional data from dyads and turns it into actor-partner format.
+#'
+#' Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads. Need dyad ID numbered same as for person ID for the first person in the dyad. Both members in each dyad need to have the same number of rows (rows of missing data are ok)
+#'
+#' @param basedata A dataframe with cross-sectional dyadic data.
+#' @param dyadID The name of variable indicating dyad ID.
+#' @param personID The name of the variable indicating peron ID.
+#' @return A dataframe in actor-partner format.
 
-# Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads
-# Need dyad ID numbered same as for person ID for the first person in the dyad
-# Both members in each dyad need to have the same number of rows (rows of missing data are ok)
-
-#  arguments: basedata = name of an R data frame containing original data, dyadID = name of variable indicating dyad ID, and personID = name of the variable indicating peron ID.
-# function will return a data file in actor-partner format
-
-# Example:
-# dataAP <- actorPartnerDataCross(data, "dyad", "person")
+# @export
 
 actorPartnerDataCross <- function(basedata, dyadID, personID){
 	
@@ -147,16 +146,16 @@ actorPartnerDataCross <- function(basedata, dyadID, personID){
 	return(dataAP)		
 }
 
-## actorPartnerDataTime: This function takes individual repeated measures data from dyads and turns it into actor-partner format
+#' actorPartnerDataTime: This function takes individual repeated measures data from dyads and turns it into actor-partner format.
+#'
+#' Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads. Need dyad ID numbered same as for person ID for the first person in the dyad. Both members in each dyad need to have the same number of rows (rows of missing data are ok).
+#'
+#' @param basedata A dataframe with repeated measures dyadic data
+#' @param dyadID The name of variable indicating dyad ID.
+#' @param personID The name of the variable indicating peron ID.
+#' @return A dataframe in actor-partner format.
 
-# Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads
-# Need dyad ID numbered same as for person ID for the first person in the dyad
-# Both members in each dyad need to have the same number of rows (rows of missing data are ok)
-#  arguments: basedata = name of an R data frame containing original data, dyadID = name of variable indicating dyad ID, and personID = name of the variable indicating peron ID.
-# function will create a data file in actor-partner format
-
-# Example:
-# dataAP <- actorPartnerDataTime(data, "Dyad", "Person")
+#' @export
 
 actorPartnerDataTime <- function(basedata, dyadID, personID){
 		

@@ -5,18 +5,23 @@
 
 #' Produces auto-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
 #' 
-#' @param basedata A dataframe that has the variables needed for the dataPrep function, either in the right order or as named arguments (e.g., the order and names are: id, dyad, obs, sysVar, dist, time_name). See documentation for the dataPrep function for more detail.
+#' @param basedata A user provided dataframe.
+#' @param id The name of the column in the dataframe that has the person-level identifier.
+#' @param dyad The name of the column in the dataframe that has the dyad-level identifier.
+#' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 
 #' @export
 
-autoCorPlots <- function(basedata)
+autoCorPlots <- function(basedata, id, dyad, obs, time_name){invisible(acp(basedata, id, dyad, obs, time_name))}
+
+acp <- function(basedata, id, dyad, obs, time_name)
 {
+  basedata <- subset(basedata, select=c(id, dyad, obs, time_name))
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
   names(basedata)[3] <- "obs"
-  names(basedata)[4] <- "sysVar"
-  names(basedata)[5] <- "dist1"
-  names(basedata)[6] <- "time"
+  names(basedata)[4] <- "time"
 
   basedata <- basedata[complete.cases(basedata), ]
   basedata <- lineCenterById(basedata)
@@ -28,33 +33,39 @@ autoCorPlots <- function(basedata)
 	
   for (i in 1:length(newDiD)){
 	datai <- basedata[basedata$dyad == newDiD[i], ]
-	datai_ts <- zoo::zoo(datai[,7])
+	datai_ts <- zoo::zoo(datai[,"obs_deTrend"])
 	d <- acf(datai_ts, plot=F, na.action=na.exclude, lag.max=20)
     acf[[i]] <- d
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
   par(mfrow=c(3,3))
-  for(j in 1:length(newDiD))
+  for(j in 1:length(newDiD)){
   plot(acf[[j]], main=paste("AutoCorr_Dyad", plotTitle[j], sep="_"))
+  }
   par(mfrow=c(1,1))
   return(acf)
 }
 
 #' Produces cross-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
 #' 
-#' @param basedata A dataframe that has the variables needed for the dataPrep function, either in the right order or as named arguments (e.g., the order and names are: id, dyad, obs, sysVar, dist, time_name). See documentation for the dataPrep function for more detail.
+#' @param basedata A user provided dataframe.
+#' @param id The name of the column in the dataframe that has the person-level identifier.
+#' @param dyad The name of the column in the dataframe that has the dyad-level identifier.
+#' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 
 #' @export
 
-crossCorPlots <- function(basedata)
+crossCorPlots <- function(basedata, id, dyad, obs, time_name){invisible(ccp(basedata, id, dyad, obs, time_name))}
+
+ccp <- function(basedata, id, dyad, obs, time_name)
 {
+  basedata <- subset(basedata, select=c(id, dyad, obs, time_name))  
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
   names(basedata)[3] <- "obs"
-  names(basedata)[4] <- "sysVar"
-  names(basedata)[5] <- "dist1"
-  names(basedata)[6] <- "time"
+  names(basedata)[4] <- "time"
 
   basedata <- basedata[complete.cases(basedata), ]
   basedata <- lineCenterById(basedata)
@@ -66,16 +77,17 @@ crossCorPlots <- function(basedata)
 	
   for (i in 1:length(newDiD)){
 	datai <- basedata[basedata$dyad == newDiD[i], ]
-	datai_ts1 <- zoo::zoo(datai[ ,7])
-	datai_ts2 <- zoo::zoo(datai[ ,14])
+	datai_ts1 <- zoo::zoo(datai[ ,"obs_deTrend"])
+	datai_ts2 <- zoo::zoo(datai[ ,"p_obs_deTrend"])
 	d <- ccf(datai_ts1, datai_ts2, type="correlation", plot=F, na.action=na.exclude, lag.max=20)
     ccf[[i]] <- d
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
   par(mfrow=c(3,3))
-  for(j in 1:length(newDiD))
+  for(j in 1:length(newDiD)){
   plot(ccf[[j]], main=paste("CrossCorr_Dyad", plotTitle[j], sep="_"))
+  }
   par(mfrow=c(1,1))
   return(acf)
 }
@@ -246,112 +258,6 @@ indivInertCoordPlots <- function(basedata, whichModel, dist0name = NULL, dist1na
   results <- list(plots=plots)
 }
 
-
-#' Provides results for predicting the system variable from latent profiles of the inertia-coordination model parameters (obtained from latent profile analysis(LPA)). 
-#' 
-#' The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership, 2) main effects of profile membership and the distinguishing variable, and 3) the interaction of profile membership and the distinguishing variable. If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution.
-#' 
-#' @param basedata A dataframe containing the LPA profile memberships.
-#' @param sysVarType Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores
-#' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
-#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
-#' @param sysVarName An optional name for the system variable being predicted (e.g., "Satisfaction"). Default is sysVar.
-#' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
-#' @param family An optional argument specifying the error distribution and link function to be used in the model. Any of the "family" options supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available. Default is gaussian.
-#' 
-#' @return For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). Similarly, for non-normal system variables, the function returns a list of the glm or glmmPQL objects containing the full results for the models. By default, the function also displays histograms of the residuals and plots of the predicted values against observed values for each model, but these can be turned off by setting plots=F. 
-
-#' @export
-inertCoordSysVarOut <- function(basedata, sysVarType, dist0name=NULL, dist1name=NULL, sysVarName=NULL, minMax=NULL, family=NULL, printPlots=T)
-{
-  if(is.null(dist0name)){dist0name <- "dist0"}
-  if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(sysVarName)){sysVarName <- "sysVar"}
-  if(is.null(family)){family <- "gaussian"}
-	
-  if(is.null(minMax)){
-  	min <- min(basedata$sysVar, na.rm=T)
-	max <- max(basedata$sysVar, na.rm=T)
-  } else {
-  	min <- quantile(basedata$sysVar, minMax[1], na.rm=T)
-	max <- quantile(basedata$sysVar, minMax[2],  na.rm=T)
-    }
- 	
-  if(sysVarType != "indiv" & sysVarType != "dyadic") {
-	stop("the sysVarType must be either indiv or dyadic")
-  }
-	
-  basedata <- basedata[complete.cases(basedata), ] 
-  basedata$dist1 <- ifelse(basedata$dist0 == 1, 0, 1)
-  basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
-	
-  if (sysVarType == "dyadic"){	
-	basedata <- basedata[!duplicated(basedata$dyad), ]	
-	
-	if (family == "gaussian"){
-	  profile <- lm(sysVar ~ profile, data= basedata)
-	  profilePred <- fitted(profile)
-	} else {
-	  profile <- glm(sysVar ~ profile, data= basedata, family=family)
-	  profilePred <- fitted(profile)
-    }
-      
-    if(plots==T){
-	  ylabName <- paste(sysVarName, "predicted", sep="_")
-	  xlabName <- paste(sysVarName, "observed", sep="_")
-
-	  hist(residuals(profile))
-	  plot(profilePred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Model")
-	 }
-  }
-
-  if (sysVarType == "indiv"){
-	if (family == "gaussian"){
-	
-	profile <- nlme::lme(sysVar ~ profile, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), method="ML")
-	
-	profilePlusDist <- nlme::lme(sysVar ~ profile + dist, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), method="ML")
-
-	profileByDist <- nlme::lme(sysVar ~ profile * dist, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), method="ML")
-    } else {
-	
-	  profile <- MASS::glmmPQL(sysVar ~ profile, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), family=family)
-	
-	  profilePlusDist <- MASS::glmmPQL(sysVar ~ profile + dist, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), family=family)
-
-	  profileByDist <- MASS::glmmPQL(sysVar ~ profile * dist, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), family=family)
-	  }
-	
-	profilePred <- fitted(profile)
-	profilePlusDistPred <- fitted(profilePlusDist)
-	profileByDistPred <- fitted(profileByDist)
-  	
-    if(printPlots == T){
-	  ylabName <- paste(sysVarName, "predicted", sep="_")
-	  xlabName <- paste(sysVarName, "observed", sep="_")
-	  
-	  hist(residuals(profile))
-	  plot(profilePred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Model")
-	
-	  hist(residuals(profilePlusDist))
-	  plot(profilePlusDistPred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Plus Dist Model")
-
-	  hist(residuals(profileByDist))
-	  plot(profileByDistPred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile By Dist Model")
-	  
-	  interaction.plot(basedata$profile, basedata$dist, basedata$sysVar, xlab="profile", ylab=sysVarName, trace.label="dist")
-	}
-  }
-
-  if(sysVarType == "dyadic"){
-	models <- list(profile=profile)
-  }
-	
-  if(sysVarType == "indiv"){
-	models <- list(profile=profile, profilePlusDist=profilePlusDist, profileByDist=profileByDist)
-  }
-	output <- list(models=models)
-}
 
 
 ###############

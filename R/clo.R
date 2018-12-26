@@ -405,213 +405,74 @@ indivCloPlots <- function(basedata, whichModel, idConvention, dist0name=NULL, di
   results <- list(plots=plots)
 }
 
-
-
-
-
-
-
-
-
-
-#' Compares a base line "intercept only" model to coupled and uncoupled oscillator models for predicting the system variable from the dynamic parameters.
+#' Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters.
 #' 
-#' The dynamic parameters used in these models come from the set of clo parameter: obs_0, obs_1, d1_0, d1_1, p_obs_0, p_obs_1, p_d1_0, p_d1_1. The 3 models compared are the baseline intercept-only, the uncoupled CLO (obs_0, obs_1, d1_0, d1_1), and the full coupled CLO. The system variable can be either dyadic (sysVarType = "dyad"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). To make it easier to read the output, the dynamic parameters are renamed as follows: obs = freq, d1 = damp, p_obs = freqCoupling, p_d1 = dampCoupling.
-
+#' @param origData A dataframe that was produced with the "dataPrep" function.
+#' @param lpaData A dataframe containing the LPA profile memberships.
+#' @param lpaParams A matrix containing the clo parameter estimates associated with each of the latent profiles.
+#' @param n_profiles The number of latent profiles.
+#' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the observed time variable.
+#' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
+#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
+#' @param obsName An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.
+#' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
+#' @param printPlots An optional argument specifying whether the plots should be automatically printed. Default is TRUE.
 #' 
-#' @param basedata A dataframe containing the coupled oscillator parameter estimates produced by the "indivCloCouple" function.
-#' @param sysVarType Whether the system variable is "dyad", which means both partners have the same socre, or "indiv" which means the partners can have different scores
-#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
-#' @param sysVarName A name for the system variable being predicted (e.g., "Satisfaction").
-#' 
-#' @return The function returns a list including: 1) the lm or lme objects containing the full results for each model(called "models"), and 2) adjusted R^2 information for each model  (called "R2"). The function also displays histograms of the residuals and plots of the predicted values against observed values for each model. 
-
-#' @export
-cloSysVarOut <- function(basedata, sysVarType, dist0name, dist1name, sysVarName)
-{
-	basedata$dist1 <- ifelse(basedata$dist0 == 1, 0, 1)
-	
-	# Names for model parameters
-	freq0name <- paste("freq",dist0name, sep="_")
-	freq1name <- paste("freq",dist1name, sep="_")
-	damp0name <- paste("damp",dist0name, sep="_")
-	damp1name <- paste("damp",dist1name, sep="_")
-	
-	freqCouple0name <- paste("freqCoupling",dist0name, sep="_")
-	freqCouple1name <- paste("freqCoupling",dist1name, sep="_")
-	dampCouple0name <- paste("dampCoupling",dist0name, sep="_")
-	dampCouple1name <- paste("dampCoupling",dist1name, sep="_")
-
-	
-	if(sysVarType != "indiv" & sysVarType != "dyad") 
-    {
-	stop("the sysVarType must be either indiv or dyad")
-	}
-	
-	else if (sysVarType == "dyad")
- 	{	
- 	basedata <- basedata[!duplicated(basedata$dyad), ]
-
-	base <- lm(sysVar ~ 1, data= basedata)
-	names(base$coefficients) <- c("intercept")
-
-	uncoupled <- lm(sysVar ~ obs_0 + d1_0 + obs_1 + d1_1, data= basedata)
-	names(uncoupled$coefficients) <- c("intercept", freq0name, damp0name, freq1name, damp1name)
-		
-	coupled <- lm(sysVar ~ obs_0 + d1_0 + obs_1 + d1_1 + p_obs_0 + p_d1_0 + p_obs_1 + p_d1_1, data= basedata)
-	names(coupled$coefficients) <- c("intercept", freq0name, damp0name, freq1name, damp1name, freqCouple0name, dampCouple0name, freqCouple1name, dampCouple1name)
-		
-	basePred <- predict(base)## all predictions will be the mean
-	uncoupledPred <- predict(uncoupled)
-	coupledPred <- predict(coupled)
-	
-	baseR2 <- summary(base)$adj.r.squared # will be zero
-	uncoupledR2 <- summary(uncoupled)$adj.r.squared 
-	coupledR2 <- summary(coupled)$adj.r.squared
-	}
-	
-	else if (sysVarType == "indiv")
-	{	
-	base <- nlme::lme(sysVar ~ dist0, random= ~ 1 | dyad, data= basedata, na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"))
-	names(base$coefficients$fixed) <- c("intercept", dist0name)
-	
-	uncoupled <- nlme::lme(sysVar ~ dist0:obs_0 + dist0:d1_0 + dist1:obs_1 + dist1:d1_0 , random= ~ 1 | dyad, data= basedata, na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"))
-	names(uncoupled$coefficients$fixed) <- c("intercept", freq0name, damp0name, freq1name, damp1name)
-		
-	coupled <- nlme::lme(sysVar ~ dist0:obs_0 + dist0:d1_0 + dist1:obs_1 + dist1:d1_1 + 
-								dist0:obs_1 + dist0:d1_1 + dist1:obs_0 + dist1:d1_0, random= ~ 1 | dyad, data= basedata, na.action=na.omit, method="ML", control=nlme::lmeControl(opt="optim"))
-	names(coupled$coefficients$fixed) <- c("intercept", freq0name, damp0name, freq1name, damp1name, freqCouple0name, dampCouple0name, freqCouple1name, dampCouple1name)
-	
-	basePred <- predict(base)
-	uncoupledPred <- predict(uncoupled)
-	coupledPred <- predict(coupled)
-	
-	obs <- basedata$sysVar
-	baseR2 <- summary(lm(obs ~ basePred))$adj.r.squared
-	uncoupledR2 <- summary(lm(obs ~ uncoupledPred))$adj.r.squared
-	coupledR2 <- summary(lm(obs ~ coupledPred))$adj.r.squared
-	}
-	
-	
-	min <- min(basedata$sysVar, na.rm=T)
-	max <- max(basedata$sysVar, na.rm=T)
-	
-	ylabName <- paste(sysVarName, "observed", sep="_")
-	xlabName <- paste(sysVarName, "predicted", sep="_")
-
-	par(mfrow=c(2,1))
-	hist(residuals(base))
-	plot(basedata$sysVar ~ basePred, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Baseline Model")
-
-	par(mfrow=c(2,1))
-	hist(residuals(uncoupled))
-	plot(basedata$sysVar ~ uncoupledPred, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Uncoupled Oscillator")
-	
-	par(mfrow=c(2,1))
-	hist(residuals(coupled))
-	plot(basedata$sysVar ~ coupledPred, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Coupled Oscillator")
-	
-
-	models <- list(base=base, uncoupled=uncoupled, coupled=coupled)
-	R2 <- list(baseR2=baseR2, uncoupledR2=uncoupledR2, coupledR2=coupledR2)
-		
-	output <- list(models=models, R2=R2)
-}
-
-
-#' Plots the state variable's clo model predicted temporal trajectory 
-#' 
-#' Produces plots of the state variable's predicted temporal trajectory based on 3 versions of the clo model. The first is the "average" model, with all parameters centered on the sample averages. The other two are specified by the user by providing centering values for any desired parameters. For example, if prior analyses showed that the system variable was predicted by the damping parameter for the level-0 of the distinguishing variable, then a logical pair of models to compare would be one with that parameter centered at a low value, such as 1SD below the mean, and one with it centered at a high value, such as 1SD above the mean. All other parameters would be centered at the sample averages.
-#' 
-#' @param origdata A dataframe produced by the "dataPrep" function.
-#' @param paramData A dataframe produced by the "indivClo" function.
-#' @param paramM1 A vector of centering values for the first comparison model.
-#' @param paramM2 A vector of centering values for the second comparison model.
-#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
-#' @param obsName A name for the state variable (e.g., "Emotional Experience").
-#' @param m1Name A name for the first user-specified model.
-#' @param m2Name A name for the second user-specified model.
+#' @return The function returns the plots as a list. 
 
 #' @import ggplot2
 #' @export
 
-cloPredTraj <- function(origdata, paramData, paramM1, paramM2, dist0name, dist1name, obsName, m1Name, m2Name)
+cloPredTraj <- function(origData, lpaData, lpaParams, n_profiles, time_length=NULL, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL, printPlots=T)
 {
-	statedata0 <- origdata[origdata$dist0 == 1 & origdata$time ==1,] 
+  if(is.null(time_length)){time_length <- as.numeric(quantile(origData$time, prob=.75))}
+  if(is.null(dist0name)){dist0name <- "dist0"}
+  if(is.null(dist1name)){dist1name <- "dist1"}
+  if(is.null(obsName)){obsName <- "observed"}
+  
+  if(is.null(minMax)){
+  	min <- min(origData$obs_deTrend, na.rm=T)
+	max <- max(origData$obs_deTrend, na.rm=T)
+  } else {
+  	min <- quantile(origData$obs_deTrend, minMax[1], na.rm=T)
+	max <- quantile(origData$obs_deTrend, minMax[2],  na.rm=T)
+  }
+  
+  plots <- list()
+  
+  for(i in 1:n_profiles){
+	statedata0 <- origData[origData$dist0 == 1 & origData$time ==1,] 
 	start0 <- median(statedata0$obs_deTrend, na.rm=T)
-  	statedata1 <- origdata[origdata$dist0 == 0 & origdata$time ==1,] 
+  	statedata1 <- origData[origData$dist0 == 0 & origData$time ==1,] 
 	start1 <- median(statedata1$obs_deTrend, na.rm=T)
   	
-  	maxtime <- quantile(origdata$time, prob=.75)
-	plotTimes <- seq(1, maxtime, by=1)
-	min <- quantile(origdata$obs_deTrend, .1, na.rm=T)
-	max <- quantile(origdata$obs_deTrend, .9,  na.rm=T)
+	plotTimes <- seq(1, time_length, by=1)
 
 	state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
+	paramsi <- lpaParams[ ,i]
 	
-	ave_obs_0 <- median(paramData$obs_0, na.rm=T)
-	ave_obs_1 <- median(paramData$obs_1, na.rm=T)
-	ave_p_obs_0 <- median(paramData$p_obs_0, na.rm=T)
-	ave_p_obs_1 <- median(paramData$p_obs_1, na.rm=T)
-	ave_d1_0 <- median(paramData$d1_0, na.rm=T)
-	ave_d1_1 <- median(paramData$d1_1, na.rm=T)
-	ave_p_d1_0 <- median(paramData$p_d1_0, na.rm=T)
-	ave_p_d1_1 <- median(paramData$p_d1_1, na.rm=T)
-	paramAve <- list(obs_0=ave_obs_0, obs_1=ave_obs_1, d1_0=ave_d1_0, d1_1=ave_d1_1, p_obs_0=ave_p_obs_0, p_obs_1=ave_p_obs_1, p_d1_0=ave_p_d1_0, p_d1_1=ave_p_d1_1)
-
-	tempAve <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupleOde, parms= paramAve))
-	temp2 <- subset(tempAve, select=-c(y2, y4))
-	names(temp2) <- c("time","d0.pred","d1.pred")
-	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
+	temp <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
+	temp2 <- subset(temp, select=-c(y2, y4))
+	names(temp2) <- c("time","d0pred","d1pred")
+	temp3 <- reshape(temp2, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
 	temp3$roleNew <- factor(temp3$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
 			
 	plotData <- temp3[complete.cases(temp3), ]	
+	profileName <- paste("Profile", i , sep="_")
 				
-	aveCloPlot <- ggplot(plotData, aes(x=time)) +
+	plotsi <- ggplot(plotData, aes(x=time)) +
 				geom_line(aes(y= pred, color=roleNew), linetype="solid", size=1, na.rm=T) +
 				scale_color_manual(name="Role", values=c("black","gray47")) +
 				ylab(obsName) +
 				ylim(min, max) +
-				labs(title="Predicted Trajectory", subtitle= "Average Model") +
+				labs(title=profileName, subtitle= "Predicted Trajectory") +
 				theme(plot.title=element_text(size=11))
 	
-	paramM1 <- ifelse(!is.na(paramM1), paramM1, paramAve)			
-	tempM1 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupleOde, parms= paramM1))
-	temp2 <- subset(tempM1, select=-c(y2, y4))
-	names(temp2) <- c("time","d0.pred","d1.pred")
-	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
-	temp3$roleNew <- factor(temp3$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
-			
-	plotData <- temp3[complete.cases(temp3), ]	
-				
-	m1CloPlot <- ggplot(plotData, aes(x=time)) +
-				geom_line(aes(y= pred, color=roleNew), linetype="solid", size= 1, na.rm=T) +
-				scale_color_manual(name="Role", values=c("black","gray47")) +
-				ylab(obsName) +
-				ylim(min, max) +
-				labs(title="Predicted Trajectory", subtitle= m1Name) +
-				theme(plot.title=element_text(size=11))
-
-	paramM2 <- ifelse(!is.na(paramM2), paramM2, paramAve)	
-	tempM2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupleOde, parms= paramM2))
-	temp2 <- subset(tempM2, select=-c(y2, y4))
-	names(temp2) <- c("time","d0.pred","d1.pred")
-	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
-	temp3$roleNew <- factor(temp3$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
-			
-	plotData <- temp3[complete.cases(temp3), ]	
-				
-	m2CloPlot <- ggplot(plotData, aes(x=time)) +
-				geom_line(aes(y= pred, color=roleNew), linetype="solid", size= 1, na.rm=T) +
-				scale_color_manual(name="Role", values=c("black","gray47")) +
-				ylab(obsName) +
-				ylim(min, max) +
-				labs(title="Predicted Trajectory", subtitle= m2Name) +
-				theme(plot.title=element_text(size=11))
-					
-	CLOplots <- list(aveCloPlot=aveCloPlot, m1CloPlot=m1CloPlot, m2CloPlot=m2CloPlot)
+	plots[[i]] <- plotsi
+  }
+ 
+ if(printPlots == T) {print(plots)}
+ return(plots)
 }
 
 
