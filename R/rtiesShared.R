@@ -200,7 +200,7 @@ histAll <- function(basedata)
 
   par(mfrow=c(2,2))
   for(i in 1:length(numdata)){
-	hist(numdata[,i], xlab=NULL, main=names(numdata[i]))
+	hist(numdata[,i], main=NULL, xlab=names(numdata[i]))
   }
   par(mfrow=c(1,1))
 }

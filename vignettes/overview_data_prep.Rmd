@@ -12,7 +12,8 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+knitr::opts_knit$set(global.par=TRUE)
 )
 ```
 
@@ -58,6 +59,9 @@ __Important__: The dyad ID and person ID must be the same for the level-0 partne
 
 Bivariate dynamic models are complex and there are a lot of ways to fool yourself about the quality and interpretation of the results. To help prevent this, we strongly advocate looking at your data and results at every step of the analysis and we provide visualization tools to make it easy. As an initial check, we recommend looking at histograms of all of the numeric variables in your dataframe. This should uncover any seriously ill-behaved data (extreme outliers, zero variance, etc). In addition, if you intend to use the system variable as an outcome of the dynamics, you will need to decide whether it is fairly normally distributed and the default gaussian model is appropriate, or whether you will need to use one of the generalized linear model options (e.g., binomial, gamma, exponential, etc). The following function produces histograms for all numeric variables in a dataframe:
 
+```{r, include=FALSE}
+par(mar=c(1,1,1,1))
+```
 ```{r}
 histAll(data1)
 ```
