@@ -228,7 +228,7 @@ plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name=NULL, dist1n
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
  
-  lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(5,5))
+  lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
 }
 
 
