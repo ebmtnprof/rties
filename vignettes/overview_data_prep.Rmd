@@ -21,11 +21,11 @@ The _rties_ package streamlines and simplifies testing whether a set of bivariat
 ```
 Figure 1: Patterns represented by the Inertia-Coordination model. The y-axis represents whatever the bivariate time-series variable is. Panel A shows low and high inertia. Panel B shows in-phase coordination. Panel C shows anti-phase coordination.
 ```
-![Alt text](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/inertia.png) ![](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/inphase.png) ![](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/antiphase.png)
+![Alt text](inertia.png) ![](inphase.png) ![](antiphase.png)
 ```
 Figure 2: Patterns represented by the Coupled-Oscillator model. The y-axis represents whatever the bivariate time-series variable is. Panel A shows between-person damping of oscillations (a.k.a. coregulation). Panel B shows between-person amplification of oscillations (a.k.a. co-dysregulation).
 ```
-![Alt text](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/coreg.png) ![](/Users/emily/Documents/Projects/R-TIES/rties/vignettes/Figures/codysreg.png) 
+![Alt text](coreg.png) ![](codysreg.png) 
 
 
 ## General Procedure
