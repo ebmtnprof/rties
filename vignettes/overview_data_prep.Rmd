@@ -66,7 +66,36 @@ par(mar=c(4,1,1,1))
 histAll(data1)
 ```
 
-A second highly recommended check is to plot the raw time-series data for each dyad, which can be accomplished with the “plotRaw” function. It takes as arguments the name of the dataframe, the dyad ID, the state variable, the distinguishing variable, and the variable that indicates sequential temporal observations. It also takes optional strings for the labels of the levels of the distinguishing variable in the correct order (e.g., a name for level-0 first, in this case "Men", then a name for level-1, in this case "Women"). Running the following code we see that one person is completely missing data for dyad 19, which will cause problems if we don't fix it. This visualization is also useful for spotting outliers, noise in the data, etc.
-```{r}
-plotRaw(data1, "couple", "dial", "female", "time", "Men", "Women")
+A second highly recommended check is to plot the raw time-series data for each dyad, which can be accomplished with the “plotRaw” function. If you have a large number of dyads, you may want to consider only plotting a random subset, or several random subsets (for this vignette we plot a specific sub-set to present some typical-looking examples). The function takes as arguments the name of your dataframe (or a temporary one containing the sub-set of dyads to be plotted), the dyad ID, the state variable, the distinguishing variable, and the variable that indicates sequential temporal observations. It also takes optional strings for the labels of the levels of the distinguishing variable in the correct order (e.g., a name for level-0 first, in this case "Men", then a name for level-1, in this case "Women"). Running the following code we see that one person is completely missing data for dyad 19, which will cause problems if we don't fix it (if you are not plotting all your dyads, you will need to use some other method to identify any dyads with completely missing data for one or both partners). This visualization is also useful for spotting outliers, noise in the data, etc.
+```{r, dpi=150}
+temp <- subset(data1, couple %in% c(2,3,5,8,10,12,13,17,19))
+plotRaw(temp, "couple", "dial", "female", "time", "Men", "Women")
 ```
+
+At this point, it would be worthwhile to see if the missing data can be accounted for. In our case, we discovered there had been recording problems for the one person and so the only thing we can do about the missing data for dyad 19 is to remove that dyad from the analysis (several steps in the modeling require at least partial data from both partners and will generate error messages if that is violated). The following syntax accomplishes that. First, the dyad to remove is assigned to a variable called "dyads" (if more than one dyad is to be removed, this could be a vector, e.g., dyads <- c(3, 5, 19) would remove three dyads). Then the "removeDyads" function takes as arguments the full dataframe, the variable indicating which dyads to remove, and the name of the dataframe column that includes dyad membership.
+```{r}
+dyads <- c(19)
+data2 <- removeDyads(data1, dyads, data1$couple)
+```
+The “dataPrep” function does all the work of processing the data into a generic form that is appropriate for any of the _rties_ models. Function arguments are: basedata (the cleaned up dataframe; “data2” in this example), id (the person ID), dyad (the dyad ID), obs (the observed state variable), sysVar (the cross- sectional system variable), dist (the distinguishing variable), time_name (the variable indicating temporal sequence), and time_lag (an optional argument for the number of lags to use for the lagged observable).The function returns a dataframe that has all the variables needed for TIES modeling, each renamed to a generic variable name, which are:   
+
+* id = person id
+* dyad = dyad id
+* obs = observed state variable
+* sysVar = system variable
+* dist1 = 0/1 variable where the 1's indicate the 1's in the original distinguishing variable
+* dist0 = 0/1 variable where the 1's indicate the 0's in the original distinguishing variable
+* time = the variable indicating temporal sequence
+* obs_deTrend = the observed state variable with each person's linear trend removed
+* p_ = all the same variables, but for a person's partner rather than themselves    
+
+A note about choosing the lag: You can lag the observed variable by any number of steps and that decision should be driven by theory and prior research. In this case, emotional experience was assessed in 4 second intervals and so a 1-step lag is very small and doesn't leave time for meaningful change between observations. We chose a lag of 3 steps, which is equivalent to 12 seconds, because 10-15 seconds is a common unit to aggregate over in the emotional experience literature and if emotions unfold over several minutes (as suggested by many theories), then 10-15 second steps are large enough to allow meaningful change between each step, but small enough to not miss important changes.    
+
+The usage of “dataPrep” follows, where “data2” is the original data set with any necessary cleaning done and “data3” will be a dataframe holding the processed data. Currently, the code is set to only consider one system variable at a time, which is included at this initial data preparation step. Here we focus on "convQual":
+```{r}
+data3 <- dataPrep(data2, "person", "couple", "dial", "convQual", "female",
+ "time", time_lag=3)
+```
+At this point you are ready to begin using one or more of the models to test whether any of the dynamic patterns can predict, or be predicted by, your system variable(s) of interest. The procedures for each model are documented in additional vignettes.    
+
+

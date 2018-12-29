@@ -225,6 +225,11 @@ plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name=NULL, dist1n
   basedata <- basedata[ ,c(dyad, obs, dist, time_name) ]
   names(basedata) <- c("dyad", "obs", "dist", "time")
   
+  # check distinguishing variable is numeric 
+  if (!is.numeric(basedata$dist)){
+	stop("the distinguishing variable must be a 0/1 numeric variable")
+  }
+
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
  
