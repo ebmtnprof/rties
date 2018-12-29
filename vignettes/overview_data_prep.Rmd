@@ -96,6 +96,4 @@ The usage of “dataPrep” follows, where “data2” is the original data set 
 data3 <- dataPrep(data2, "person", "couple", "dial", "convQual", "female",
  "time", time_lag=3)
 ```
-At this point you are ready to begin using one or more of the models to test whether any of the dynamic patterns can predict, or be predicted by, your system variable(s) of interest. The procedures for each model are documented in additional vignettes.    
-
-
+At this point you are ready to begin using one or more of the models to test whether any of the dynamic patterns can predict, or be predicted by, your system variable(s) of interest. The procedures for each model are documented in additional vignettes.
