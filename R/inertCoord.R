@@ -39,7 +39,7 @@ acp <- function(basedata, id, dyad, obs, time_name)
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
-  par(mfrow=c(3,3))
+  par(mfrow=c(2,2))
   for(j in 1:length(newDiD)){
   plot(acf[[j]], main=paste("AutoCorr_Dyad", plotTitle[j], sep="_"))
   }
@@ -84,7 +84,7 @@ ccp <- function(basedata, id, dyad, obs, time_name)
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
-  par(mfrow=c(3,3))
+  par(mfrow=c(2,2))
   for(j in 1:length(newDiD)){
   plot(ccf[[j]], main=paste("CrossCorr_Dyad", plotTitle[j], sep="_"))
   }
