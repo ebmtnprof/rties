@@ -35,12 +35,12 @@ data2 <- removeDyads(data1, dyads, data1$couple)
 One complexity in using the Inertia-Coordination model is that the results are highly dependent upon the chosen lag length (for discussion of a similar issue when choosing the measurement interval see: Boker & Nesselroade, 2002). This dependence on the lag makes interpretation problematic unless one has a strong theory about the temporal processes at work. At a minimum, it is a good idea to inspect the auto-correlation (relevant to inertia) and cross-correlation (relevant to coordination)  plots for the observed state variables. If the state variables are oscillating at all, the auto- and cross- correlations will also oscillate depending on lag. For example, the correlations can vary from negative, to zero, to positive depending on the lag and some informed decision must be made (or exploration under-taken in the absence of theory) about what lag is most meaningful for the process one is studying. To facilitate this _rties_ provides functions to produce the plots. Here we plot a chosen subset to show the strong impact that is sometimes found due to lag, especially for cross-correlation. 
 
 ```{r, include=FALSE}
-par(mar=c(4,1,1,1))
+par(mar=c(1,1,1,1))
 ```
-```{r, dpi=150}
-temp <- subset(data2, couple %in% c(2,5,27,31,47))
-autoCorPlots(data2, "person","couple","dial","time")
-crossCorPlots(data2, "person","couple","dial","time")
+```{r}
+temp <- subset(data2, couple %in% c(2,5,27,31,47,60))
+autoCorPlots(temp, "person","couple","dial","time")
+crossCorPlots(temp, "person","couple","dial","time")
 ```
 
 Technically, the same problem exists with inertia, but pragmatically we have not observed the issue in our own or published research. Specifically, reported inertia estimates are typically positive, while coordination estimates show greater variance. By restricting the model to concurrent coordination, interpretation is simplified (see Figure 1 in overview_data_prep.pdf). Higher positive inertia implies slower fluctuations in emotional responding. If one obtains a negative inertia estimate, however, it implies that the observed variable is oscillating back and forth between each lag. For the between-person coordination parameters, a positive estimate implies an in-phase pattern, such that when one partner is high on some measure of emotion, so is their partner, while a negative parameter implies an anti-phase pattern, such that when one partner is high the other partner is low (Randall, Post, Reed, & Butler, 2013; Reed et al., 2013; Wilson et al., 2018).
