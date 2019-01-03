@@ -148,8 +148,8 @@ sysVarIn <- function(basedata, sysVarType, n_profiles, dist0name=NULL, dist1name
     basedata <- data3
     
     sysVar0name <- paste(sysVarName, dist0name, sep="_")
-	sysVar1name <- paste(sysVarName, dist1name, sep="_")
-	sysVar01name <- paste(sysVar0name, sysVar1name, sep=":")
+	  sysVar1name <- paste(sysVarName, dist1name, sep="_")
+	  sysVar01name <- paste(sysVar0name, sysVar1name, sep=":")
    
     if(n_profiles == 2){
       base <- glm(profile ~ 1, data=basedata, family="binomial")
