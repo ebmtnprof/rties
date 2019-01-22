@@ -109,6 +109,8 @@ sysVarOut <- function(basedata, sysVarType, dist0name=NULL, dist1name=NULL, sysV
 	output <- list(models=models)
 }
 
+#############################
+
 
 #' @export
 sysVarIn <- function(basedata, sysVarType, n_profiles, dist0name=NULL, dist1name=NULL, sysVarName=NULL, printPlots=T){
@@ -116,23 +118,24 @@ sysVarIn <- function(basedata, sysVarType, n_profiles, dist0name=NULL, dist1name
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
   if(is.null(sysVarName)){sysVarName <- "sysVar"}
-
+  
   if(sysVarType != "indiv" & sysVarType != "dyadic") {
 	stop("the sysVarType must be either indiv or dyadic")
   }
 
   basedata <- basedata[complete.cases(basedata), ] 
+  basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
   
   if(sysVarType == "dyadic"){
     
     basedata <- basedata[!duplicated(basedata$dyad), ]
     
     if(n_profiles == 2){
-      base <- glm(profile ~ 1, data=basedata, family="binomial")
-      sysVar <- glm(profile ~ sysVar, data=basedata, family="binomial")    	
+      base <- glm(profileN ~ 1, data=basedata, family="binomial")
+      sysVar <- glm(profileN ~ sysVar, data=basedata, family="binomial")    	
     } else {
-    	base <- nnet::multinom(profile ~ 1, data=basedata)
-    	sysVar <- nnet::multinom(profile ~ sysVar, data=basedata)
+    	base <- nnet::multinom(profileN ~ 1, data=basedata)
+    	sysVar <- nnet::multinom(profileN ~ sysVar, data=basedata)
     }	
 	  if(printPlots==T){
 	  	plot(basedata$sysVar, basedata$profile)
@@ -141,33 +144,42 @@ sysVarIn <- function(basedata, sysVarType, n_profiles, dist0name=NULL, dist1name
   
     if(sysVarType == "indiv"){
     
-    data1 <- subset(basedata, select=c(dyad, sysVar, dist0, profile))
+    data1 <- subset(basedata, select=c(dyad, sysVar, dist0, profileN))
     data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")
-    data3 <- subset(data2, select=-c(profile.1))   
-    colnames(data3) <- c("dyad", "sysVar0", "sysVar1","profile")
+    data3 <- subset(data2, select=-c(profileN.1))   
+    colnames(data3) <- c("dyad", "sysVar0", "profileN", "sysVar1")
     basedata <- data3
     
     sysVar0name <- paste(sysVarName, dist0name, sep="_")
-	  sysVar1name <- paste(sysVarName, dist1name, sep="_")
-	  sysVar01name <- paste(sysVar0name, sysVar1name, sep=":")
+	sysVar1name <- paste(sysVarName, dist1name, sep="_")
+	sysVar01name <- paste(sysVar0name, sysVar1name, sep=":")
    
     if(n_profiles == 2){
-      base <- glm(profile ~ 1, data=basedata, family="binomial")
-      sysVarMain <- glm(profile ~ sysVar0 + sysVar1, data=basedata, family="binomial") 
+      base <- glm(profileN ~ 1, data=basedata, family="binomial")
+      sysVarMain <- glm(profileN ~ sysVar0 + sysVar1, data=basedata, family="binomial") 
       names(sysVarMain$coefficients) <- c("Intercept", sysVar0name, sysVar1name)
-      sysVarInteract <- glm(profile ~ sysVar0 * sysVar1, data=basedata, family="binomial") 
+      sysVarInteract <- glm(profileN ~ sysVar0 * sysVar1, data=basedata, family="binomial") 
       names(sysVarInteract$coefficients) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
-
-    } else {
-    	base <- nnet::multinom(profile ~ 1, data=basedata)
-    	sysVarMain <- nnet::multinom(profile ~ sysVar0name + sysVar1name, data=basedata)
-    	sysVarInteract <- nnet::multinom(profile ~ sysVar0name * sysVar1name, data=basedata)
-    }	
-	  if(printPlots==T){
+           
+     if(printPlots==T){
 	  	plot(basedata$sysVar0, basedata$profile, xlab=sysVar0name, ylab="Profile")
 	  	plot(basedata$sysVar1, basedata$profile, xlab=sysVar1name, ylab="Profile")
-	  	print(jtools::interact_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, color.class="Greys"))
+	  	print(jtools::interact_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, color.class="Greys", interval=T))
 	  }
+
+
+    } else {
+    	base <- nnet::multinom(profileN ~ 1, data=basedata)
+    	sysVarMain <- nnet::multinom(profileN ~ sysVar0 + sysVar1, data=basedata)
+    	names(sysVarMain$coefnames) <- c("Intercept", sysVar0name, sysVar1name)
+    	sysVarInteract <- nnet::multinom(profileN ~ sysVar0 * sysVar1, data=basedata)
+    	names(sysVarInteract$coefnames) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
+    	     
+     if(printPlots==T){
+	  	plot(basedata$sysVar0, basedata$profile, xlab=sysVar0name, ylab="Profile")
+	  	plot(basedata$sysVar1, basedata$profile, xlab=sysVar1name, ylab="Profile")
+	  }
+    }	
   }
   
   if(sysVarType == "dyadic"){

@@ -1,15 +1,8 @@
 Package: rties
 Title: Tools for Modeling Interpersonal Dynamics
-Version: 1.2.0
+Version: 1.1.0
 Authors@R: person("Emily", "Butler", email = "emily.a.butler@gmail.com", role = c("aut", "cre"))
-Description: This package grew out of my research on temporal interpersonal emotion systems (TIES),
-    hence the name "rties". It provides tools for using a suite of models to investigate temporal
-    processes in bivariate (e.g., dyadic) systems. The general approach is to model, one dyad at a time,
-    the dynamics of a variable that is assessed repeatedly from both partners, extract the parameter
-    estimates for each dyad, use those parameter estimates as input to a latent profile analysis,
-    and then use the predicted profile memberships for each dyad to either predict, or be predicted by,
-    another variable of interest. Currently, 2 models are supported: 1) inertia-coordination, and
-    2) a coupled-oscillator. The models are currently restricted to distinguishable dyads.
+Description: This package grew out of my research on temporal interpersonal emotion systems (TIES), hence the name "rties". It provides tools for using a set of models to investigate temporal processes in bivariate (e.g., dyadic) systems. The general approach is to model, one dyad at a time, the dynamics of a variable that is assessed repeatedly from both partners, extract the parameter estimates for each dyad, and then use those parameter estimates to either predict, or be predicted by, another variable of interest. Currently, 2 models are supported: 1) inertia-coordination, and 2) a coupled-oscillator. The models are currently restricted to distinguishable dyads. Documentation is provided as pdfs in the "documentation" folder (relevant publications) and as vignettes (published as RPubs).
 Depends: R (>= 3.4.4)
 Imports:
     car,
@@ -19,10 +12,11 @@ Imports:
     gridExtra,  
     lattice,
     plyr,
-    scales
+    scales,
+    tidyLPA
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Suggests: knitr, rmarkdown
-VignetteBulder: knitr
+VignetteBuilder: knitr
