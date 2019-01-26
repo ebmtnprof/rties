@@ -183,6 +183,44 @@ actorPartnerDataTime <- function(basedata, dyadID, personID){
 	dataAP <- as.data.frame(do.call(rbind, dataAP))
 } 	
 
+#' Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.
+#'
+#' @param modelData A dataframe created by one of the "indiv" functions containing the parameter estimates for one of the models (e.g., inertCoord or clo) in combination and all other data in the analysis (e.g., sysVar, covariates, etc)
+#' @param lpaData The object created by tidyLPA's "estimate_profiles" function when "return_orig_df = TRUE"
+#' @param lpaParams The object created by tidyLPA's "estimate_profiles" function when "to_return = mclust"
+#' @param whichModel The name of the model that is being investigated (e.g., "inertCoord" or "clo")
+#' @return A list containing 1) a dataframe that contains all variables needed for plotting profile trajectories and using the profiles to predict, or be predicted by, the system variable (called "profileData"), and 2)a dataframe containing the profile parameter estimates needed for plotting the predicted trajectories for each profile (called "profileParams").
+
+#' @export
+
+makeLpaData <- function(modelData, lpaData, lpaParams, whichModel){
+  
+  if(whichModel !="inertCoord" & whichModel != "clo" ){
+	stop("the model type must be either inertCoord or clo")
+	
+	} else if (whichModel == "inertCoord"){
+		
+	    data <- as.data.frame(lpaData)
+        data <- subset(data, select=c(dyad, profile))
+        data <- suppressMessages(plyr::join(modelData, data))
+        data$profileN <- as.numeric(data$profile) - 1        
+        params <- lpaParams$parameters$mean
+	
+	} else if (whichModel == "clo"){
+			
+	    data <- as.data.frame(lpaData)
+        data <- subset(data, select=c(dyad, profile))
+        data <- suppressMessages(plyr::join(modelData, data))
+        data <- data[!duplicated(data$id), ] 
+        data$profileN <- as.numeric(data$profile) - 1        
+        params <- lpaParams$parameters$mean
+	}
+	
+  results <- list(profileData=data, profileParams=params)
+}
+
+
+
 
 ################ Plotting functions
 

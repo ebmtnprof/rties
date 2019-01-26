@@ -254,9 +254,9 @@ indivClo <- function(basedata, whichModel)
 	numParam <- length(m$coefficients)
 	param[[i]][numParam + 1] <- unique(datai$dyad)
   }			
-  paramData <- as.data.frame(do.call(rbind, param))
-  colnames(paramData) <- paramNames	
-  results <- list(R2=R2, paramData=paramData)
+  params <- as.data.frame(do.call(rbind, param))
+  colnames(params) <- paramNames	
+  results <- list(R2=R2, params=params)
 }
 
 
