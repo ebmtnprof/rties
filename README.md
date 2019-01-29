@@ -4,4 +4,5 @@ This package grew out of my research on temporal interpersonal emotion systems (
 
 ## Vignettes available at RPubs
 overview_data_prep: https://rpubs.com/ebmtnprof/455051
+
 inertia_coordination: http://rpubs.com/ebmtnprof/462482
