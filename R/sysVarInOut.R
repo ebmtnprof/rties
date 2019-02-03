@@ -1,4 +1,4 @@
-#' Provides results for predicting the system variable from the latent profiles of the dynamic parameters . 
+#' Provides results for predicting the system variable from the latent profiles of the dynamic parameters. 
 #' 
 #' The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership, 2) main effects of profile membership and the distinguishing variable, and 3) the interaction of profile membership and the distinguishing variable. If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution.
 #' 
@@ -162,7 +162,7 @@ sysVarIn <- function(basedata, sysVarType, n_profiles, dist0name=NULL, dist1name
     data1 <- subset(basedata, select=c(dyad, sysVar, dist0, profileN))
     data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")
     data3 <- subset(data2, select=-c(profileN.1))   
-    colnames(data3) <- c("dyad", "sysVar0", "profileN", "sysVar1")
+    colnames(data3) <- c("dyad", "sysVar0","sysVar1","profileN")
     basedata <- data3
     
     sysVar0name <- paste(sysVarName, dist0name, sep="_")
