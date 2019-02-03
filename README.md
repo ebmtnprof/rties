@@ -7,3 +7,5 @@ This package grew out of my research on temporal interpersonal emotion systems (
 overview_data_prep: http://rpubs.com/ebmtnprof/463911
 
 inertia_coordination: http://rpubs.com/ebmtnprof/463936
+
+coupled_oscillator: http://rpubs.com/ebmtnprof/463962
