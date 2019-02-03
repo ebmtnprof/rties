@@ -162,7 +162,7 @@ sysVarIn <- function(basedata, sysVarType, n_profiles, dist0name=NULL, dist1name
     data1 <- subset(basedata, select=c(dyad, sysVar, dist0, profileN))
     data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")
     data3 <- subset(data2, select=-c(profileN.1))   
-    colnames(data3) <- c("dyad", "sysVar0","sysVar1","profileN")
+    colnames(data3) <- c("dyad", "sysVar0","profileN","sysVar1")
     basedata <- data3
     
     sysVar0name <- paste(sysVarName, dist0name, sep="_")
