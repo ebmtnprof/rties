@@ -144,8 +144,11 @@ profilePlots <- inertCoordPredTraj(origData=data2, lpaData=lpaVars$profileData, 
 The next step in the analysis is to use each dyad's profile membership to predict the system variable using the "sysVarOut" function. The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership ("profile"), 2) main effects of profile membership and the distinguishing variable ("profilePlusDist"), and 3) the interaction of profile membership and the distinguishing variable ("profileByDist"). If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution.
 
 For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). These results can be inspected using the usual "summary" function and the models can be compared using the "anova" function. Similarly, for non-normal system variables, the function returns a list of the glm or glmmPQL objects containing the full results for the models. By default, the function also displays histograms of the residuals and plots of the predicted values against observed values for each model, but these can be turned off by setting "printPlots=F". In this example, we find a significant main effect of profile, such that the system variable (empathy) is predicted to be higher for couples with Profile 2, but there is no evidence of differences between men and women (the effect of "distmen" variable) or of an interaction between profile and sex.
+```{r, include=FALSE, fig.width=4}
+par(mar=c(1,1,1,1))
+```
 ```{r}
-sysOut <- sysVarOut(lpaVars$profileData, "indiv", dist0name="men", dist1name="women", sysVarName = "convQual", printPlots=F)
+sysOut <- sysVarOut(lpaVars$profileData, "indiv", dist0name="men", dist1name="women", sysVarName = "Empathy")
 summary(sysOut$models$profile)
 summary(sysOut$models$profilePlusDist)
 summary(sysOut$models$profileByDist)
@@ -158,6 +161,9 @@ The last step in the analysis is to turn the direction of prediction around and 
 
 The function returns a list of the full model results and by default produces plots of profile membership against the system variable(s), but these can be turned off by setting printPlots=F. The results below show weak evidence for empathy predicting profile membership, such that higher empathy for either partner predicts more likeilood of being in Profile 2, although neither effect is large enough to be significant. Thus, taken together, the results from this example provide some evidence that the dynamics represented by the Inertia-Coordination model are associated with empathy, such that higher-amplitude in-phase emotional oscillations are associated with more empathy.
 
+```{r, include=FALSE, fig.width=4}
+par(mar=c(1,1,1,1))
+```
 ```{r}
 sysIn <- sysVarIn(lpaVars$profileData, "indiv", n_profiles=2, dist0name="women", dist1name="men", sysVarName="empathy")
 summary(sysIn$models$sysVarMain)
