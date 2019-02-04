@@ -139,8 +139,7 @@ sysVarIn <- function(basedata, sysVarType, n_profiles, dist0name=NULL, dist1name
   }
 
   basedata <- basedata[complete.cases(basedata), ] 
-  basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
-  
+
   if(sysVarType == "dyadic"){
     
     basedata <- basedata[!duplicated(basedata$dyad), ]
@@ -160,10 +159,10 @@ sysVarIn <- function(basedata, sysVarType, n_profiles, dist0name=NULL, dist1name
     if(sysVarType == "indiv"){
     
     data1 <- subset(basedata, select=c(dyad, sysVar, dist0, profileN))
-    data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")
-    data3 <- subset(data2, select=-c(profileN.1))   
-    colnames(data3) <- c("dyad", "sysVar0","profileN","sysVar1")
-    basedata <- data3
+    data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")   
+   data3 <- dplyr::rename(data2, dyad=dyad, sysVar0=sysVar.0, profileN1= profileN.1, sysVar1= sysVar.1, profileN=profileN.0)
+    data4 <- subset(data3, select=-c(profileN1))   
+    basedata <- data4
     
     sysVar0name <- paste(sysVarName, dist0name, sep="_")
 	sysVar1name <- paste(sysVarName, dist1name, sep="_")
