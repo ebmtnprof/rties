@@ -178,9 +178,13 @@ sysVarIn <- function(basedata, sysVarType, n_profiles, dist0name=NULL, dist1name
      if(printPlots==T){
 	  	plot(basedata$sysVar0, basedata$profile, xlab=sysVar0name, ylab="Profile")
 	  	plot(basedata$sysVar1, basedata$profile, xlab=sysVar1name, ylab="Profile")
-	  	print(jtools::interact_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, color.class="Greys", interval=T))
-	  }
-
+	  	
+	  	if(is.factor(basedata$sysVar0)){
+	  		print(interactions::cat_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T))
+	  		} else {
+	  	print(interactions::interact_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T))
+	  	   }
+	  	}
 
     } else {
     	base <- nnet::multinom(profileN ~ 1, data=basedata)

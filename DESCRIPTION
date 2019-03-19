@@ -13,7 +13,8 @@ Imports:
     lattice,
     plyr,
     scales,
-    tidyLPA
+    tidyLPA,
+    interactions
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
