@@ -189,11 +189,12 @@ actorPartnerDataTime <- function(basedata, dyadID, personID){
 #' @param lpaData The object created by tidyLPA's "estimate_profiles" function when "return_orig_df = TRUE"
 #' @param lpaParams The object created by tidyLPA's "estimate_profiles" function when "to_return = mclust"
 #' @param whichModel The name of the model that is being investigated (e.g., "inertCoord" or "clo")
-#' @return A list containing 1) a dataframe that contains all variables needed for plotting profile trajectories and using the profiles to predict, or be predicted by, the system variable (called "profileData"), and 2)a dataframe containing the profile parameter estimates needed for plotting the predicted trajectories for each profile (called "profileParams").
+#' @param extraVars An optional dataframe of cross-sectional variables to be used for more complex models that include control variables, moderators, etc. The first column must be the person ID and the second column must be the dyad ID. See the "power_user" vignette for how to make use of these variables.
+#' @return A list containing 1) a dataframe that contains all variables needed for using the profiles to predict, or be predicted by, the system variable (called "profileData"), and 2)a dataframe containing the profile parameter estimates needed for plotting the predicted trajectories for each profile (called "profileParams").
 
 #' @export
 
-makeLpaData <- function(modelData, lpaData, lpaParams, whichModel){
+makeLpaData <- function(modelData, lpaData, lpaParams, whichModel, extraVars=NULL){
   
   if(whichModel !="inertCoord" & whichModel != "clo" ){
 	stop("the model type must be either inertCoord or clo")
@@ -216,10 +217,17 @@ makeLpaData <- function(modelData, lpaData, lpaParams, whichModel){
         params <- lpaParams$parameters$mean
 	}
 	
-  results <- list(profileData=data, profileParams=params)
-}
-
-
+  if(!is.null(extraVars)){
+  	names(extraVars)[1] <- "id"
+    names(extraVars)[2] <- "dyad"
+    fullData <- plyr::join(data, extraVars) 	
+    results <- list(profileData=fullData, profileParams=params)
+  } else{ 	
+  	  results <- list(profileData=data, profileParams=params)
+    }
+  
+  return(results)
+ }
 
 
 ################ Plotting functions

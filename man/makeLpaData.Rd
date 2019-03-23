@@ -4,7 +4,7 @@
 \alias{makeLpaData}
 \title{Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.}
 \usage{
-makeLpaData(modelData, lpaData, lpaParams, whichModel)
+makeLpaData(modelData, lpaData, lpaParams, whichModel, extraVars = NULL)
 }
 \arguments{
 \item{modelData}{A dataframe created by one of the "indiv" functions containing the parameter estimates for one of the models (e.g., inertCoord or clo) in combination and all other data in the analysis (e.g., sysVar, covariates, etc)}
@@ -14,9 +14,11 @@ makeLpaData(modelData, lpaData, lpaParams, whichModel)
 \item{lpaParams}{The object created by tidyLPA's "estimate_profiles" function when "to_return = mclust"}
 
 \item{whichModel}{The name of the model that is being investigated (e.g., "inertCoord" or "clo")}
+
+\item{extraVars}{An optional dataframe of cross-sectional variables to be used for more complex models that include control variables, moderators, etc. The first column must be the person ID and the second column must be the dyad ID. See the "power_user" vignette for how to make use of these variables.}
 }
 \value{
-A list containing 1) a dataframe that contains all variables needed for plotting profile trajectories and using the profiles to predict, or be predicted by, the system variable (called "profileData"), and 2)a dataframe containing the profile parameter estimates needed for plotting the predicted trajectories for each profile (called "profileParams").
+A list containing 1) a dataframe that contains all variables needed for using the profiles to predict, or be predicted by, the system variable (called "profileData"), and 2)a dataframe containing the profile parameter estimates needed for plotting the predicted trajectories for each profile (called "profileParams").
 }
 \description{
 Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.
