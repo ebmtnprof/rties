@@ -10,8 +10,8 @@
 #' In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations.
 #'
 #' @param basedata A user-provided dataframe.
-#' @param id The name of the column in the dataframe that has the person-level identifier.
-#' @param dyad The name of the column in the dataframe that has the dyad-level identifier.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
 #' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param sysVar The name of the column in the dataframe that has the system variable (e.g., something that will be predicted from the dynamics of the system).
 #' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
@@ -33,9 +33,9 @@
 #'}
 
 #' @export
-dataPrep <- function(basedata,id,dyad,obs,sysVar,dist,time_name,time_lag=NULL, center=NULL){
+dataPrep <- function(basedata,personId,dyadId,obs,sysVar,dist,time_name,time_lag=NULL, center=NULL){
   
-  basedata <- subset(basedata, select=c(id, dyad, obs, sysVar, dist, time_name))
+  basedata <- subset(basedata, select=c(personId, dyadId, obs, sysVar, dist, time_name))
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
   names(basedata)[3] <- "obs"

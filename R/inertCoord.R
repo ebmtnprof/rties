@@ -6,18 +6,18 @@
 #' Produces auto-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
 #' 
 #' @param basedata A user provided dataframe.
-#' @param id The name of the column in the dataframe that has the person-level identifier.
-#' @param dyad The name of the column in the dataframe that has the dyad-level identifier.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
 #' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 
 #' @export
 
-autoCorPlots <- function(basedata, id, dyad, obs, time_name){invisible(acp(basedata, id, dyad, obs, time_name))}
+autoCorPlots <- function(basedata, personId, dyadId, obs, time_name){invisible(acp(basedata, personId, dyadId, obs, time_name))}
 
-acp <- function(basedata, id, dyad, obs, time_name)
+acp <- function(basedata, personId, dyadId, obs, time_name)
 {
-  basedata <- subset(basedata, select=c(id, dyad, obs, time_name))
+  basedata <- subset(basedata, select=c(personId, dyadId, obs, time_name))
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
   names(basedata)[3] <- "obs"
@@ -50,18 +50,18 @@ acp <- function(basedata, id, dyad, obs, time_name)
 #' Produces cross-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
 #' 
 #' @param basedata A user provided dataframe.
-#' @param id The name of the column in the dataframe that has the person-level identifier.
-#' @param dyad The name of the column in the dataframe that has the dyad-level identifier.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
 #' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 
 #' @export
 
-crossCorPlots <- function(basedata, id, dyad, obs, time_name){invisible(ccp(basedata, id, dyad, obs, time_name))}
+crossCorPlots <- function(basedata, personId, dyadId, obs, time_name){invisible(ccp(basedata, personId, dyadId, obs, time_name))}
 
-ccp <- function(basedata, id, dyad, obs, time_name)
+ccp <- function(basedata, personId, dyadId, obs, time_name)
 {
-  basedata <- subset(basedata, select=c(id, dyad, obs, time_name))  
+  basedata <- subset(basedata, select=c(personId, dyadId, obs, time_name))  
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
   names(basedata)[3] <- "obs"

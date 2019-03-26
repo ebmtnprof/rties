@@ -4,15 +4,11 @@
 \alias{dataPrep}
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
-dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name,
+dataPrep(basedata, personId, dyadId, obs, sysVar, dist, time_name,
   time_lag = NULL, center = NULL)
 }
 \arguments{
 \item{basedata}{A user-provided dataframe.}
-
-\item{id}{The name of the column in the dataframe that has the person-level identifier.}
-
-\item{dyad}{The name of the column in the dataframe that has the dyad-level identifier.}
 
 \item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
 
@@ -25,6 +21,10 @@ dataPrep(basedata, id, dyad, obs, sysVar, dist, time_name,
 \item{time_lag}{An optional argument for the number of lags for the lagged observable.}
 
 \item{center}{An optional vector of centering values for the system variable.}
+
+\item{id}{The name of the column in the dataframe that has the person-level identifier.}
+
+\item{dyad}{The name of the column in the dataframe that has the dyad-level identifier.}
 }
 \value{
 The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:
