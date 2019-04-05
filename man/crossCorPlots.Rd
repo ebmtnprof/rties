@@ -9,13 +9,13 @@ crossCorPlots(basedata, personId, dyadId, obs, time_name)
 \arguments{
 \item{basedata}{A user provided dataframe.}
 
+\item{personId}{The name of the column in the dataframe that has the person-level identifier.}
+
+\item{dyadId}{The name of the column in the dataframe that has the dyad-level identifier.}
+
 \item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
-
-\item{id}{The name of the column in the dataframe that has the person-level identifier.}
-
-\item{dyad}{The name of the column in the dataframe that has the dyad-level identifier.}
 }
 \description{
 Produces cross-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.

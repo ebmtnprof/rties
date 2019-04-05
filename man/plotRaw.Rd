@@ -5,7 +5,7 @@
 \title{Plots of observed variable over time by dyad.}
 \usage{
 plotRaw(basedata, dyad, obs, dist, time_name, dist0name = NULL,
-  dist1name = NULL)
+  dist1name = NULL, obs_name = NULL)
 }
 \arguments{
 \item{basedata}{A dataframe.}
@@ -18,9 +18,11 @@ plotRaw(basedata, dyad, obs, dist, time_name, dist0name = NULL,
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
-\item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
+\item{dist0name}{An optional name for the level-0 of the distinguishing variable to appear on plots (e.g., "Women").}
 
-\item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.}
+\item{dist1name}{An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").}
+
+\item{obsName}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
 }
 \description{
 Produces plots of the observed variable for each dyad over time to check for data errors, etc.

@@ -1,0 +1,9 @@
+setwd("/Users/emily/Documents/Projects/LAF/Data/Edited")#
+data1 <- read.csv("dialC2secMods04.csv")
+data2 <- subset(data1, select=c(Couple, Person, Dial, time, female, influenceDAve, supDAve, engage, svagg, negInf))
+data2$svagg <- data2$svagg + .05
+data2$negInf <- ifelse(data2$negInf == 0, 0 , 1)
+data2$negInfCat <- factor(data2$negInf, labels=c("no","yes"))
+data2$supDAve <- ifelse(data2$supDAve < -1.5, 0, 1)
+setwd("/Users/emily/Documents/Projects/R-TIES/rties/Data")#
+write.csv(data2, "forTesting.csv", row.names=F)

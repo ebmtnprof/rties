@@ -4,27 +4,25 @@
 \alias{dataPrep}
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
-dataPrep(basedata, personId, dyadId, obs, sysVar, dist, time_name,
-  time_lag = NULL, center = NULL)
+dataPrep(basedata, personId, dyadId, obs, dist, time_name, sysVar = NULL,
+  time_lag = NULL)
 }
 \arguments{
 \item{basedata}{A user-provided dataframe.}
 
-\item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
+\item{personId}{The name of the column in the dataframe that has the person-level identifier.}
 
-\item{sysVar}{The name of the column in the dataframe that has the system variable (e.g., something that will be predicted from the dynamics of the system).}
+\item{dyadId}{The name of the column in the dataframe that has the dyad-level identifier.}
+
+\item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
 
 \item{dist}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
+\item{sysVar}{An optional argument that is the name of the column in the dataframe that has the system variable (e.g., something that will predict, or be predicted by, the dynamics of the system).}
+
 \item{time_lag}{An optional argument for the number of lags for the lagged observable.}
-
-\item{center}{An optional vector of centering values for the system variable.}
-
-\item{id}{The name of the column in the dataframe that has the person-level identifier.}
-
-\item{dyad}{The name of the column in the dataframe that has the dyad-level identifier.}
 }
 \value{
 The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:

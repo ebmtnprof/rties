@@ -4,19 +4,22 @@
 \alias{sysVarOut}
 \title{Provides results for predicting the system variable from the latent profiles of the dynamic parameters.}
 \usage{
-sysVarOut(basedata, sysVarType, dist0name = NULL, dist1name = NULL,
-  sysVarName = NULL, minMax = NULL, family = NULL, printPlots = T)
+sysVarOut(basedata, sysVar = NULL, sysVarType, dist0name = NULL,
+  dist1name = NULL, sysVarName = NULL, minMax = NULL,
+  family = NULL, printPlots = T)
 }
 \arguments{
-\item{basedata}{A dataframe containing the LPA profile memberships.}
+\item{basedata}{A dataframe created by the makeLpaData function.}
+
+\item{sysVar}{The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. If the system variable was included during the dataPrep step, then this argument should not be included. But if the system variable was only included by using the "extraVars" argument during the makeLpaData step, then this argument is required.}
 
 \item{sysVarType}{Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores}
 
-\item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
+\item{dist0name}{An optional name for the level-0 of the distinguishing variable to appear as plot labels (e.g., "Women"). Default is dist0.}
 
-\item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
+\item{dist1name}{An optional name for the level-1 of the distinguishing variable to appear as plot labels (e.g., "Men"). Default is dist1}
 
-\item{sysVarName}{An optional name for the system variable being predicted (e.g., "Satisfaction"). Default is sysVar.}
+\item{sysVarName}{An optional name for the system variable to appear as plot labels (e.g., "Satisfaction"). Default is sysVar.}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
 

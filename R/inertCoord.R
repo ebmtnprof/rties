@@ -100,12 +100,13 @@ ccp <- function(basedata, personId, dyadId, obs, time_name)
 #'
 #' @param basedata A dataframe that was produced with the "dataPrep" function.
 #' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
+#' @param sysVarInclude An optional argument specifying whether the system variable was included in the dataframe during the dataPrep step (TRUE), or not (FALSE). Default is TRUE.
 #' 
 #' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) a dataframe containing both the parameter estimates for the model for each dyad and the system variable (called "data", for using the dynamic parameters to either predict, or be predicted by, the system variable), and 3) a dataframe with just the parameter estimates (called "params", for use in the latent profile analysis).
 
 #' @export
 
-indivInertCoord <- function(basedata, whichModel)
+indivInertCoord <- function(basedata, whichModel, sysVarInclude=TRUE)
 {	
   if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
   	stop("the model type must be either inert, coord or inertCoord")
@@ -138,7 +139,12 @@ indivInertCoord <- function(basedata, whichModel)
   
   param <- as.data.frame(do.call(rbind, param))
   colnames(param) <- paramNames
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))
+  
+  if(sysVarInclude==TRUE){
+    temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))
+    } else {
+    	temp <- subset(basedata, select=c("id","dyad","dist0"))
+    }
   temp2 <- unique(temp)
   data <- suppressMessages(plyr::join(param, temp2))
   params <- data[data$dist0 == 1, ]
@@ -195,9 +201,9 @@ indivInertCoordCompare <- function(basedata)
 #'
 #' @param basedata A dataframe that was produced with the "dataPrep" function.
 #' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
-#' @param dist0name A name for the level-0 of the distinguishing variable (e.g., "Women").
-#' @param dist1name A name for the level-1 of the distinguishing variable (e.g., "Men").
-#' @param obsName A name for the observed state variables being plotted (e.g., "Emotional Experience").
+#' @param dist0name An optional name for the level-0 of the distinguishing variable to appear on plots (e.g., "Women").
+#' @param dist1name An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").
+#' @param obsName An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' 
 #' @return The function returns plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf", or "coordPlots.pdf" or "inertCoordPlots.pdf"
@@ -258,7 +264,6 @@ indivInertCoordPlots <- function(basedata, whichModel, dist0name = NULL, dist1na
   ggsave(plotFileName, modelPlots)
   results <- list(plots=plots)
 }
-
 
 
 ###############

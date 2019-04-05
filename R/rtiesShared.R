@@ -13,11 +13,10 @@
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
 #' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
-#' @param sysVar The name of the column in the dataframe that has the system variable (e.g., something that will be predicted from the dynamics of the system).
 #' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
+#' @param sysVar An optional argument that is the name of the column in the dataframe that has the system variable (e.g., something that will predict, or be predicted by, the dynamics of the system).
 #' @param time_lag An optional argument for the number of lags for the lagged observable.
-#' @param center An optional vector of centering values for the system variable.
 #'
 #' @return The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:
 #' \itemize{
@@ -33,17 +32,19 @@
 #'}
 
 #' @export
-dataPrep <- function(basedata,personId,dyadId,obs,sysVar,dist,time_name,time_lag=NULL, center=NULL){
+dataPrep <- function(basedata, personId, dyadId, obs, dist, time_name, sysVar=NULL, time_lag=NULL){
   
-  basedata <- subset(basedata, select=c(personId, dyadId, obs, sysVar, dist, time_name))
-  names(basedata)[1] <- "id"
-  names(basedata)[2] <- "dyad"
-  names(basedata)[3] <- "obs"
-  names(basedata)[4] <- "sysVar"
-  names(basedata)[5] <- "dist1"
-  names(basedata)[6] <- "time"
-  
-  # check distinguishing variable is numeric 
+  if(!is.null(sysVar)){
+    vars <- c(personId, dyadId, obs, dist, time_name, sysVar)
+    basedata <- basedata[vars]
+    names(basedata) <- c("id","dyad","obs","dist1","time","sysVar")
+  } else {
+  	vars <- c(personId, dyadId, obs, dist, time_name)
+    basedata <- basedata[vars]
+    names(basedata) <- c("id","dyad","obs","dist1","time")
+  }
+    
+      # check distinguishing variable is numeric 
   if (!is.numeric(basedata$dist1)){
 	stop("the distinguishing variable must be a 0/1 numeric variable")
   }
@@ -66,12 +67,6 @@ dataPrep <- function(basedata,personId,dyadId,obs,sysVar,dist,time_name,time_lag
 	}
 	    
   basedata <- lineCenterById(basedata)
-
-  if(!is.null(center)){
-	basedata$sysVarL <- basedata$sysVar - center[1]
-	basedata$sysVarM <- basedata$sysVar - center[2]
-	basedata$sysVarH <- basedata$sysVar - center[3]
-  }
 	   
   if(!is.null(time_lag)){
 	lag <- time_lag
@@ -222,7 +217,7 @@ makeLpaData <- function(modelData, lpaData, lpaParams, whichModel, extraVars=NUL
     names(extraVars)[2] <- "dyad"
     fullData <- plyr::join(data, extraVars) 	
     results <- list(profileData=fullData, profileParams=params)
-  } else{ 	
+  } else { 	
   	  results <- list(profileData=data, profileParams=params)
     }
   
@@ -260,14 +255,14 @@ histAll <- function(basedata)
 #' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
-#' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
-#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
+#' @param dist0name An optional name for the level-0 of the distinguishing variable to appear on plots (e.g., "Women").
+#' @param dist1name An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").
+#' @param obsName An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 
 #' @export
 
-plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name=NULL, dist1name=NULL) 
+plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name=NULL, dist1name=NULL, obs_name=NULL) 
 {
-  obs_name <- obs 
   basedata <- basedata[ ,c(dyad, obs, dist, time_name) ]
   names(basedata) <- c("dyad", "obs", "dist", "time")
   
@@ -278,23 +273,38 @@ plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name=NULL, dist1n
 
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
+  if(is.null(obs_name)){obs_name <- "obs"}
  
   lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
 }
 
 
-sysVarByParam <- function(paramData, colToPlot, sysVarName)
-{
-	ymin <- min(paramData$sysVar, na.rm=T)
-	ymax <- max(paramData$sysVar, na.rm=T)
-	par(mfrow=c(4,4))
-	for(i in colToPlot)
-	{
-		xmin <- min(paramData[i], na.rm=T)
-		xmax <- max(paramData[i], na.rm=T)
-		plot(paramData$sysVar ~ paramData[,i], xlab="", ylab=sysVarName, ylim=c(ymin, ymax), xlim=c(xmin, xmax), main=names(paramData[i]))
-	}	
+#' Plots of de-trended observed variable over time, with dyads separated into groups based on LPA profile membership.
+#'
+#' @param prepData A dataframe created by the dataPrep function.
+#' @param profileData The "profileData" dataframe created by the makeLpaData function
+#' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
+#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
+#' @param obsName An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
+
+plotDataByProfile <- function(prepData, profileData, n_profiles, dist0name=NULL, dist1name=NULL, obs_name=NULL){
+
+  if(is.null(dist0name)){dist0name <- "dist0"}
+  if(is.null(dist1name)){dist1name <- "dist1"}
+  if(is.null(obs_name)){obs_name <- "obs_deTrend"}
+    
+    temp1 <- subset(profileData, select=c(dyad, dist0, profile))
+    temp2 <- subset(prepData, select=c(dyad, dist0, obs_deTrend, time))
+    temp3 <- plyr::join(temp1, temp2)
+
+    for(i in 1:n_profiles){
+      tempi <- subset(temp3, profile==i)
+      label <- paste("Profile", i, sep="-")   
+      print(lattice::xyplot(obs_deTrend ~ time|as.factor(dyad), data = tempi, group=dist0, type=c("l"), ylab=obs_name, main=label, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")), as.table=T, layout = c(3,3)))
+
+    }
 }
+
 
 ######################### Miscellaneous functions
 

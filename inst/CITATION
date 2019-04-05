@@ -1,0 +1,10 @@
+citHeader("To cite rties, please use:")
+
+citEntry(entry="manual", 
+  title  = "Quantifying interpersonal dynamics for studying socio-emotional processes and adverse health behaviors",
+  author = "Butler, E. A. & Barnard, J. K.",
+  journal = "Psychosomatic Medicine",
+  year = "in press",
+  
+  textVersion = paste("Butler, E. A. & Barnard, J. K. (in press). Quantifying interpersonal dynamics for studying socio-emotional processes and adverse health behaviors. Psychosomatic Medicine.")
+  )

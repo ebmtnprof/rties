@@ -12,11 +12,11 @@ indivInertCoordPlots(basedata, whichModel, dist0name = NULL,
 
 \item{whichModel}{Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").}
 
-\item{dist0name}{A name for the level-0 of the distinguishing variable (e.g., "Women").}
+\item{dist0name}{An optional name for the level-0 of the distinguishing variable to appear on plots (e.g., "Women").}
 
-\item{dist1name}{A name for the level-1 of the distinguishing variable (e.g., "Men").}
+\item{dist1name}{An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").}
 
-\item{obsName}{A name for the observed state variables being plotted (e.g., "Emotional Experience").}
+\item{obsName}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
 }

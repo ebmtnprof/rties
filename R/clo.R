@@ -86,11 +86,12 @@ gllaEmbed <- function(x, embed, tau, groupby=NA, label="x", idColumn=F) {
 #' @param taus A vector containing the values of tau to use. Tau indicates the number of time points to lag in the lagged data matrix (see Boker, S.M., Deboeck, P.R., Edler, C., & Keel, P.K. (2010). Generalized local linear approximation of derivatives from time series. In S.M. Chow & E. Ferrer (Eds.), Statistical Methods for Modeling Human Dynamics: An Interdisciplinary Dialogue (pp. 161-178). New York, NY: Taylor & Francis Group). The first derivative is estimated as the mean of the two adjacent slopes across that number of lags, e.g., if tau = 2 then the estimate of the first derivative at time = t is based on the mean of the slopes left and right of time t across 2 observations each. The second derivative is the difference in the two slopes with respect to time. Tau = 1 is sensitive to noise and increasing its value acts as smoothing. 
 #' @param embeds A vector containing the values of embeds to use. Embeds indicates the number of columns in the lagged data matrix. The minimum = 3 for 2nd order derivatives and higher values increase smoothing.
 #' @param delta A value indicating the inter-observation interval. For example, if delta = 2, then every second observation is used in the estimation process.
+#' @param sysVarInclude An optional argument specifying whether the system variable was included in the dataframe during the dataPrep step (TRUE), or not (FALSE). Default is TRUE.
 #' 
 #' @return The function returns a list including: 1) "data" which is a dataframe containing first and second derivative estimates of an observed state variable, and 2) "fitTable" which shows the maximal R^2 achieved for each person for an individual oscillator model, along with the associated tau, embed and estimated period of oscillation.
 
 #' @export
-estDerivs <- function(basedata, taus, embeds, delta)
+estDerivs <- function(basedata, taus, embeds, delta, sysVarInclude=TRUE)
 {
    basedata <- basedata[complete.cases(basedata), ] 
    params <- expand.grid(taus=taus, embeds=embeds)
@@ -145,18 +146,25 @@ estDerivs <- function(basedata, taus, embeds, delta)
 	   obsDeriv <- obsEmbed[,1:dim(obsEmbed)[2]] %*% obsLLA
 	   p_obsDeriv <- p_obsEmbed[,1:dim(p_obsEmbed)[2]] %*% obsLLA
 
-	   # add time, recover original ids, distinguisher and moderator variables, add to derivatives and 
-	   # name columns
+	   # add time, recover original ids, distinguisher and sysVar (if TRUE), add to derivatives and name columns
 	   idLength <- dim(obsDeriv)[1]
 	   time <- seq_len(idLength)
 	   dyad <- rep(unique(datai$dyad, idLength))
 	   id <- rep(unique(datai$id), idLength)
 	   dist0 <- rep(unique(datai$dist0), idLength)
 	   dist1 <- rep(unique(datai$dist1), idLength)
-	   sysVar <- rep(unique(datai$sysVar), idLength)
-	   deriv <- cbind(dyad, id, time, obsDeriv, p_obsDeriv, dist0, dist1, sysVar)
-	   dimnames(deriv) <- list(NULL,c("dyad","id","time","obs_deTrend","d1","d2","p_obs_deTrend","p_d1","p_d2","dist0", 
+	   
+	   if(sysVarInclude == TRUE){
+	     sysVar <- rep(unique(datai$sysVar), idLength)
+	     deriv <- cbind(dyad, id, time, obsDeriv, p_obsDeriv, dist0, dist1, sysVar)
+	     dimnames(deriv) <- list(NULL,c("dyad","id","time","obs_deTrend","d1","d2","p_obs_deTrend","p_d1","p_d2","dist0", 
 	   "dist1", "sysVar"))
+	      } else {
+	  	      deriv <- cbind(dyad, id, time, obsDeriv, p_obsDeriv, dist0, dist1)
+	     dimnames(deriv) <- list(NULL,c("dyad","id","time","obs_deTrend","d1","d2","p_obs_deTrend","p_d1","p_d2","dist0", 
+	   "dist1"))
+	    }
+	   
 	   deriv <- as.data.frame(deriv)
 
 	   derivData[[p]] <- deriv
