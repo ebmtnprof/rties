@@ -5,6 +5,9 @@
 
 ################ Data manipulation functions
 
+
+########### dataPrep
+
 #' Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling
 #'
 #' In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations.
@@ -76,6 +79,28 @@ dataPrep <- function(basedata, personId, dyadId, obs, dist, time_name, sysVar=NU
   basedata <- actorPartnerDataTime(basedata, "dyad", "id")  
   return(basedata)
 }
+
+################## makeDist
+
+#' Create a distinguishing variable (called "dist") for non-distinguishable dyads by assigning the partner who is lower on a chosen variable a 0 and the partner who is higher on the variable a 1. 
+#'
+#' @param basedata A user-provided dataframe.
+#' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
+#' @param dist_name The name of the column in the dataframe that holds the variable to use for distinguishing the partners. For example, if "influence" was the variable, for each dyad the partner scoring lower on "influence" would be given a score of 0 on "dist" and the partner scoring higher on "influence" would be given a score of 1 on "dist"
+
+#' @export
+
+makeDist <- function(basedata, dyadId, personId, time_name, dist_name){
+    temp1 <- subset(basedata, select=c(dyadId, personId, time_name, dist_name))
+    temp2 <- rties::actorPartnerDataTime(temp1, dyadId, personId)     
+    temp2$dist <- ifelse(temp2[ ,4] == temp2[ ,8], NA, 
+				ifelse(temp2[ ,4] < temp2[ ,8], 0, 1))
+    temp3 <- subset(temp2, select=c(dyadId, personId, time_name, "dist"))
+    temp4 <- plyr::join(data1, temp3)
+    return(temp4)
+ }
 
 ############### lineCenterById
 
