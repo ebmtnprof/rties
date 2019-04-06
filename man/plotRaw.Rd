@@ -4,13 +4,13 @@
 \alias{plotRaw}
 \title{Plots of observed variable over time by dyad.}
 \usage{
-plotRaw(basedata, dyad, obs, dist, time_name, dist0name = NULL,
+plotRaw(basedata, dyadId, obs, dist, time_name, dist0name = NULL,
   dist1name = NULL, obs_name = NULL)
 }
 \arguments{
 \item{basedata}{A dataframe.}
 
-\item{dyad}{The name of the column in the dataframe that has the dyad-level identifier.}
+\item{dyadId}{The name of the column in the dataframe that has the dyad-level identifier.}
 
 \item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
 

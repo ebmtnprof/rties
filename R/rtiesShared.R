@@ -251,7 +251,7 @@ histAll <- function(basedata)
 #' Produces plots of the observed variable for each dyad over time to check for data errors, etc. 
 #'
 #' @param basedata A dataframe.
-#' @param dyad The name of the column in the dataframe that has the dyad-level identifier.
+#' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
 #' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
@@ -261,9 +261,9 @@ histAll <- function(basedata)
 
 #' @export
 
-plotRaw <- function(basedata, dyad, obs, dist, time_name, dist0name=NULL, dist1name=NULL, obs_name=NULL) 
+plotRaw <- function(basedata, dyadId, obs, dist, time_name, dist0name=NULL, dist1name=NULL, obs_name=NULL) 
 {
-  basedata <- basedata[ ,c(dyad, obs, dist, time_name) ]
+  basedata <- basedata[ ,c(dyadId, obs, dist, time_name) ]
   names(basedata) <- c("dyad", "obs", "dist", "time")
   
   # check distinguishing variable is numeric 
