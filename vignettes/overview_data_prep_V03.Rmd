@@ -93,7 +93,7 @@ histAll(data1)
 ```
 
 A second highly recommended check is to plot the raw time-series data for each dyad, which can be accomplished with the “plotRaw” function. If you have a large number of dyads, you may want to only plot a random subset, or several random subsets. For this vignette we plot a specific sub-set to present some typical-looking examples. Use ?plotRaw for further explanation of the arguments for the function. Running the following syntax we see that one person is completely missing data for dyad 19, which will cause problems if we don't fix it. If you are not plotting all your dyads, you will need to use some other method to identify any dyads with completely missing data for one or both partners. This visualization is also useful for spotting outliers, noise in the data, etc. that should be fixed before proceeding.
-```{r, dpi=150}
+```{r, dpi=180}
 temp <- subset(data1, couple %in% c(2,3,5,8,10,12,13,17,19))
 plotRaw(temp, dyadId="couple", obs="dial", dist="female", time_name="time", dist0name="Men", dist1name="Women", obs_name="Dial")
 ```
