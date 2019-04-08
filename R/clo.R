@@ -413,6 +413,55 @@ indivCloPlots <- function(basedata, whichModel, idConvention, dist0name=NULL, di
   results <- list(plots=plots)
 }
 
+#' Produces histograms of the residuals from the oscillator model for each dyad.
+#' 
+#' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' @param whichModel Whether the model to be estimated is the uncoupled-oscillator ("uncoupled") or the coupled-oscillator ("coupled").
+#' 
+#' @return The function returns histograms of the residuals from the model for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "uncoupledResid.pdf", or "coupledResid.pdf" or "inertCoordResid.pdf"
+
+#' @import ggplot2
+#' @export
+
+cloResids <- function(basedata, whichModel)
+{
+  if(whichModel != "uncoupled" & whichModel != "coupled") {
+  	stop("the model type must be either uncoupled or coupled")
+	
+	} else if (whichModel == "uncoupled"){
+	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
+	  plotFileName <- "uncoupledResid.pdf"
+
+      } else if (whichModel == "coupled"){
+      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
+   		plotFileName <- "coupledResid.pdf"
+  }	   
+
+  newDiD <- unique(factor(basedata$dyad))
+  plots <- list()
+  resid <- list()
+	
+  for (i in 1:length(newDiD)){
+	datai <- basedata[basedata$dyad == newDiD[i], ]
+	m <- lm(model, na.action=na.exclude, data=datai) 
+	plotTitle <- as.character(unique(datai$dyad))
+	resid[[i]] <- m$residuals
+	plotResid <- data.frame(resid[[i]])
+	colnames(plotResid) <- "Residuals"
+						
+	plots[[i]] <- ggplot(plotResid, aes(x=Residuals)) +
+	geom_histogram(color="black", fill="grey") +
+	labs(title= "Dyad ID:", subtitle= plotTitle) +
+	theme(plot.title=element_text(size=11)) +
+	theme(plot.subtitle=element_text(size=10))		
+  }
+	
+  modelPlots <- suppressMessages(gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3))
+  ggsave(plotFileName, modelPlots)
+  results <- list(plots=plots)
+}
+
+
 #' Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters.
 #' 
 #' @param origData A dataframe that was produced with the "dataPrep" function.

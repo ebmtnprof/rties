@@ -93,7 +93,6 @@ ccp <- function(basedata, personId, dyadId, obs, time_name)
 }
 
 
-
 #' Estimates versions of the inertia-coordination model for each dyad.
 #' 
 #' The user specifies which of 3 models are to be estimated. Each model predicts the observed state variables (with linear trends removed) from either: 1) Inertia only ("inert")- each person's intercept and each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), 2) Coordination only ("coord")- each person's intercept and each person's partner's state variable lagged at the amount specified (again with linear trends removed), or 3) Full inertia-coordination model ("inertCoord") - each person's intercept, each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), and each person's partner's state variable lagged at the amount specified (again with linear trends removed).
@@ -264,6 +263,56 @@ indivInertCoordPlots <- function(basedata, whichModel, dist0name = NULL, dist1na
   ggsave(plotFileName, modelPlots)
   results <- list(plots=plots)
 }
+
+#' Produces histograms of the residuals from the inertia-coordination model for each dyad.
+#' 
+#' @param basedata A dataframe that was produced with the "dataPrep" function.
+#' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
+#' 
+#' @return The function returns histograms of the residuals from the model for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertResid.pdf", or "coordResid.pdf" or "inertCoordResid.pdf"
+
+#' @import ggplot2
+#' @export
+
+inertCoordResids <- function(basedata, whichModel)
+{
+  if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
+  	stop("the model type must be either inert, coord or inertCoord")
+	} else if (whichModel == "inert"){
+	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
+	  plotFileName <- "inertResid.pdf"
+      } else if (whichModel == "coord"){
+      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+      	plotFileName <- "coordResid.pdf"
+        } else {
+          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+          plotFileName <- "inertCoordResid.pdf"
+        }
+
+  newDiD <- unique(factor(basedata$dyad))
+  plots <- list()
+  resid <- list()
+	
+  for (i in 1:length(newDiD)){
+	datai <- basedata[basedata$dyad == newDiD[i], ]
+	m <- lm(model, na.action=na.exclude, data=datai) 
+	plotTitle <- as.character(unique(datai$dyad))
+	resid[[i]] <- m$residuals
+	plotResid <- data.frame(resid[[i]])
+	colnames(plotResid) <- "Residuals"
+						
+	plots[[i]] <- ggplot(plotResid, aes(x=Residuals)) +
+	geom_histogram(color="black", fill="grey") +
+	labs(title= "Dyad ID:", subtitle= plotTitle) +
+	theme(plot.title=element_text(size=11)) +
+	theme(plot.subtitle=element_text(size=10))		
+  }
+	
+  modelPlots <- suppressMessages(gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3))
+  ggsave(plotFileName, modelPlots)
+  results <- list(plots=plots)
+}
+
 
 
 ###############
