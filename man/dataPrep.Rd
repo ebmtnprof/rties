@@ -5,7 +5,7 @@
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
 dataPrep(basedata, personId, dyadId, obs, dist, time_name, sysVar = NULL,
-  time_lag = NULL)
+  time_lag = NULL, robustScale = FALSE)
 }
 \arguments{
 \item{basedata}{A user-provided dataframe.}
@@ -23,6 +23,8 @@ dataPrep(basedata, personId, dyadId, obs, dist, time_name, sysVar = NULL,
 \item{sysVar}{An optional argument that is the name of the column in the dataframe that has the system variable (e.g., something that will predict, or be predicted by, the dynamics of the system).}
 
 \item{time_lag}{An optional argument for the number of lags for the lagged observable.}
+
+\item{robustScale}{An optional argument to perform robust scaling of the de-trended observed state variable, one person at a time, using the DescTools package}
 }
 \value{
 The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:

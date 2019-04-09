@@ -20,6 +20,7 @@
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param sysVar An optional argument that is the name of the column in the dataframe that has the system variable (e.g., something that will predict, or be predicted by, the dynamics of the system).
 #' @param time_lag An optional argument for the number of lags for the lagged observable.
+#' @param robustScale An optional argument to perform robust scaling of the de-trended observed state variable, one person at a time, using the DescTools package
 #'
 #' @return The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:
 #' \itemize{
@@ -35,7 +36,7 @@
 #'}
 
 #' @export
-dataPrep <- function(basedata, personId, dyadId, obs, dist, time_name, sysVar=NULL, time_lag=NULL){
+dataPrep <- function(basedata, personId, dyadId, obs, dist, time_name, sysVar=NULL, time_lag=NULL, robustScale = FALSE){
   
   if(!is.null(sysVar)){
     vars <- c(personId, dyadId, obs, dist, time_name, sysVar)
@@ -70,6 +71,10 @@ dataPrep <- function(basedata, personId, dyadId, obs, dist, time_name, sysVar=NU
 	}
 	    
   basedata <- lineCenterById(basedata)
+  
+  if (robustScale == TRUE){
+  	dataRobScale(basedata)
+  }
 	   
   if(!is.null(time_lag)){
 	lag <- time_lag
@@ -117,6 +122,25 @@ lineCenterById <- function(basedata)
   }		
   basedata <- as.data.frame(do.call(rbind, dataCent)) 	
 }		
+
+############# dataRobScale
+
+#' Apply robust scaling from the DescTools package one person at a time to the detrended observed variable (obs_deTrend).
+
+dataRobScale <- function(basedata){
+  newId <- unique(factor(basedata$id))
+  dataRobust <- list()
+  
+  for(i in 1:length(newId)){
+	datai <- basedata[basedata$id == newId[i],]
+	datai$obs_deTrend <- DescTools::RobScale(datai$obs_deTrend)
+	dataRobust[[i]] <- datai
+  }		
+  dataRobust <- as.data.frame(do.call(rbind, dataRobust)) 
+  basedata <- dataRobust
+}
+
+
 
 ########### removeDyads
 

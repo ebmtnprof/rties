@@ -367,7 +367,7 @@ indivCloPlots <- function(basedata, whichModel, idConvention, dist0name=NULL, di
   plots <- list()
 	
   for (i in 1:length(newDiD)){
-    statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,] 
+    statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 0,] 
   	maxtime <- max(statedatai$time) 
  	plotTimes <- seq(1, maxtime, by=1)
  	start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))
