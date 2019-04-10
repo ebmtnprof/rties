@@ -78,9 +78,11 @@ gllaEmbed <- function(x, embed, tau, groupby=NA, label="x", idColumn=F) {
     return(embeddedMatrix[1:(tRow-1), 2:(embed+1)])
 }
 
+############## estDerivs
+
 #' Estimates first and second derivatives of an oberved state variable
 #'
-#' This function makes use of 2 functions written by Steven Boker, "gllaWMatrix" and "gllaEmbed" which are available on his website, http://people.virginia.edu/~smb3u/. It fits an individual linear oscillator model for each person at different combinations of the input parameters (tau, embeds) and returns the input values and period of oscillation that maximize the R^2 for each person. It also estimates first and second derivatives of the observed state variable for each person at the input values that maximize the R^2 for that person and returns a dataframe that contains them.
+#' This function makes use of 2 functions written by Steven Boker, "gllaWMatrix" and "gllaEmbed" which are available on his website, http://people.virginia.edu/~smb3u/. It fits a coupled oscillator model for each dyad at different combinations of the input parameters (tau, embeds) and returns the input values and period of oscillation that maximize the R^2 for each dyad. It also estimates first and second derivatives of the observed state variable for each person at the input values that maximize the R^2 for that dyad and returns a dataframe that contains them.
 #'
 #' @param basedata A dataframe that was produced with the "dataPrep" function.
 #' @param taus A vector containing the values of tau to use. Tau indicates the number of time points to lag in the lagged data matrix (see Boker, S.M., Deboeck, P.R., Edler, C., & Keel, P.K. (2010). Generalized local linear approximation of derivatives from time series. In S.M. Chow & E. Ferrer (Eds.), Statistical Methods for Modeling Human Dynamics: An Interdisciplinary Dialogue (pp. 161-178). New York, NY: Taylor & Francis Group). The first derivative is estimated as the mean of the two adjacent slopes across that number of lags, e.g., if tau = 2 then the estimate of the first derivative at time = t is based on the mean of the slopes left and right of time t across 2 observations each. The second derivative is the difference in the two slopes with respect to time. Tau = 1 is sensitive to noise and increasing its value acts as smoothing. 
@@ -88,99 +90,130 @@ gllaEmbed <- function(x, embed, tau, groupby=NA, label="x", idColumn=F) {
 #' @param delta A value indicating the inter-observation interval. For example, if delta = 2, then every second observation is used in the estimation process.
 #' @param sysVarInclude An optional argument specifying whether the system variable was included in the dataframe during the dataPrep step (TRUE), or not (FALSE). Default is TRUE.
 #' 
-#' @return The function returns a list including: 1) "data" which is a dataframe containing first and second derivative estimates of an observed state variable, and 2) "fitTable" which shows the maximal R^2 achieved for each person for an individual oscillator model, along with the associated tau, embed and estimated period of oscillation.
+#' @return The function returns a list including: 1) "data" which is a dataframe containing first and second derivative estimates of an observed state variable, and 2) "fitTable" which shows the maximal R^2 achieved for each dyad for a coupled oscillator model, along with the associated tau, embed and estimated period of oscillation.
 
 #' @export
-estDerivs <- function(basedata, taus, embeds, delta, sysVarInclude=TRUE)
-{
-   basedata <- basedata[complete.cases(basedata), ] 
-   params <- expand.grid(taus=taus, embeds=embeds)
-   newId <- unique(factor(basedata$id))
+estDerivs <- function(basedata, taus, embeds, delta, sysVarInclude=TRUE){  
+  
+  basedata <- basedata[complete.cases(basedata), ] 
+  params <- expand.grid(taus=taus, embeds=embeds)
+  dyadId <- unique(factor(basedata$dyad))
 
-   derivData <- list()
-   fitTable <- list()
+  derivData <- list()
+  fitTable <- list()
 
-	for(p in 1:length(newId))
-	{
-	   r <- list()
-	   datai <- basedata[basedata$id == newId[p],]
+  for(d in 1:length(dyadId)){
+    r <- list()
+    freq0 <- list()
+    freq1 <- list()
+	dataiFull <- basedata[basedata$dyad == dyadId[d],]
+	datai <- subset(dataiFull, dist0 == 1)
 
-		for(i in 1:nrow(params))
-		{
-		   # Estimate derivatives for each parameter combination
-		   obsEmbed <- gllaEmbed(datai$obs_deTrend, tau=params[i,1], embed=params[i,2])
-		   p_obsEmbed <- gllaEmbed(datai$p_obs_deTrend, tau=params[i,1], embed=params[i,2])   
+    for(i in 1:nrow(params)){
+	  # Estimate derivatives for each parameter combination
+	  obsEmbed <- gllaEmbed(datai$obs_deTrend, tau=params[i,1], embed=params[i,2])
+	  p_obsEmbed <- gllaEmbed(datai$p_obs_deTrend, tau=params[i,1], embed=params[i,2])   
 
-		   obsLLA <- gllaWMatrix(tau=params[i,1], embed=params[i,2], deltaT=delta, order=2)
-		   obsDeriv <- obsEmbed[,1:dim(obsEmbed)[2]] %*% obsLLA
-		   p_obsDeriv <- p_obsEmbed[,1:dim(p_obsEmbed)[2]] %*% obsLLA
+	  obsLLA <- gllaWMatrix(tau=params[i,1], embed=params[i,2], deltaT=delta, order=2)
+	  obsDeriv <- obsEmbed[,1:dim(obsEmbed)[2]] %*% obsLLA
+	  p_obsDeriv <- p_obsEmbed[,1:dim(p_obsEmbed)[2]] %*% obsLLA
 
-		   # combine actor/partner derivatives and name columns
-		   deriv <- cbind(obsDeriv, p_obsDeriv)
-		   dimnames(deriv) <- list(NULL, c("obs_deTrend","d1","d2","p_obs_deTrend","p_d1","p_d2"))
-		   deriv <- as.data.frame(deriv)
+	  idLength <- dim(obsDeriv)[1]
+	  dist0 <- rep(unique(datai$dist0), idLength)
+	  dist1 <- rep(unique(datai$dist1), idLength)
 
-		   # fit CLO and get R^2 for that combination of parameters
-		   out <- lm(d2 ~ obs_deTrend + d1 + p_obs_deTrend + p_d1, data=deriv)
-		   r[i] <- summary(out)$adj.r.squared 
-		}
-		
-	   ## get maximum R^2 for given person and the corresponding tau & embed values
-	   maxR <- max(unlist(r))
-	   paramRow <- which(r==maxR)
-	   select <- params[paramRow,]
-	   tau <- select[1,1]
-	   embed <- select[1,2]
+	  deriv0 <- cbind(obsDeriv, dist0)
+	  deriv1 <- cbind(p_obsDeriv, dist1)
+	  deriv0full <- cbind(deriv0, deriv1)
+	  dimnames(deriv0full) <- list(NULL, c("obs_deTrend","d1","d2","dist0","p_obs_deTrend","p_d1","p_d2","dist1")) 
+	  deriv1full <- cbind(deriv1, deriv0)
+	  dimnames(deriv1full) <- list(NULL, c("obs_deTrend","d1","d2","dist0","p_obs_deTrend","p_d1","p_d2","dist1"))
 
-	   ## get period (1 cycle (peak to peak)) in given time units associated with highest R^2
+	  derivi <- rbind(deriv1full, deriv0full)
+	  derivi <- as.data.frame(derivi)
 
-	   if (out$coefficients[2] >= 0) {print("error: frequency parameter is not negative")}
-	   n <- abs(as.numeric(out$coefficients[2]))
-	   period <- (2*pi) / (sqrt(n))
+	  # fit CLO and get R^2 for that combination of parameters
+	  out <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1, data=derivi)
+	  r[i] <- summary(out)$adj.r.squared 
+	  freq0[i] <- out$coefficients[1]
+	  freq1[i] <- out$coefficients[5]
+	 }
+	  
+	  ## get maximum R^2 for given dyad and the corresponding tau & embed values
+	  maxR <- max(unlist(r))
+	  paramRow <- which(r==maxR)
+	  select <- params[paramRow,]
+	  tau <- select[1,1]
+	  embed <- select[1,2]
+	  temp0 <- unlist(freq0)
+	  freq0 <- temp0[paramRow]
+	  n0 <- abs(as.numeric(freq0))
+	  temp1 <- unlist(freq1)
+	  freq1 <- temp1[paramRow]
+	  n1 <- abs(as.numeric(freq1))
 
-	   # Estimate derivatives with selected tau and embed for each person
-	   obsEmbed <- gllaEmbed(datai$obs_deTrend, tau=tau, embed=embed)
-	   p_obsEmbed <- gllaEmbed(datai$p_obs_deTrend, tau=tau, embed=embed)   
+	  ## get period (1 cycle (peak to peak)) in given time units associated with highest R^2
 
-	   obsLLA <- gllaWMatrix(tau=tau, embed=embed, deltaT=delta, order=2)
-	   obsDeriv <- obsEmbed[,1:dim(obsEmbed)[2]] %*% obsLLA
-	   p_obsDeriv <- p_obsEmbed[,1:dim(p_obsEmbed)[2]] %*% obsLLA
+	  if (freq0 >= 0 | freq1 >= 0) {print("error: frequency parameter is not negative")}
+	  period0 <- (2*pi) / (sqrt(n0))
+	  period1 <- (2*pi) / (sqrt(n1))
 
-	   # add time, recover original ids, distinguisher and sysVar (if TRUE), add to derivatives and name columns
-	   idLength <- dim(obsDeriv)[1]
-	   time <- seq_len(idLength)
-	   dyad <- rep(unique(datai$dyad, idLength))
-	   id <- rep(unique(datai$id), idLength)
-	   dist0 <- rep(unique(datai$dist0), idLength)
-	   dist1 <- rep(unique(datai$dist1), idLength)
+      # Estimate derivatives with selected tau and embed for each dyad
+	  obsEmbed <- gllaEmbed(datai$obs_deTrend, tau=tau, embed=embed)
+	  p_obsEmbed <- gllaEmbed(datai$p_obs_deTrend, tau=tau, embed=embed)   
+
+	  obsLLA <- gllaWMatrix(tau=tau, embed=embed, deltaT=delta, order=2)
+	  obsDeriv <- obsEmbed[,1:dim(obsEmbed)[2]] %*% obsLLA
+	  p_obsDeriv <- p_obsEmbed[,1:dim(p_obsEmbed)[2]] %*% obsLLA
 	   
-	   if(sysVarInclude == TRUE){
-	     sysVar <- rep(unique(datai$sysVar), idLength)
-	     deriv <- cbind(dyad, id, time, obsDeriv, p_obsDeriv, dist0, dist1, sysVar)
-	     dimnames(deriv) <- list(NULL,c("dyad","id","time","obs_deTrend","d1","d2","p_obs_deTrend","p_d1","p_d2","dist0", 
-	   "dist1", "sysVar"))
-	      } else {
-	  	      deriv <- cbind(dyad, id, time, obsDeriv, p_obsDeriv, dist0, dist1)
-	     dimnames(deriv) <- list(NULL,c("dyad","id","time","obs_deTrend","d1","d2","p_obs_deTrend","p_d1","p_d2","dist0", 
-	   "dist1"))
-	    }
+	  idLength <- dim(obsDeriv)[1]
+	  dist0 <- rep(unique(datai$dist0), idLength)
+	  dist1 <- rep(unique(datai$dist1), idLength)
+	  time <- seq_len(idLength)
+	  dyad <- rep(unique(datai$dyad, idLength))
+	  id0 <- rep(unique(datai$id), idLength)
+	  id1 <- rep(unique(datai$dyad), idLength)
 	   
-	   deriv <- as.data.frame(deriv)
+      if(sysVarInclude == TRUE){
+	     data0 <- dataiFull[dataiFull$dist0 == 1, "sysVar"]
+	     temp1 <- data0[1]
+	     sysVar0 <- rep(temp1, idLength)
+	     data1 <- dataiFull[dataiFull$dist1 == 1, "sysVar"]
+	     temp2 <- data1[1]
+	     sysVar1 <- rep(temp2, idLength)
+	   	   
+	     deriv0 <- cbind(dyad, id0, dist0, sysVar0, time, obsDeriv)
+	     deriv1 <- cbind(dyad, id1, dist1, sysVar1, time, p_obsDeriv)  
+	     deriv0full <- cbind(deriv0, deriv1)
+	     dimnames(deriv0full) <- list(NULL, c("dyad","id", "dist0", "sysVar","time","obs_deTrend","d1","d2","p_dyad","p_id","dist1","p_sysVar","p_time","p_obs_deTrend","p_d1","p_d2"))
+	     deriv1full <- cbind(deriv1, deriv0)
+	     dimnames(deriv1full) <- list(NULL, c("dyad","id", "dist0", "sysVar","time","obs_deTrend","d1","d2","p_dyad","p_id","dist1","p_sysVar","p_time","p_obs_deTrend","p_d1","p_d2"))
+	   } else {
+	  	   deriv0 <- cbind(dyad, id0, dist0, time, obsDeriv)
+	       deriv1 <- cbind(dyad, id1, dist1, time, p_obsDeriv)
+	       deriv0full <- cbind(deriv0, deriv1)
+	       dimnames(deriv0full) <- list(NULL, c("dyad","id", "dist0", "time","obs_deTrend","d1","d2","p_dyad","p_id","dist1","p_time","p_obs_deTrend","p_d1","p_d2"))	   
+	       deriv1full <- cbind(deriv1, deriv0)		  
+	       dimnames(deriv1full) <- list(NULL, c("dyad","id", "dist0", "time","obs_deTrend","d1","d2","p_dyad","p_id","dist1","p_time","p_obs_deTrend","p_d1","p_d2"))
+       }
 
-	   derivData[[p]] <- deriv
-	   fitTable[[p]] <- c("id"= unique(deriv$id), "tau"=tau, "embed"= embed, 
-	   "Rsqr"= maxR, "Period"=period)
-	}
+    deriv <- rbind(deriv1full, deriv0full)
+	deriv <- as.data.frame(deriv)   
+	derivData[[d]] <- deriv
+	fitTable[[d]] <- c("dyad"= unique(deriv$dyad), "tau"=tau, "embed"= embed, 
+	   "Rsqr"= maxR, "Period0"=period0, "Period1"=period1)
+  }
 
    ## output, which includes the derivative data and the fit table
 
-   derivD <- as.data.frame(do.call(rbind, derivData))
-   fitTable <- matrix(unlist(fitTable), nrow= length(newId), byrow=T)
-   dimnames(fitTable) <- list(NULL, c("id","tau","embed","Max-Rsqr","Period"))
-   fitTable <- round(fitTable, 2)
+  derivD <- as.data.frame(do.call(rbind, derivData))
+  fitTable <- as.data.frame(do.call(rbind, fitTable))
+  fitTable <- round(fitTable, 2)
 
-   derivOut <- list("data"=derivD, "fitTable"= fitTable)
+  derivOut <- list("data"=derivD, "fitTable"= fitTable)
 }
+
+################ cloCoupleOde
 
 #' Provides the equation for a coupled oscillator model for the differential equation solver (ode) to plot
 
@@ -195,6 +228,8 @@ cloCoupledOde <- function(t, state, parameters)
   })
 }
 
+############### cloUncoupledOde
+
 #' Provides the equation for an un-coupled oscillator model for the differential equation solver (ode) to plot
 
 cloUncoupledOde <- function(t, state, parameters)
@@ -208,6 +243,7 @@ cloUncoupledOde <- function(t, state, parameters)
   })
 }
 
+################### indivClo
 
 #' Estimates either an uncoupled or coupled oscillator model for each dyad.
 #' 
@@ -268,6 +304,8 @@ indivClo <- function(basedata, whichModel)
 }
 
 
+################### indivCloCompare
+
 #' Compares model fit for the uncoupled and coupled oscillator for each dyad's state trajectories using an R-square comparison. 
 #' 
 #' Fits an uncoupled and coupled oscillator model to each dyad's observed state variables and returns the adjusted R-squares, along with the difference between them (coupled - uncoupled, so positive values indicate better fit for the more complex model).
@@ -298,6 +336,8 @@ indivCloCompare <- function(basedata)
   output <- list(R2uncouple=R2uncouple, R2couple=R2couple, R2dif=R2dif)
 }
 
+
+################ indivCloPlots
 
 #' Produces plots of either an uncoupled or coupled oscillator model-predicted trajectories overlaid on raw data for each dyad.
 #' 
@@ -413,6 +453,8 @@ indivCloPlots <- function(basedata, whichModel, idConvention, dist0name=NULL, di
   results <- list(plots=plots)
 }
 
+###################### cloResids
+
 #' Produces histograms of the residuals from the oscillator model for each dyad.
 #' 
 #' @param basedata A dataframe that was produced with the "estDerivs" function.
@@ -461,6 +503,8 @@ cloResids <- function(basedata, whichModel)
   results <- list(plots=plots)
 }
 
+
+#################### cloPredTraj
 
 #' Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters.
 #' 

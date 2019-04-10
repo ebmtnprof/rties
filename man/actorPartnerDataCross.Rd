@@ -2,7 +2,7 @@
 % Please edit documentation in R/rtiesShared.R
 \name{actorPartnerDataCross}
 \alias{actorPartnerDataCross}
-\title{actorPartnerDataCross: This function takes individual cross-sectional data from dyads and turns it into actor-partner format.}
+\title{Takes individual cross-sectional data from dyads and turns it into actor-partner format.}
 \usage{
 actorPartnerDataCross(basedata, dyadID, personID)
 }

@@ -18,8 +18,8 @@ estDerivs(basedata, taus, embeds, delta, sysVarInclude = TRUE)
 \item{sysVarInclude}{An optional argument specifying whether the system variable was included in the dataframe during the dataPrep step (TRUE), or not (FALSE). Default is TRUE.}
 }
 \value{
-The function returns a list including: 1) "data" which is a dataframe containing first and second derivative estimates of an observed state variable, and 2) "fitTable" which shows the maximal R^2 achieved for each person for an individual oscillator model, along with the associated tau, embed and estimated period of oscillation.
+The function returns a list including: 1) "data" which is a dataframe containing first and second derivative estimates of an observed state variable, and 2) "fitTable" which shows the maximal R^2 achieved for each dyad for a coupled oscillator model, along with the associated tau, embed and estimated period of oscillation.
 }
 \description{
-This function makes use of 2 functions written by Steven Boker, "gllaWMatrix" and "gllaEmbed" which are available on his website, http://people.virginia.edu/~smb3u/. It fits an individual linear oscillator model for each person at different combinations of the input parameters (tau, embeds) and returns the input values and period of oscillation that maximize the R^2 for each person. It also estimates first and second derivatives of the observed state variable for each person at the input values that maximize the R^2 for that person and returns a dataframe that contains them.
+This function makes use of 2 functions written by Steven Boker, "gllaWMatrix" and "gllaEmbed" which are available on his website, http://people.virginia.edu/~smb3u/. It fits a coupled oscillator model for each dyad at different combinations of the input parameters (tau, embeds) and returns the input values and period of oscillation that maximize the R^2 for each dyad. It also estimates first and second derivatives of the observed state variable for each person at the input values that maximize the R^2 for that dyad and returns a dataframe that contains them.
 }

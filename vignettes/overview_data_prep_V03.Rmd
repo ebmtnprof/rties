@@ -1,5 +1,5 @@
 ---
-title: "overview_data_prep"
+title: "overview_data_prep_V03"
 author: "Emily Butler, eabutler@u.arizona.edu"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -95,7 +95,8 @@ histAll(data1)
 A second highly recommended check is to plot the raw time-series data for each dyad, which can be accomplished with the “plotRaw” function. If you have a large number of dyads, you may want to only plot a random subset, or several random subsets. For this vignette we plot a specific sub-set to present some typical-looking examples. Use ?plotRaw for further explanation of the arguments for the function. Running the following syntax we see that one person is completely missing data for dyad 19, which will cause problems if we don't fix it. If you are not plotting all your dyads, you will need to use some other method to identify any dyads with completely missing data for one or both partners. This visualization is also useful for spotting outliers, noise in the data, etc. that should be fixed before proceeding.
 ```{r, dpi=180}
 temp <- subset(data1, couple %in% c(2,3,5,8,10,12,13,17,19))
-plotRaw(temp, dyadId="couple", obs="dial", dist="female", time_name="time", dist0name="Men", dist1name="Women", obs_name="Dial")
+plotRaw(temp, dyadId="couple", obs="dial", dist="female",
+        time_name="time", dist0name="Men", dist1name="Women", obs_name="Dial")
 ```
 
 At this point, it would be worthwhile to see if the missing data can be accounted for. In our case, we discovered there had been recording problems for the one person and so the only thing we can do about the missing data for dyad 19 is to remove that dyad from the analysis (several steps in the modeling require at least partial data from both partners and will generate error messages if that is violated). The following syntax accomplishes that. First, the dyad to remove is assigned to an object called "dyads" (if more than one dyad is to be removed, this could be a vector, e.g., dyads <- c(3, 5, 19) would remove three dyads). Then the "removeDyads" function takes as arguments the full dataframe, the variable indicating which dyads to remove, and the name of the dataframe column that includes dyad membership.
@@ -104,9 +105,10 @@ dyads <- c(19)
 data2 <- removeDyads(data1, dyads, data1$couple)
 ```
 
-The “dataPrep” function does much of the work of processing the data into a generic form that is appropriate for any of the _rties_ models (see syntax below). In this example, “data2” is the original data set with any necessary cleaning done and “data3” will be a dataframe holding the processed data. The argument "sysVar" is optional and allows you to include a single system variable that will be carried through the analysis. If, however, you would like to investigate multiple system variables, or include other control variables or moderators when it comes to predicting the dynamics, you can include these at a later step (see "makeLpaData" in the model vignettes). Here we focus on the single system variable of "empathy" and include it at the "dataPrep"" step.  Use ?dataPrep for further explanation of the arguments for the function. 
+The “dataPrep” function does much of the work of processing the data into a generic form that is appropriate for any of the _rties_ models (see syntax below). In this example, “data2” is the original data set with any necessary cleaning done and “data3” will be a dataframe holding the processed data. The argument "sysVar" is optional and allows you to include a single system variable that will be carried through the analysis. If, however, you would like to investigate multiple system variables, or include other control variables or moderators when it comes to predicting the dynamics, you can include these at a later step (see "makeLpaData" in the model vignettes). Here we focus on the single system variable of "empathy" and include it at the "dataPrep"" step.  The argument "robustScale" indicates whether the observed state variable should be robust scaled, using the _DescTools_ package, which can help to reduce noise. Use ?dataPrep for further explanation of the arguments for the function. 
 ```{r}
-data3 <- dataPrep(data2, personId="person", dyadId="couple", obs="dial", sysVar="empathy", dist="female", time_name="time", time_lag=10)
+data3 <- dataPrep(data2, personId="person", dyadId="couple", obs="dial", sysVar="empathy",
+                  dist="female", time_name="time", time_lag=10, robustScale=TRUE)
 head(data3)
 ```
 

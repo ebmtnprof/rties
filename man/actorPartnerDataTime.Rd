@@ -2,7 +2,7 @@
 % Please edit documentation in R/rtiesShared.R
 \name{actorPartnerDataTime}
 \alias{actorPartnerDataTime}
-\title{actorPartnerDataTime: This function takes individual repeated measures data from dyads and turns it into actor-partner format.}
+\title{Takes individual repeated measures data from dyads and turns it into actor-partner format.}
 \usage{
 actorPartnerDataTime(basedata, dyadID, personID)
 }

@@ -141,7 +141,6 @@ dataRobScale <- function(basedata){
 }
 
 
-
 ########### removeDyads
 
 #' Remove data for specified dyads from a dataframe
@@ -160,7 +159,9 @@ removeDyads <- function (basedata, dyads, dyadID){
 	return(basedata)
 }
 
-#' actorPartnerDataCross: This function takes individual cross-sectional data from dyads and turns it into actor-partner format.
+################# actorPartnerDataCross
+
+#' Takes individual cross-sectional data from dyads and turns it into actor-partner format.
 #'
 #' Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads. Need dyad ID numbered same as for person ID for the first person in the dyad. Both members in each dyad need to have the same number of rows (rows of missing data are ok)
 #'
@@ -190,7 +191,9 @@ actorPartnerDataCross <- function(basedata, dyadID, personID){
 	return(dataAP)		
 }
 
-#' actorPartnerDataTime: This function takes individual repeated measures data from dyads and turns it into actor-partner format.
+################# actorPartnerDataTime
+
+#' Takes individual repeated measures data from dyads and turns it into actor-partner format.
 #'
 #' Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads. Need dyad ID numbered same as for person ID for the first person in the dyad. Both members in each dyad need to have the same number of rows (rows of missing data are ok).
 #'
@@ -226,6 +229,8 @@ actorPartnerDataTime <- function(basedata, dyadID, personID){
 		}		
 	dataAP <- as.data.frame(do.call(rbind, dataAP))
 } 	
+
+############# makeLpaData
 
 #' Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.
 #'
@@ -276,6 +281,8 @@ makeLpaData <- function(modelData, lpaData, lpaParams, whichModel, extraVars=NUL
 
 ################ Plotting functions
 
+########## histAll
+
 #' Histograms for all numeric variables in a dataframe.
 #'
 #' Useful for checking distributions of potential system variables to assess normality
@@ -294,6 +301,8 @@ histAll <- function(basedata)
   }
   par(mfrow=c(1,1))
 }
+
+############### plotRaw
 
 #' Plots of observed variable over time by dyad.
 #'
@@ -327,6 +336,7 @@ plotRaw <- function(basedata, dyadId, obs, dist, time_name, dist0name=NULL, dist
   lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
 }
 
+################ plotDataByProfile
 
 #' Plots of de-trended observed variable over time, with dyads separated into groups based on LPA profile membership.
 #'
