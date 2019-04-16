@@ -504,64 +504,74 @@ cloResids <- function(basedata, whichModel)
 }
 
 
-#################### cloPredTraj
+#################### cloPlotTraj
 
 #' Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters.
 #' 
-#' @param origData A dataframe that was produced with the "dataPrep" function.
-#' @param lpaData A dataframe containing the LPA profile memberships.
-#' @param lpaParams A matrix containing the clo parameter estimates associated with each of the latent profiles.
+#' @param prepData A dataframe that was produced with the "dataPrep" function.
+#' @param paramEst A dataframe created by indivClo containing the clo parameter estimates for each dyad.
 #' @param n_profiles The number of latent profiles.
 #' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the observed time variable.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
 #' @param obsName An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
-#' @param printPlots An optional argument specifying whether the plots should be automatically printed. Default is TRUE.
 #' 
 #' @return The function returns the plots as a list. 
 
 #' @import ggplot2
 #' @export
 
-cloPredTraj <- function(origData, lpaData, lpaParams, n_profiles, time_length=NULL, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL, printPlots=T)
-{
-  if(is.null(time_length)){time_length <- as.numeric(quantile(origData$time, prob=.75))}
-  if(is.null(dist0name)){dist0name <- "dist0"}
-  if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(obsName)){obsName <- "observed"}
-  
-  if(is.null(minMax)){
-  	min <- min(origData$obs_deTrend, na.rm=T)
-	max <- max(origData$obs_deTrend, na.rm=T)
+cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+{    
+    if(is.null(minMax)){
+    min <- min(prepData$obs_deTrend, na.rm=T)
+    max <- max(prepData$obs_deTrend, na.rm=T)
   } else {
-  	min <- quantile(origData$obs_deTrend, minMax[1], na.rm=T)
-	max <- quantile(origData$obs_deTrend, minMax[2],  na.rm=T)
+  	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
+	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
-  
-  plots <- list()
-  
-  for(i in 1:n_profiles){
-	statedata0 <- origData[origData$dist0 == 1 & origData$time ==1,] 
-	start0 <- median(statedata0$obs_deTrend, na.rm=T)
-  	statedata1 <- origData[origData$dist0 == 0 & origData$time ==1,] 
-	start1 <- median(statedata1$obs_deTrend, na.rm=T)
-  	
-	plotTimes <- seq(1, time_length, by=1)
 
-	state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
-	paramsi <- lpaParams[ ,i]
-	
-	temp <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
-	temp2 <- subset(temp, select=-c(y2, y4))
-	names(temp2) <- c("time","d0pred","d1pred")
-	temp3 <- reshape(temp2, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
-	temp3$roleNew <- factor(temp3$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
+    if(is.null(time_length)){time_length <- as.numeric(quantile(prepData$time, prob=.75))}
+    if(is.null(dist0name)){dist0name <- "dist0"}
+    if(is.null(dist1name)){dist1name <- "dist1"}
+    if(is.null(obsName)){obsName <- "observed"}
+    if(is.null(minMax)){min <- min(prepData$obs_deTrend, na.rm=T)
+    				   max <- max(prepData$obs_deTrend, na.rm=T)}
+
+    temp1 <- paramEst %>%
+        select(obs_0:p_d1_1) %>%
+        tidyLPA::estimate_profiles(n_profiles)
+        profileParams <- as.data.frame(tidyLPA::get_estimates(temp1))
+        
+    plots <- list()
+  
+    for(i in 1:n_profiles){
+	  statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
+	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
+  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
+	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
+  	
+	  plotTimes <- seq(1, time_length, by=1)
+
+	  state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
+	  
+	  tempParams <- subset(profileParams, Category == "Means" & Class==i, select=c(Parameter, Estimate))
+	  temp1 <- tempParams[ ,2]
+      names <- tempParams[ ,1]
+      names(temp1) <- names
+      paramsi <- temp1
+		  
+	  temp2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
+	  temp3 <- subset(temp2, select=-c(y2, y4))
+	  names(temp3) <- c("time","d0pred","d1pred")
+	  temp4 <- reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
+	   temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
 			
-	plotData <- temp3[complete.cases(temp3), ]	
-	profileName <- paste("Profile", i , sep="_")
+	  plotData <- temp4[complete.cases(temp3), ]	
+	  profileName <- paste("Profile", i , sep="_")
 				
-	plotsi <- ggplot(plotData, aes(x=time)) +
+	  plotsi <- ggplot(plotData, aes(x=time)) +
 				geom_line(aes(y= pred, color=roleNew), linetype="solid", size=1, na.rm=T) +
 				scale_color_manual(name="Role", values=c("black","gray47")) +
 				ylab(obsName) +
@@ -569,11 +579,87 @@ cloPredTraj <- function(origData, lpaData, lpaParams, n_profiles, time_length=NU
 				labs(title=profileName, subtitle= "Predicted Trajectory") +
 				theme(plot.title=element_text(size=11))
 	
-	plots[[i]] <- plotsi
+	  plots[[i]] <- plotsi
+    }
+  print(plots)
+  return(plots) 
+} 
+
+
+#################### cloPredTrajInternal
+
+#' Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters. Not exported - used by "inspectProfiles"
+#' 
+#' @param prepData A dataframe that was produced with the "dataPrep" function.
+#' @param paramEst A dataframe created by indivClo containing the clo parameter estimates for each dyad.
+#' @param n_profiles The number of latent profiles.
+#' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
+#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
+#' @param obsName An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.
+#' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
+#' 
+#' @return The function prints the plots. 
+
+#' @import ggplot2
+
+cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+{    
+    if(is.null(minMax)){
+    min <- min(prepData$obs_deTrend, na.rm=T)
+    max <- max(prepData$obs_deTrend, na.rm=T)
+  } else {
+  	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
+	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
- 
- if(printPlots == T) {print(plots)}
- return(plots)
-}
 
+    time_length <- as.numeric(quantile(prepData$time, prob=.75))
+    if(is.null(dist0name)){dist0name <- "dist0"}
+    if(is.null(dist1name)){dist1name <- "dist1"}
+    if(is.null(obsName)){obsName <- "observed"}
+    if(is.null(minMax)){min <- min(prepData$obs_deTrend, na.rm=T)
+    				   max <- max(prepData$obs_deTrend, na.rm=T)}
 
+    temp1 <- paramEst %>%
+        select(obs_0:p_d1_1) %>%
+        tidyLPA::estimate_profiles(n_profiles)
+        profileParams <- as.data.frame(tidyLPA::get_estimates(temp1))
+        
+    plots <- list()
+  
+    for(i in 1:n_profiles){
+	  statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
+	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
+  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
+	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
+  	
+	  plotTimes <- seq(1, time_length, by=1)
+
+	  state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
+	  
+	  tempParams <- subset(profileParams, Category == "Means" & Class==i, select=c(Parameter, Estimate))
+	  temp1 <- tempParams[ ,2]
+      names <- tempParams[ ,1]
+      names(temp1) <- names
+      paramsi <- temp1
+		  
+	  temp2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
+	  temp3 <- subset(temp2, select=-c(y2, y4))
+	  names(temp3) <- c("time","d0pred","d1pred")
+	  temp4 <- reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
+	   temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
+			
+	  plotData <- temp4[complete.cases(temp3), ]	
+	  profileName <- paste("Profile", i , sep="_")
+				
+	  plotsi <- ggplot(plotData, aes(x=time)) +
+				geom_line(aes(y= pred, color=roleNew), linetype="solid", size=1, na.rm=T) +
+				scale_color_manual(name="Role", values=c("black","gray47")) +
+				ylab(obsName) +
+				ylim(min, max) +
+				labs(title=profileName, subtitle= "Predicted Trajectory") +
+				theme(plot.title=element_text(size=11))
+	
+	  plots[[i]] <- plotsi
+    }
+  print(plots)
+} 

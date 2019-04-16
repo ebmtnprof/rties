@@ -14,7 +14,8 @@ Imports:
     plyr,
     scales,
     tidyLPA,
-    interactions
+    interactions,
+    dplyr
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

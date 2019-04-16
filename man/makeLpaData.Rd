@@ -7,7 +7,7 @@
 makeLpaData(modelData, lpaData, lpaParams, whichModel, extraVars = NULL)
 }
 \arguments{
-\item{modelData}{A dataframe created by one of the "indiv" functions containing the parameter estimates for one of the models (e.g., inertCoord or clo) in combination and all other data in the analysis (e.g., sysVar, covariates, etc)}
+\item{modelData}{A dataframe created by one of the "indiv" functions containing the parameter estimates for one of the models (e.g., inertCoord or clo) in combination and all other data in the analysis (e.g., dist0, dist1, sysVar if included, etc)}
 
 \item{lpaData}{The object created by tidyLPA's "estimate_profiles" function when "return_orig_df = TRUE"}
 

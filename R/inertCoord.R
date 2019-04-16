@@ -152,6 +152,8 @@ indivInertCoord <- function(basedata, whichModel, sysVarInclude=TRUE)
 }
 
 
+####################### indivInertCoordCompare
+
 #' Compares model fit for the inertia-only, coordination-only and full inertia-coordination model for each dyad's state trajectories using an R-square comparison. 
 #' 
 #' Fits inertia-only, coordination-only and full inertia-coordination models to each dyad's observed state variables and returns the adjusted R-squares, along with the differences between them, so positive values indicate better fit for the first model in the comparison. The 3 comparisons are inertia minus coordination, full model minus inertia, and full model minus coordination.
@@ -193,6 +195,8 @@ indivInertCoordCompare <- function(basedata)
   output <- list(R2inert=R2inert, R2coord=R2coord, R2inertCoord=R2inertCoord, R2dif_I_C=R2dif_I_C, R2dif_IC_I=R2dif_IC_I, R2dif_IC_C=R2dif_IC_C)
 }
 
+
+####################### indivInertCoordPlots
 
 #' Produces plots of versions of the inertia-coordination model-predicted trajectories overlaid on raw data for each dyad.
 #' 
@@ -264,6 +268,8 @@ indivInertCoordPlots <- function(basedata, whichModel, dist0name = NULL, dist1na
   results <- list(plots=plots)
 }
 
+#################### inertCoordResids
+
 #' Produces histograms of the residuals from the inertia-coordination model for each dyad.
 #' 
 #' @param basedata A dataframe that was produced with the "dataPrep" function.
@@ -314,61 +320,70 @@ inertCoordResids <- function(basedata, whichModel)
 }
 
 
+######################## inertCoordPlotTrajInternal 
 
-###############
-#' Plots the bivariate state variables' model-predicted temporal trajectories for each latent profile of inertia-coordination parameters. 
+#' Plots the bivariate state variables' model-predicted temporal trajectories for each latent profile of inertia-coordination parameters. Not exported - used by inspectProfiles
 #' 
 #' Produces sets of prototypical example plots of the state variables' predicted temporal trajectories for each latent profile obtained based on the inertia-coordination parameters. The plots are produced by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step.  
 #' 
-#' @param origData A dataframe that was produced with the "dataPrep" function.
-#' @param lpaData A dataframe containing the LPA profile memberships.
-#' @param lpaParams A matrix containing the inertia-coordination parameter estimates associated with each of the latent profiles.
+#' @param prepData A dataframe that was produced with the "dataPrep" function.
+#' @param paramEst A dataframe created by indivInertCoord containing the inertia-coordination parameter estimates for each dyad.
 #' @param n_profiles The number of latent profiles.
-#' @param time_length An optional value specifying how many time points to plot across. Default is 20.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
 #' @param obsName An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
-#' @param printPlots An optional argument specifying whether the plots should be automatically printed. Default is TRUE.
-#' @param numPlots An optional value controlling how many random examples of each profile are produced. Default is 5.
 #' 
-#' @return The function returns the plots as a list. 
+#' @return The function prints the plots. 
 
 #' @import ggplot2
-#' @export
+#' @import dplyr
 
-inertCoordPredTraj <- function(origData, lpaData, lpaParams, n_profiles, time_length=NULL, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL, printPlots=T, numPlots=NULL){
-
-  if(is.null(time_length)){time_length <- 20}
+inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+{ 
+  time_length <- 20
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
   if(is.null(obsName)){obsName <- "observed"}
   
   if(is.null(minMax)){
-  	min <- min(origData$obs_deTrend, na.rm=T)
-	max <- max(origData$obs_deTrend, na.rm=T)
+  	min <- min(prepData$obs_deTrend, na.rm=T)
+	max <- max(prepData$obs_deTrend, na.rm=T)
   } else {
-  	min <- quantile(origData$obs_deTrend, minMax[1], na.rm=T)
-	max <- quantile(origData$obs_deTrend, minMax[2],  na.rm=T)
+  	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
+	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
 
-  noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.omit, data=origData, control=nlme::lmeControl(opt="optim"))
+  temp1 <- paramEst %>%
+        select(inert1, coord1, coord0, inert0) %>%
+        tidyLPA::estimate_profiles(n_profiles)
+        profileParams <- as.data.frame(tidyLPA::get_estimates(temp1))
+  
+  noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.omit, data=prepData, control=nlme::lmeControl(opt="optim"))
   
   noise <- noiseModel$sigma
 
-  if(is.null(numPlots)) {numPlots <- 5}
+  numPlots <- 3
   
   multiPlots <- list()
   plots <- list()
   label <- vector()
 
-  
   for(i in 1:n_profiles){
   	for (k in 1:numPlots){
-      start1 <- colMeans(subset(lpaData, profile==i & dist0==0, select=int1), na.rm=T)
-      start0 <- colMeans(subset(lpaData, profile==i & dist0==0, select=int0), na.rm=T) 
-      start <- c(start1, start0)
-      paramsi <- lpaParams[ ,i]
+      statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
+	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
+  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
+	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
+  	
+      start <- c(start1, start0)  
+      
+      tempParams <- subset(profileParams, Category == "Means" & Class==i, select=c(Parameter, Estimate))
+	  temp1 <- tempParams[ ,2]
+      names <- tempParams[ ,1]
+      names(temp1) <- names
+      paramsi <- temp1
+
       A <- matrix(paramsi, ncol=2, byrow=T)
 
       results1 <- list()
@@ -417,10 +432,128 @@ inertCoordPredTraj <- function(origData, lpaData, lpaParams, n_profiles, time_le
     }
     multiPlots[[i]] <- plots
   }
-  if(printPlots == T) {print(multiPlots)}
-  return(multiPlots)
+print(multiPlots)
 }
 
+
+######################## inertCoordPlotTraj 
+
+#' Plots the bivariate state variables' model-predicted temporal trajectories for each latent profile of inertia-coordination parameters. 
+#' 
+#' Produces sets of prototypical example plots of the state variables' predicted temporal trajectories for each latent profile obtained based on the inertia-coordination parameters. The plots are produced by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step.  
+#' 
+#' @param prepData A dataframe that was produced with the "dataPrep" function.
+#' @param paramEst A dataframe created by indivInertCoord containing the inertia-coordination parameter estimates for each dyad.
+#' @param n_profiles The number of latent profiles.
+#' @param time_length An optional value specifying how many time points to plot across. Default is 20.
+#' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
+#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
+#' @param obsName An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.
+#' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
+#' @param numPlots An optional value controlling how many random examples of each profile are produced. Default is 5.
+#' 
+#' @return The function prints the plots and returns them as a list. 
+
+#' @import ggplot2
+#' @import dplyr
+#' @export
+
+inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL, numPlots=NULL)
+{ 
+  if(is.null(time_length)){time_length <- 20}
+  if(is.null(dist0name)){dist0name <- "dist0"}
+  if(is.null(dist1name)){dist1name <- "dist1"}
+  if(is.null(obsName)){obsName <- "observed"}
+  
+  if(is.null(minMax)){
+  	min <- min(prepData$obs_deTrend, na.rm=T)
+	max <- max(prepData$obs_deTrend, na.rm=T)
+  } else {
+  	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
+	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
+  }
+
+  temp1 <- paramEst %>%
+        select(inert1, coord1, coord0, inert0) %>%
+        tidyLPA::estimate_profiles(n_profiles)
+        profileParams <- as.data.frame(tidyLPA::get_estimates(temp1))
+  
+  noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.omit, data=prepData, control=nlme::lmeControl(opt="optim"))
+  
+  noise <- noiseModel$sigma
+
+  if(is.null(numPlots)){numPlots <- 5}
+  
+  multiPlots <- list()
+  plots <- list()
+  label <- vector()
+
+  for(i in 1:n_profiles){
+  	for (k in 1:numPlots){
+      statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
+	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
+  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
+	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
+  	
+      start <- c(start1, start0)  
+      
+      tempParams <- subset(profileParams, Category == "Means" & Class==i, select=c(Parameter, Estimate))
+	  temp1 <- tempParams[ ,2]
+      names <- tempParams[ ,1]
+      names(temp1) <- names
+      paramsi <- temp1
+
+      A <- matrix(paramsi, ncol=2, byrow=T)
+
+      results1 <- list()
+      results0 <- list()
+      nextStep <- list()
+
+      for (t in 1:time_length){
+        if(t == 1){
+  	      pred <- A %*% start
+  	      dist <- c(1, 0)
+  	      time <- t
+  	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)
+  	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)
+   	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
+        } else {
+  	      pred <- A %*% nextStep[[t-1]]
+  	      dist <- c(1, 0)
+  	      time <- t
+  	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)
+  	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)
+  	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
+          }
+        }
+      
+      final1 <- data.frame(do.call(rbind, results1))
+      temp1 <- data.frame(matrix(unlist(final1), ncol=3, byrow=F))
+      colnames(temp1) <- c("pred1", "dist1", "time")
+      final0 <- data.frame(do.call(rbind, results0))
+      temp0 <- data.frame(matrix(unlist(final0), ncol=3, byrow=F))
+      colnames(temp0) <- c("pred0", "dist0", "time") 
+      temp2 <- suppressMessages(plyr::join(temp1, temp0))
+      temp3 <- reshape(temp2, idvar="dist", varying=list(c("pred1", "pred0"), c("dist1", "dist0")), direction="long")
+      temp4 <- temp3[ , - 1]
+      colnames(temp4) <- c("pred","dist","time")
+      temp4$dist <- factor(temp4$dist, labels=c(dist0name, dist1name))
+    
+      plotData <- temp4
+      profileName <- paste("Profile", i , sep="_")
+      plots[[k]] <- ggplot(plotData, aes(x=time, y=pred, group=dist)) +
+                  geom_line(aes(color=dist)) +
+                  scale_color_manual(values=c("black","gray47")) +
+                  ylab(obsName) +
+                  ylim(min, max) +
+	              labs(title= profileName, subtitle= "Predicted_Trajectory") +
+	              theme(plot.title=element_text(size=11)) 
+    }
+    multiPlots[[i]] <- plots
+  }
+print(multiPlots)
+return(multiPlots)
+}
 
 
 

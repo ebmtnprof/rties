@@ -234,7 +234,7 @@ actorPartnerDataTime <- function(basedata, dyadID, personID){
 
 #' Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.
 #'
-#' @param modelData A dataframe created by one of the "indiv" functions containing the parameter estimates for one of the models (e.g., inertCoord or clo) in combination and all other data in the analysis (e.g., sysVar, covariates, etc)
+#' @param modelData A dataframe created by one of the "indiv" functions containing the parameter estimates for one of the models (e.g., inertCoord or clo) in combination and all other data in the analysis (e.g., dist0, dist1, sysVar if included, etc)
 #' @param lpaData The object created by tidyLPA's "estimate_profiles" function when "return_orig_df = TRUE"
 #' @param lpaParams The object created by tidyLPA's "estimate_profiles" function when "to_return = mclust"
 #' @param whichModel The name of the model that is being investigated (e.g., "inertCoord" or "clo")
@@ -363,6 +363,9 @@ plotDataByProfile <- function(prepData, profileData, n_profiles, dist0name=NULL,
 
     }
 }
+
+
+
 
 
 ######################### Miscellaneous functions
