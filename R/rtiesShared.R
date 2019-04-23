@@ -10,24 +10,22 @@
 
 #' Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling
 #'
-#' In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations.
+#' In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations. See the "overview_data_prep" vignette for complete details on the necessary format for the dataframe.
 #'
-#' @param basedata A user-provided dataframe.
+#' @param basedata A user-provided dataframe that includes all variables needed for an rties analysis, including potential system variables, control variables, etc.
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
 #' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
-#' @param sysVar An optional argument that is the name of the column in the dataframe that has the system variable (e.g., something that will predict, or be predicted by, the dynamics of the system).
 #' @param time_lag An optional argument for the number of lags for the lagged observable.
 #' @param robustScale An optional argument to perform robust scaling of the de-trended observed state variable, one person at a time, using the DescTools package
 #'
-#' @return The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:
+#' @return The function returns a dataframe that has all the variables needed for modeling system dynamics, each renamed to a generic variable name, which are:
 #' \itemize{
 #' \item id = person id
 #' \item dyad = dyad id
 #' \item obs = observed state variable
-#' \item sysVar = system variable
 #' \item dist1 = 0/1 variable where the 1's indicate the 1's in the original distinguishing variable
 #' \item time = the variable indicating temporal sequence
 #' \item dist0 = 0/1 variable where the 1's indicate the 0's in the original distinguishing variable
@@ -36,17 +34,11 @@
 #'}
 
 #' @export
-dataPrep <- function(basedata, personId, dyadId, obs, dist, time_name, sysVar=NULL, time_lag=NULL, robustScale = FALSE){
+dataPrep <- function(basedata, personId, dyadId, obs, dist, time_name, time_lag=NULL, robustScale = FALSE){
   
-  if(!is.null(sysVar)){
-    vars <- c(personId, dyadId, obs, dist, time_name, sysVar)
-    basedata <- basedata[vars]
-    names(basedata) <- c("id","dyad","obs","dist1","time","sysVar")
-  } else {
-  	vars <- c(personId, dyadId, obs, dist, time_name)
-    basedata <- basedata[vars]
-    names(basedata) <- c("id","dyad","obs","dist1","time")
-  }
+  vars <- c(personId, dyadId, obs, dist, time_name)
+  basedata <- basedata[vars]
+  names(basedata) <- c("id","dyad","obs","dist1","time")
     
       # check distinguishing variable is numeric 
   if (!is.numeric(basedata$dist1)){
@@ -230,11 +222,11 @@ actorPartnerDataTime <- function(basedata, dyadID, personID){
 	dataAP <- as.data.frame(do.call(rbind, dataAP))
 } 	
 
-############# makeLpaData
+############# makeFullData
 
 #' Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.
 #'
-#' @param modelData A dataframe created by one of the "indiv" functions containing the parameter estimates for one of the models (e.g., inertCoord or clo) in combination and all other data in the analysis (e.g., dist0, dist1, sysVar if included, etc)
+#' @param origData The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential control variables, etc.
 #' @param lpaData The object created by tidyLPA's "estimate_profiles" function when "return_orig_df = TRUE"
 #' @param lpaParams The object created by tidyLPA's "estimate_profiles" function when "to_return = mclust"
 #' @param whichModel The name of the model that is being investigated (e.g., "inertCoord" or "clo")
@@ -243,41 +235,29 @@ actorPartnerDataTime <- function(basedata, dyadID, personID){
 
 #' @export
 
-makeLpaData <- function(modelData, lpaData, lpaParams, whichModel, extraVars=NULL){
+makeFullData <- function(basedata, personId, dyadId, dist, lpaData, params){
   
-  if(whichModel !="inertCoord" & whichModel != "clo" ){
-	stop("the model type must be either inertCoord or clo")
-	
-	} else if (whichModel == "inertCoord"){
-		
-	    data <- as.data.frame(lpaData)
-        data <- subset(data, select=c(dyad, profile))
-        data <- suppressMessages(plyr::join(modelData, data))
-        data$profileN <- as.numeric(data$profile) - 1        
-        params <- lpaParams$parameters$mean
-	
-	} else if (whichModel == "clo"){
-			
-	    data <- as.data.frame(lpaData)
-        data <- subset(data, select=c(dyad, profile))
-        data <- suppressMessages(plyr::join(modelData, data))
-        data <- data[!duplicated(data$id), ] 
-        data$profileN <- as.numeric(data$profile) - 1        
-        params <- lpaParams$parameters$mean
-	}
-	
-  if(!is.null(extraVars)){
-  	names(extraVars)[1] <- "id"
-    names(extraVars)[2] <- "dyad"
-    fullData <- plyr::join(data, extraVars) 	
-    results <- list(profileData=fullData, profileParams=params)
-  } else { 	
-  	  results <- list(profileData=data, profileParams=params)
-    }
-  
-  return(results)
- }
+  temp1 <- as.data.frame(lpaData)
+  temp2 <- temp1[!duplicated(temp1$id), ]
+  temp3 <- subset(temp2, select=c(Class))
+  colnames(temp3) <- "profile"
+  temp3$profileN <- as.numeric(temp3$profile) - 1 
+  temp3$profile <- factor(temp3$profile)
 
+  dyad <- params$dyad
+  temp4 <- cbind(temp3, dyad)
+
+  colnames(otherVars)[colnames(otherVars)=="dyadId"] <- "dyad"
+  colnames(otherVars)[colnames(otherVars)=="personId"] <- "person"
+  colnames(otherVars)[colnames(otherVars)=="dist"] <- "dist1"
+
+  otherVars <- otherVars[!duplicated(otherVars$person), ]
+  otherVars$dist0 <- ifelse(otherVars$dist1 == 1, 0, 1)
+
+  fullData <- plyr::join(otherVars, temp4)
+  
+  return(fullData)
+}
 
 ################ Plotting functions
 
