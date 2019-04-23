@@ -4,11 +4,11 @@
 \alias{dataPrep}
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
-dataPrep(basedata, personId, dyadId, obs, dist, time_name, sysVar = NULL,
+dataPrep(basedata, personId, dyadId, obs, dist, time_name,
   time_lag = NULL, robustScale = FALSE)
 }
 \arguments{
-\item{basedata}{A user-provided dataframe.}
+\item{basedata}{A user-provided dataframe that includes all variables needed for an rties analysis, including potential system variables, control variables, etc.}
 
 \item{personId}{The name of the column in the dataframe that has the person-level identifier.}
 
@@ -20,19 +20,16 @@ dataPrep(basedata, personId, dyadId, obs, dist, time_name, sysVar = NULL,
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
-\item{sysVar}{An optional argument that is the name of the column in the dataframe that has the system variable (e.g., something that will predict, or be predicted by, the dynamics of the system).}
-
 \item{time_lag}{An optional argument for the number of lags for the lagged observable.}
 
 \item{robustScale}{An optional argument to perform robust scaling of the de-trended observed state variable, one person at a time, using the DescTools package}
 }
 \value{
-The function returns a dataframe that has all the variables needed for rties modeling, each renamed to a generic variable name, which are:
+The function returns a dataframe that has all the variables needed for modeling system dynamics, each renamed to a generic variable name, which are:
 \itemize{
 \item id = person id
 \item dyad = dyad id
 \item obs = observed state variable
-\item sysVar = system variable
 \item dist1 = 0/1 variable where the 1's indicate the 1's in the original distinguishing variable
 \item time = the variable indicating temporal sequence
 \item dist0 = 0/1 variable where the 1's indicate the 0's in the original distinguishing variable
@@ -41,5 +38,5 @@ The function returns a dataframe that has all the variables needed for rties mod
 }
 }
 \description{
-In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations.
+In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations. See the "overview_data_prep" vignette for complete details on the necessary format for the dataframe.
 }
