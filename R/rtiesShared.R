@@ -326,6 +326,8 @@ plotRaw <- function(basedata, dyadId, obs, dist, time_name, dist0name=NULL, dist
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
 #' @param obsName An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 
+#' @export
+
 plotDataByProfile <- function(prepData, profileData, n_profiles, dist0name=NULL, dist1name=NULL, obs_name=NULL){
 
   if(is.null(dist0name)){dist0name <- "dist0"}
