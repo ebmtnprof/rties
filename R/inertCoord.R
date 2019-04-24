@@ -104,10 +104,6 @@ ccp <- function(basedata, personId, dyadId, obs, time_name)
 
 #' @export
 
-basedata <- data2
-whichModel <- "inertCoord"
-i <- 3
-
 indivInertCoord <- function(basedata, whichModel)
 {	
   if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
