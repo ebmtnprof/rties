@@ -247,14 +247,14 @@ makeFullData <- function(basedata, personId, dyadId, dist, lpaData, params){
   dyad <- params$dyad
   temp4 <- cbind(temp3, dyad)
 
-  colnames(otherVars)[colnames(otherVars)=="dyadId"] <- "dyad"
-  colnames(otherVars)[colnames(otherVars)=="personId"] <- "person"
-  colnames(otherVars)[colnames(otherVars)=="dist"] <- "dist1"
+  colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
+  colnames(basedata)[colnames(basedata)== personId] <- "person"
+  colnames(basedata)[colnames(basedata)== dist ] <- "dist1"
 
-  otherVars <- otherVars[!duplicated(otherVars$person), ]
-  otherVars$dist0 <- ifelse(otherVars$dist1 == 1, 0, 1)
+  basedata <- basedata[!duplicated(basedata$person), ]
+  basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)
 
-  fullData <- plyr::join(otherVars, temp4)
+  fullData <- plyr::join(basedata, temp4)
   
   return(fullData)
 }
