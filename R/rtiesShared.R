@@ -346,10 +346,6 @@ plotDataByProfile <- function(prepData, profileData, n_profiles, dist0name=NULL,
     }
 }
 
-
-
-
-
 ######################### Miscellaneous functions
 
 
