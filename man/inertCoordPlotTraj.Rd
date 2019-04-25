@@ -4,9 +4,9 @@
 \alias{inertCoordPlotTraj}
 \title{Plots the bivariate state variables' model-predicted temporal trajectories for each latent profile of inertia-coordination parameters.}
 \usage{
-inertCoordPlotTraj(prepData, paramEst, n_profiles, time_length = NULL,
-  dist0name = NULL, dist1name = NULL, obsName = NULL,
-  minMax = NULL, numPlots = NULL)
+inertCoordPlotTraj(prepData, paramEst, n_profiles, time_lag,
+  time_length = NULL, dist0name = NULL, dist1name = NULL,
+  obsName = NULL, minMax = NULL, numPlots = NULL)
 }
 \arguments{
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}

@@ -21,7 +21,7 @@
 #' @import ggplot2
 #' @export
 
-inspectProfiles <- function(whichModel, prepData, paramEst, hasNA, n_profiles, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+inspectProfiles <- function(whichModel, time_lag=NULL, prepData, paramEst, hasNA, n_profiles, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
 {   
    if(whichModel == "clo" & hasNA == TRUE){
     lpa <- paramEst %>%
@@ -53,9 +53,9 @@ inspectProfiles <- function(whichModel, prepData, paramEst, hasNA, n_profiles, d
   tidyLPA::plot_profiles(lpa)
    
   if(whichModel=="clo") {
-  cloPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles,dist0name=dist0name, dist1name=dist1name, obsName=obsName, minMax=minMax)
+  cloPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, obsName=obsName, minMax=minMax)
   } else if (whichModel=="inertCoord"){
-  	  inertCoordPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, obsName=obsName, minMax=minMax)
+  	  inertCoordPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, time_lag=time_lag, dist0name=dist0name, dist1name=dist1name, obsName=obsName, minMax=minMax)
   } else
   print("Model must be inertCoord or clo")
   

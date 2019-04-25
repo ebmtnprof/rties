@@ -333,7 +333,7 @@ inertCoordResids <- function(basedata, whichModel)
 #' @import ggplot2
 #' @import dplyr
 
-inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
 { 
   time_length <- 20
   if(is.null(dist0name)){dist0name <- "dist0"}
@@ -353,11 +353,13 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
         tidyLPA::estimate_profiles(n_profiles)
         profileParams <- as.data.frame(tidyLPA::get_estimates(temp1))
   
-  noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.omit, data=prepData, control=nlme::lmeControl(opt="optim"))
+  noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.exclude, data=prepData, control=nlme::lmeControl(opt="optim"))
   
   noise <- noiseModel$sigma
 
   numPlots <- 3
+  
+  stateCutOff <- time_lag + 5
   
   multiPlots <- list()
   plots <- list()
@@ -365,9 +367,9 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
 
   for(i in 1:n_profiles){
   	for (k in 1:numPlots){
-      statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
+      statedata0 <- prepData[prepData$dist0 == 1 & prepData$time <= stateCutOff,] 
 	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
-  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
+  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time <= stateCutOff,] 
 	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
   	
       start <- c(start1, start0)  
@@ -452,7 +454,7 @@ print(multiPlots)
 #' @import dplyr
 #' @export
 
-inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL, numPlots=NULL)
+inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_length=NULL, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL, numPlots=NULL)
 { 
   if(is.null(time_length)){time_length <- 20}
   if(is.null(dist0name)){dist0name <- "dist0"}
@@ -475,6 +477,8 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL,
   noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.omit, data=prepData, control=nlme::lmeControl(opt="optim"))
   
   noise <- noiseModel$sigma
+  
+  stateCutOff <- time_lag + 5
 
   if(is.null(numPlots)){numPlots <- 5}
   
@@ -484,9 +488,9 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL,
 
   for(i in 1:n_profiles){
   	for (k in 1:numPlots){
-      statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
+      statedata0 <- prepData[prepData$dist0 == 1 & prepData$time <= stateCutOff,] 
 	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
-  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
+  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time <= stateCutOff,] 
 	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
   	
       start <- c(start1, start0)  
