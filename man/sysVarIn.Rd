@@ -4,14 +4,13 @@
 \alias{sysVarIn}
 \title{Provides results for predicting couples' latent profile membership from the system variable.}
 \usage{
-sysVarIn(basedata, sysVar = NULL, sysVarType, n_profiles,
-  dist0name = NULL, dist1name = NULL, sysVarName = NULL,
-  printPlots = T)
+sysVarIn(basedata, sysVar, sysVarType, n_profiles, dist0name = NULL,
+  dist1name = NULL, sysVarName = NULL, printPlots = T)
 }
 \arguments{
 \item{basedata}{A dataframe created by the makeLpaData function.}
 
-\item{sysVar}{The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. If the system variable was included during the dataPrep step, then this argument should not be included. But if the system variable was only included by using the "extraVars" argument during the makeLpaData step, then this argument is required.}
+\item{sysVar}{The name of the variable in the dataframe that contains the system variable to be predicted by profile membership.}
 
 \item{sysVarType}{Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores}
 

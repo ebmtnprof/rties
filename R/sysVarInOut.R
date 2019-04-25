@@ -3,7 +3,7 @@
 #' The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership, 2) main effects of profile membership and the distinguishing variable, and 3) the interaction of profile membership and the distinguishing variable. If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution.
 #' 
 #' @param basedata A dataframe created by the makeLpaData function.
-#' @param sysVar The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. If the system variable was included during the dataPrep step, then this argument should not be included. But if the system variable was only included by using the "extraVars" argument during the makeLpaData step, then this argument is required.
+#' @param sysVar The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. 
 #' @param sysVarType Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores
 #' @param dist0name An optional name for the level-0 of the distinguishing variable to appear as plot labels (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable to appear as plot labels (e.g., "Men"). Default is dist1
@@ -15,16 +15,15 @@
 #' @return For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). Similarly, for non-normal system variables, the function returns a list of the glm or glmmPQL objects containing the full results for the models. By default, the function also displays histograms of the residuals and plots of the predicted values against observed values for each model, but these can be turned off by setting printPlots=F. 
 
 #' @export
-sysVarOut <- function(basedata, sysVar=NULL, sysVarType, dist0name=NULL, dist1name=NULL, sysVarName=NULL, minMax=NULL, family=NULL, printPlots=T)
+
+sysVarOut <- function(basedata, sysVar, sysVarType, dist0name=NULL, dist1name=NULL, sysVarName=NULL, minMax=NULL, family=NULL, printPlots=T)
 {
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
   if(is.null(sysVarName)){sysVarName <- "System_Variable"}
   if(is.null(family)){family <- "gaussian"}
 	
-  if(!is.null(sysVar)){
-  	colnames(basedata)[colnames(basedata)== sysVar] <- "sysVar" 	
-  }
+  colnames(basedata)[colnames(basedata)== sysVar] <- "sysVar" 	
 
   if(is.null(minMax)){
   	min <- min(basedata$sysVar, na.rm=T)
@@ -38,7 +37,6 @@ sysVarOut <- function(basedata, sysVar=NULL, sysVarType, dist0name=NULL, dist1na
 	stop("the sysVarType must be either indiv or dyadic")
   }
 	
-  basedata <- basedata[complete.cases(basedata), ] 
   basedata$dist1 <- ifelse(basedata$dist0 == 1, 0, 1)
   basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
 	
@@ -46,10 +44,10 @@ sysVarOut <- function(basedata, sysVar=NULL, sysVarType, dist0name=NULL, dist1na
 	basedata <- basedata[!duplicated(basedata$dyad), ]	
 	
 	if (family == "gaussian"){
-	  profile <- lm(sysVar ~ profile, data= basedata)
+	  profile <- lm(sysVar ~ profile, data= basedata, na.action=na.exclude)
 	  profilePred <- fitted(profile)
 	} else {
-	  profile <- glm(sysVar ~ profile, data= basedata, family=family)
+	  profile <- glm(sysVar ~ profile, data= basedata, na.action=na.exclude, family=family)
 	  profilePred <- fitted(profile)
     }
       
@@ -65,18 +63,18 @@ sysVarOut <- function(basedata, sysVar=NULL, sysVarType, dist0name=NULL, dist1na
   if (sysVarType == "indiv"){
 	if (family == "gaussian"){
 	
-	profile <- nlme::lme(sysVar ~ profile, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), method="ML")
+	profile <- nlme::lme(sysVar ~ profile, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
 	
-	profilePlusDist <- nlme::lme(sysVar ~ profile + dist, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), method="ML")
+	profilePlusDist <- nlme::lme(sysVar ~ profile + dist, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
 
-	profileByDist <- nlme::lme(sysVar ~ profile * dist, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), method="ML")
+	profileByDist <- nlme::lme(sysVar ~ profile * dist, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
     } else {
 	
-	  profile <- MASS::glmmPQL(sysVar ~ profile, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), family=family)
+	  profile <- MASS::glmmPQL(sysVar ~ profile, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), family=family)
 	
-	  profilePlusDist <- MASS::glmmPQL(sysVar ~ profile + dist, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), family=family)
+	  profilePlusDist <- MASS::glmmPQL(sysVar ~ profile + dist, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), family=family)
 
-	  profileByDist <- MASS::glmmPQL(sysVar ~ profile * dist, random= ~ 1 | dyad, data= basedata, na.action=na.omit, control=nlme::lmeControl(opt="optim"), family=family)
+	  profileByDist <- MASS::glmmPQL(sysVar ~ profile * dist, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), family=family)
 	  }
 	
 	profilePred <- fitted(profile)
@@ -124,7 +122,7 @@ sysVarOut <- function(basedata, sysVar=NULL, sysVarType, dist0name=NULL, dist1na
 #' If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, a couple's shared score is the only predictor of their profile membership (called "sysVar"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base"). The function returns a list of the full model results and by default produces plots of profile membership against the system variable(s), but these can be turned off by setting printPlots=F.
 #' 
 #' @param basedata A dataframe created by the makeLpaData function.
-#' @param sysVar The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. If the system variable was included during the dataPrep step, then this argument should not be included. But if the system variable was only included by using the "extraVars" argument during the makeLpaData step, then this argument is required.
+#' @param sysVar The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. 
 #' @param sysVarType Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores
 #' @param n_profiles The number of latent profiles.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
@@ -136,7 +134,7 @@ sysVarOut <- function(basedata, sysVar=NULL, sysVarType, dist0name=NULL, dist1na
 
 #' @export
 
-sysVarIn <- function(basedata, sysVar=NULL, sysVarType, n_profiles, dist0name=NULL, dist1name=NULL, sysVarName=NULL, printPlots=T){
+sysVarIn <- function(basedata, sysVar, sysVarType, n_profiles, dist0name=NULL, dist1name=NULL, sysVarName=NULL, printPlots=T){
 
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
@@ -146,22 +144,18 @@ sysVarIn <- function(basedata, sysVar=NULL, sysVarType, n_profiles, dist0name=NU
 	stop("the sysVarType must be either indiv or dyadic")
   }
 
-  basedata <- basedata[complete.cases(basedata), ] 
-  
-  if(!is.null(sysVar)){
-  	colnames(basedata)[colnames(basedata)== sysVar] <- "sysVar" 	
-  }
+  colnames(basedata)[colnames(basedata)== sysVar] <- "sysVar" 	
 
   if(sysVarType == "dyadic"){
     
     basedata <- basedata[!duplicated(basedata$dyad), ]
     
     if(n_profiles == 2){
-      base <- glm(profileN ~ 1, data=basedata, family="binomial")
-      sysVar <- glm(profileN ~ sysVar, data=basedata, family="binomial")    	
+      base <- glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
+      sysVar <- glm(profileN ~ sysVar, data=basedata, na.action=na.exclude, family="binomial")    	
     } else {
-    	base <- nnet::multinom(profileN ~ 1, data=basedata)
-    	sysVar <- nnet::multinom(profileN ~ sysVar, data=basedata)
+    	base <- nnet::multinom(profileN ~ 1, data=basedata, nnet::multinom)
+    	sysVar <- nnet::multinom(profileN ~ sysVar, data=basedata, nnet::multinom)
     }	
 	  if(printPlots==T){
 	  	plot(basedata$sysVar, basedata$profile)
@@ -181,10 +175,10 @@ sysVarIn <- function(basedata, sysVar=NULL, sysVarType, n_profiles, dist0name=NU
 	sysVar01name <- paste(sysVar0name, sysVar1name, sep=":")
    
     if(n_profiles == 2){
-      base <- glm(profileN ~ 1, data=basedata, family="binomial")
-      sysVarMain <- glm(profileN ~ sysVar0 + sysVar1, data=basedata, family="binomial") 
+      base <- glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
+      sysVarMain <- glm(profileN ~ sysVar0 + sysVar1, data=basedata, na.action=na.exclude, family="binomial") 
       names(sysVarMain$coefficients) <- c("Intercept", sysVar0name, sysVar1name)
-      sysVarInteract <- glm(profileN ~ sysVar0 * sysVar1, data=basedata, family="binomial") 
+      sysVarInteract <- glm(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude, family="binomial") 
       names(sysVarInteract$coefficients) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
            
      if(printPlots==T){
@@ -200,9 +194,9 @@ sysVarIn <- function(basedata, sysVar=NULL, sysVarType, n_profiles, dist0name=NU
 
     } else {
     	base <- nnet::multinom(profileN ~ 1, data=basedata)
-    	sysVarMain <- nnet::multinom(profileN ~ sysVar0 + sysVar1, data=basedata)
+    	sysVarMain <- nnet::multinom(profileN ~ sysVar0 + sysVar1, data=basedata, na.action=na.exclude)
     	names(sysVarMain$coefnames) <- c("Intercept", sysVar0name, sysVar1name)
-    	sysVarInteract <- nnet::multinom(profileN ~ sysVar0 * sysVar1, data=basedata)
+    	sysVarInteract <- nnet::multinom(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude)
     	names(sysVarInteract$coefnames) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
     	     
      if(printPlots==T){

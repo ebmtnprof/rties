@@ -92,6 +92,7 @@ gllaEmbed <- function(x, embed, tau, groupby=NA, label="x", idColumn=F) {
 #' @return The function returns a list including: 1) "data" which is a dataframe containing first and second derivative estimates of an observed state variable, and 2) "fitTable" which shows the maximal R^2 achieved for each dyad for a coupled oscillator model, along with the associated tau, embed and estimated period of oscillation.
 
 #' @export
+
 estDerivs <- function(basedata, taus, embeds, delta, idConvention)
 {   
   basedata <- basedata[complete.cases(basedata), ] 
@@ -171,15 +172,18 @@ estDerivs <- function(basedata, taus, embeds, delta, idConvention)
 	dist1 <- rep(unique(datai$dist1), idLength)
 	time <- seq_len(idLength)
 	dyad <- rep(unique(datai$dyad, idLength))
-	id0 <- rep(unique(datai$id + idConvention), idLength)
-	id1 <- rep(unique(datai$id), idLength)
-	   
-	deriv0 <- cbind(dyad, id0, dist0, time, obsDeriv)
-	deriv1 <- cbind(dyad, id1, dist1, time, p_obsDeriv)
-	deriv0full <- cbind(deriv0, deriv1)
-	dimnames(deriv0full) <- list(NULL, c("dyad","id", "dist0", "time","obs_deTrend","d1","d2","p_dyad","p_id","dist1","p_time","p_obs_deTrend","p_d1","p_d2"))	   
-	deriv1full <- cbind(deriv1, deriv0)		  
-	dimnames(deriv1full) <- list(NULL, c("dyad","id", "dist0", "time","obs_deTrend","d1","d2","p_dyad","p_id","dist1","p_time","p_obs_deTrend","p_d1","p_d2")) 
+	deriv0 <- cbind(dyad, dist0, time, obsDeriv)
+	deriv1 <- cbind(dyad, dist1, time, p_obsDeriv)
+
+    deriv0full <- cbind(deriv0, deriv1)
+    id0 <- rep(unique(datai$dyad + idConvention), idLength)
+    deriv0full <- cbind(deriv0full, id0)
+    dimnames(deriv0full) <- list(NULL, c("dyad","dist0", "time","obs_deTrend","d1","d2","p_dyad","dist1","p_time","p_obs_deTrend","p_d1","p_d2", "id"))	  
+	
+	deriv1full <- cbind(deriv1, deriv0)	
+	id1 <- rep(unique(datai$dyad), idLength)
+	deriv1full <- cbind(deriv1full, id1)
+    dimnames(deriv1full) <- list(NULL, c("dyad","dist0", "time","obs_deTrend","d1","d2","p_dyad","dist1","p_time","p_obs_deTrend","p_d1","p_d2", "id"))	  
 
     deriv <- rbind(deriv1full, deriv0full)
 	deriv <- as.data.frame(deriv)   

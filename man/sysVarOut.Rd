@@ -4,14 +4,14 @@
 \alias{sysVarOut}
 \title{Provides results for predicting the system variable from the latent profiles of the dynamic parameters.}
 \usage{
-sysVarOut(basedata, sysVar = NULL, sysVarType, dist0name = NULL,
+sysVarOut(basedata, sysVar, sysVarType, dist0name = NULL,
   dist1name = NULL, sysVarName = NULL, minMax = NULL,
   family = NULL, printPlots = T)
 }
 \arguments{
 \item{basedata}{A dataframe created by the makeLpaData function.}
 
-\item{sysVar}{The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. If the system variable was included during the dataPrep step, then this argument should not be included. But if the system variable was only included by using the "extraVars" argument during the makeLpaData step, then this argument is required.}
+\item{sysVar}{The name of the variable in the dataframe that contains the system variable to be predicted by profile membership.}
 
 \item{sysVarType}{Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores}
 
