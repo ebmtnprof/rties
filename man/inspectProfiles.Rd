@@ -4,8 +4,8 @@
 \alias{inspectProfiles}
 \title{A wrapper for tidyLPA that provides information to help decide how many profiles to use for  subsequent rties analyses.}
 \usage{
-inspectProfiles(whichModel, prepData, paramEst, hasNA, n_profiles,
-  dist0name = NULL, dist1name = NULL, obsName = NULL,
+inspectProfiles(whichModel, time_lag = NULL, prepData, paramEst, hasNA,
+  n_profiles, dist0name = NULL, dist1name = NULL, obsName = NULL,
   minMax = NULL)
 }
 \arguments{
