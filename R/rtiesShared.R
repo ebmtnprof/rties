@@ -10,16 +10,16 @@
 
 #' Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling
 #'
-#' In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations. See the "overview_data_prep" vignette for complete details on the necessary format for the dataframe.
+#' The dataframe must be in a specific format and include several specific variables. See the "overview_data_prep" vignette for complete details on the necessary format and follow it closely if you'd like to avoid error messages. That vignette also includes information on how to structure the data if you have two variables within people (rather thean two people within dyads) or have indistinguishable dyads.
 #'
-#' @param basedata A user-provided dataframe that includes all variables needed for an rties analysis, including potential system variables, control variables, etc.
-#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param origData A user-provided dataframe that includes all variables needed for an rties analysis.
 #' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
-#' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
-#' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param time_lag An optional argument for the number of lags for the lagged observable.
-#' @param robustScale An optional argument to perform robust scaling of the de-trended observed state variable, one person at a time, using the DescTools package
+#' @param robustScale An optional argument to perform robust scaling of the de-trended observed state variable, one person at a time, using the DescTools package. Recommended to reduce noise. Default is "TRUE"
 #'
 #' @return The function returns a dataframe that has all the variables needed for modeling system dynamics, each renamed to a generic variable name, which are:
 #' \itemize{
@@ -34,11 +34,12 @@
 #'}
 
 #' @export
-dataPrep <- function(basedata, personId, dyadId, obs, dist, time_name, time_lag=NULL, robustScale = FALSE){
+dataPrep <- function(origData, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL, robustScale = TRUE){
   
-  vars <- c(personId, dyadId, obs, dist, time_name)
+  basedata <- origData
+  vars <- c(dyadId, personId, obs_name, dist_name, time_name)
   basedata <- basedata[vars]
-  names(basedata) <- c("id","dyad","obs","dist1","time")
+  names(basedata) <- c("dyad","id","obs","dist1","time")
     
       # check distinguishing variable is numeric 
   if (!is.numeric(basedata$dist1)){
@@ -81,15 +82,19 @@ dataPrep <- function(basedata, personId, dyadId, obs, dist, time_name, time_lag=
 
 #' Create a distinguishing variable (called "dist") for non-distinguishable dyads by assigning the partner who is lower on a chosen variable a 0 and the partner who is higher on the variable a 1. 
 #'
-#' @param basedata A user-provided dataframe.
+#' @param origData A user-provided dataframe.
 #' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param dist_name The name of the column in the dataframe that holds the variable to use for distinguishing the partners. For example, if "influence" was the variable, for each dyad the partner scoring lower on "influence" would be given a score of 0 on "dist" and the partner scoring higher on "influence" would be given a score of 1 on "dist"
 
+#' @return The function returns the original dataframe with an additional variable, called "dist" that distinguishes between partners based on the user-specified variable indicated by "dist_name"
+
 #' @export
 
-makeDist <- function(basedata, dyadId, personId, time_name, dist_name){
+makeDist <- function(origData, dyadId, personId, time_name, dist_name)
+{
+    basedata <- origData
     temp1 <- subset(basedata, select=c(dyadId, personId, time_name, dist_name))
     temp2 <- rties::actorPartnerDataTime(temp1, dyadId, personId)     
     temp2$dist <- ifelse(temp2[ ,4] == temp2[ ,8], NA, 
@@ -141,13 +146,13 @@ dataRobScale <- function(basedata){
 #'
 #' @param basedata A dataframe.
 #' @param dyads A vector of dyad IDs to remove.
-#' @param dyadID The variable in the dataframe specifying dyad ID; should be in the form dataframe_name$variable_name (e.g., data$couple).
+#' @param dyadId The variable in the dataframe specifying dyad ID; should be in the form dataframe_name$variable_name (e.g., data$couple).
 #'
 #' @return A dataframe with the data for the specified dyads removed.
 
 #' @export
-removeDyads <- function (basedata, dyads, dyadID){
-	basedata <- subset(basedata, !dyadID %in% dyads)
+removeDyads <- function (basedata, dyads, dyadId){
+	basedata <- subset(basedata, !dyadId %in% dyads)
 	return(basedata)
 }
 
@@ -158,16 +163,17 @@ removeDyads <- function (basedata, dyads, dyadID){
 #' Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads. Need dyad ID numbered same as for person ID for the first person in the dyad. Both members in each dyad need to have the same number of rows (rows of missing data are ok)
 #'
 #' @param basedata A dataframe with cross-sectional dyadic data.
-#' @param dyadID The name of variable indicating dyad ID.
-#' @param personID The name of the variable indicating peron ID.
+#' @param dyadId The name of variable indicating dyad ID.
+#' @param personId The name of the variable indicating peron ID.
+#'
 #' @return A dataframe in actor-partner format.
 
 # @export
 
-actorPartnerDataCross <- function(basedata, dyadID, personID){
+actorPartnerDataCross <- function(basedata, dyadId, personId){
 	
-	basedata$d <- basedata[, dyadID]
-	basedata$p <- basedata[, personID]
+	basedata$d <- basedata[, dyadId]
+	basedata$p <- basedata[, personId]
 	basedata <- basedata[order(basedata$p), ]
 	dataA <- basedata
 	
@@ -190,16 +196,17 @@ actorPartnerDataCross <- function(basedata, dyadID, personID){
 #' Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads. Need dyad ID numbered same as for person ID for the first person in the dyad. Both members in each dyad need to have the same number of rows (rows of missing data are ok).
 #'
 #' @param basedata A dataframe with repeated measures dyadic data
-#' @param dyadID The name of variable indicating dyad ID.
-#' @param personID The name of the variable indicating peron ID.
+#' @param dyadId The name of variable indicating dyad ID.
+#' @param personId The name of the variable indicating peron ID.
+#'
 #' @return A dataframe in actor-partner format.
 
 #' @export
 
-actorPartnerDataTime <- function(basedata, dyadID, personID){
+actorPartnerDataTime <- function(basedata, dyadId, personId){
 		
-    basedata$d <- basedata[, dyadID]
-    basedata$p <- basedata[, personID]
+    basedata$d <- basedata[, dyadId]
+    basedata$p <- basedata[, personId]
     basedata <- basedata[order(basedata$p), ]
     dID <- unique(factor(basedata$d))
 	dataAP <- list()
@@ -226,16 +233,20 @@ actorPartnerDataTime <- function(basedata, dyadID, personID){
 
 #' Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.
 #'
-#' @param origData The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential control variables, etc.
-#' @param lpaData The object created by tidyLPA's "estimate_profiles" function when "return_orig_df = TRUE"
-#' @param lpaParams The object created by tidyLPA's "estimate_profiles" function when "to_return = mclust"
-#' @param whichModel The name of the model that is being investigated (e.g., "inertCoord" or "clo")
-#' @param extraVars An optional dataframe of cross-sectional variables to be used for more complex models that include control variables, moderators, etc. The first column must be the person ID and the second column must be the dyad ID. See the "power_user" vignette for how to make use of these variables.
-#' @return A list containing 1) a dataframe that contains all variables needed for using the profiles to predict, or be predicted by, the system variable (called "profileData"), and 2)a dataframe containing the profile parameter estimates needed for plotting the predicted trajectories for each profile (called "profileParams").
+#' @param origData The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.
+#' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
+#' @param lpaData The object returned by the "inspectProfiles" function
+#' @param params The list called "params" returned by one of the "indiv" functions (e.g., indivInertCoord or indivClo) 
+#'
+#' @return A dataframe that contains all variables needed for using the profiles to predict, or be predicted by, the system variable.
 
 #' @export
 
-makeFullData <- function(basedata, personId, dyadId, dist, lpaData, params){
+makeFullData <- function(origData, dyadId, personId, dist_name, lpaData, params){
+  
+  basedata <- origData
   
   temp1 <- as.data.frame(lpaData)
   temp2 <- temp1[!duplicated(temp1$id), ]
@@ -249,7 +260,7 @@ makeFullData <- function(basedata, personId, dyadId, dist, lpaData, params){
 
   colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
   colnames(basedata)[colnames(basedata)== personId] <- "person"
-  colnames(basedata)[colnames(basedata)== dist ] <- "dist1"
+  colnames(basedata)[colnames(basedata)== dist_name ] <- "dist1"
 
   basedata <- basedata[!duplicated(basedata$person), ]
   basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)
@@ -265,7 +276,7 @@ makeFullData <- function(basedata, personId, dyadId, dist, lpaData, params){
 
 #' Histograms for all numeric variables in a dataframe.
 #'
-#' Useful for checking distributions of potential system variables to assess normality
+#' Useful for checking distributions to assess normality
 #'
 #' @param basedata A user-provided dataframe.
 
@@ -290,18 +301,18 @@ histAll <- function(basedata)
 #'
 #' @param basedata A dataframe.
 #' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
-#' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
-#' @param dist The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
+#' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable to appear on plots (e.g., "Women").
 #' @param dist1name An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").
-#' @param obsName An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
+#' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 
 #' @export
 
-plotRaw <- function(basedata, dyadId, obs, dist, time_name, dist0name=NULL, dist1name=NULL, obs_name=NULL) 
+plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=NULL, dist1name=NULL, plot_obs_name=NULL) 
 {
-  basedata <- basedata[ ,c(dyadId, obs, dist, time_name) ]
+  basedata <- basedata[ ,c(dyadId, obs_name, dist_name, time_name) ]
   names(basedata) <- c("dyad", "obs", "dist", "time")
   
   # check distinguishing variable is numeric 
@@ -311,7 +322,7 @@ plotRaw <- function(basedata, dyadId, obs, dist, time_name, dist0name=NULL, dist
 
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(obs_name)){obs_name <- "obs"}
+  if(is.null(plot_obs_name)){plot_obs_name <- "obs"}
  
   lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
 }
@@ -321,20 +332,20 @@ plotRaw <- function(basedata, dyadId, obs, dist, time_name, dist0name=NULL, dist
 #' Plots of de-trended observed variable over time, with dyads separated into groups based on LPA profile membership.
 #'
 #' @param prepData A dataframe created by the dataPrep function.
-#' @param profileData The "profileData" dataframe created by the makeLpaData function
+#' @param fullData A dataframe created by the makeFullData function.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
-#' @param obsName An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
+#' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 
 #' @export
 
-plotDataByProfile <- function(prepData, profileData, n_profiles, dist0name=NULL, dist1name=NULL, obs_name=NULL){
+plotDataByProfile <- function(prepData, fullData, n_profiles, dist0name=NULL, dist1name=NULL, plot_obs_name=NULL){
 
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(obs_name)){obs_name <- "obs_deTrend"}
+  if(is.null(plot_obs_name)){plot_obs_name <- "obs_deTrend"}
     
-    temp1 <- subset(profileData, select=c(dyad, dist0, profile))
+    temp1 <- subset(fullData, select=c(dyad, dist0, profile))
     temp2 <- subset(prepData, select=c(dyad, dist0, obs_deTrend, time))
     temp3 <- plyr::join(temp1, temp2)
 

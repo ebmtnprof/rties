@@ -4,14 +4,14 @@
 \alias{actorPartnerDataTime}
 \title{Takes individual repeated measures data from dyads and turns it into actor-partner format.}
 \usage{
-actorPartnerDataTime(basedata, dyadID, personID)
+actorPartnerDataTime(basedata, dyadId, personId)
 }
 \arguments{
 \item{basedata}{A dataframe with repeated measures dyadic data}
 
-\item{dyadID}{The name of variable indicating dyad ID.}
+\item{dyadId}{The name of variable indicating dyad ID.}
 
-\item{personID}{The name of the variable indicating peron ID.}
+\item{personId}{The name of the variable indicating peron ID.}
 }
 \value{
 A dataframe in actor-partner format.

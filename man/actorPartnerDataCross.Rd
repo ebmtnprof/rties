@@ -4,14 +4,14 @@
 \alias{actorPartnerDataCross}
 \title{Takes individual cross-sectional data from dyads and turns it into actor-partner format.}
 \usage{
-actorPartnerDataCross(basedata, dyadID, personID)
+actorPartnerDataCross(basedata, dyadId, personId)
 }
 \arguments{
 \item{basedata}{A dataframe with cross-sectional dyadic data.}
 
-\item{dyadID}{The name of variable indicating dyad ID.}
+\item{dyadId}{The name of variable indicating dyad ID.}
 
-\item{personID}{The name of the variable indicating peron ID.}
+\item{personId}{The name of the variable indicating peron ID.}
 }
 \value{
 A dataframe in actor-partner format.

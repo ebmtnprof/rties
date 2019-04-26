@@ -154,8 +154,8 @@ sysVarIn <- function(basedata, sysVar, sysVarType, n_profiles, dist0name=NULL, d
       base <- glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
       sysVar <- glm(profileN ~ sysVar, data=basedata, na.action=na.exclude, family="binomial")    	
     } else {
-    	base <- nnet::multinom(profileN ~ 1, data=basedata, nnet::multinom)
-    	sysVar <- nnet::multinom(profileN ~ sysVar, data=basedata, nnet::multinom)
+    	base <- nnet::multinom(profileN ~ 1, data=basedata, na.action=na.exclude,)
+    	sysVar <- nnet::multinom(profileN ~ sysVar, data=basedata, na.action=na.exclude)
     }	
 	  if(printPlots==T){
 	  	plot(basedata$sysVar, basedata$profile)

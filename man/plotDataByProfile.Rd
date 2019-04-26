@@ -4,19 +4,19 @@
 \alias{plotDataByProfile}
 \title{Plots of de-trended observed variable over time, with dyads separated into groups based on LPA profile membership.}
 \usage{
-plotDataByProfile(prepData, profileData, n_profiles, dist0name = NULL,
-  dist1name = NULL, obs_name = NULL)
+plotDataByProfile(prepData, fullData, n_profiles, dist0name = NULL,
+  dist1name = NULL, plot_obs_name = NULL)
 }
 \arguments{
 \item{prepData}{A dataframe created by the dataPrep function.}
 
-\item{profileData}{The "profileData" dataframe created by the makeLpaData function}
+\item{fullData}{A dataframe created by the makeFullData function.}
 
 \item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.}
 
-\item{obsName}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
+\item{plot_obs_name}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
 }
 \description{
 Plots of de-trended observed variable over time, with dyads separated into groups based on LPA profile membership.

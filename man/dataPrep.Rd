@@ -4,25 +4,25 @@
 \alias{dataPrep}
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
-dataPrep(basedata, personId, dyadId, obs, dist, time_name,
-  time_lag = NULL, robustScale = FALSE)
+dataPrep(origData, dyadId, personId, obs_name, dist_name, time_name,
+  time_lag = NULL, robustScale = TRUE)
 }
 \arguments{
-\item{basedata}{A user-provided dataframe that includes all variables needed for an rties analysis, including potential system variables, control variables, etc.}
-
-\item{personId}{The name of the column in the dataframe that has the person-level identifier.}
+\item{origData}{A user-provided dataframe that includes all variables needed for an rties analysis.}
 
 \item{dyadId}{The name of the column in the dataframe that has the dyad-level identifier.}
 
-\item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
+\item{personId}{The name of the column in the dataframe that has the person-level identifier.}
 
-\item{dist}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
+\item{obs_name}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
+
+\item{dist_name}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
 \item{time_lag}{An optional argument for the number of lags for the lagged observable.}
 
-\item{robustScale}{An optional argument to perform robust scaling of the de-trended observed state variable, one person at a time, using the DescTools package}
+\item{robustScale}{An optional argument to perform robust scaling of the de-trended observed state variable, one person at a time, using the DescTools package. Recommended to reduce noise. Default is "TRUE"}
 }
 \value{
 The function returns a dataframe that has all the variables needed for modeling system dynamics, each renamed to a generic variable name, which are:
@@ -38,5 +38,5 @@ The function returns a dataframe that has all the variables needed for modeling 
 }
 }
 \description{
-In the dataframe, the partners within each dyad must have the same number of observations (e.g. rows of data), although those can include rows that have missing values (NAs). Each dyad, however, can have it's own unique number of observations. See the "overview_data_prep" vignette for complete details on the necessary format for the dataframe.
+The dataframe must be in a specific format and include several specific variables. See the "overview_data_prep" vignette for complete details on the necessary format and follow it closely if you'd like to avoid error messages. That vignette also includes information on how to structure the data if you have two variables within people (rather thean two people within dyads) or have indistinguishable dyads.
 }

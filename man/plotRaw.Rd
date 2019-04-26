@@ -4,17 +4,17 @@
 \alias{plotRaw}
 \title{Plots of observed variable over time by dyad.}
 \usage{
-plotRaw(basedata, dyadId, obs, dist, time_name, dist0name = NULL,
-  dist1name = NULL, obs_name = NULL)
+plotRaw(basedata, dyadId, obs_name, dist_name, time_name,
+  dist0name = NULL, dist1name = NULL, plot_obs_name = NULL)
 }
 \arguments{
 \item{basedata}{A dataframe.}
 
 \item{dyadId}{The name of the column in the dataframe that has the dyad-level identifier.}
 
-\item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
+\item{obs_name}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
 
-\item{dist}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
+\item{dist_name}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
@@ -22,7 +22,7 @@ plotRaw(basedata, dyadId, obs, dist, time_name, dist0name = NULL,
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").}
 
-\item{obsName}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
+\item{plot_obs_name}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
 }
 \description{
 Produces plots of the observed variable for each dyad over time to check for data errors, etc.

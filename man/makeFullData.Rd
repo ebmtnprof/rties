@@ -4,21 +4,23 @@
 \alias{makeFullData}
 \title{Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.}
 \usage{
-makeFullData(basedata, personId, dyadId, dist, lpaData, params)
+makeFullData(origData, dyadId, personId, dist_name, lpaData, params)
 }
 \arguments{
-\item{lpaData}{The object created by tidyLPA's "estimate_profiles" function when "return_orig_df = TRUE"}
+\item{origData}{The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.}
 
-\item{origData}{The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential control variables, etc.}
+\item{dyadId}{The name of the column in the dataframe that has the couple-level identifier.}
 
-\item{lpaParams}{The object created by tidyLPA's "estimate_profiles" function when "to_return = mclust"}
+\item{personId}{The name of the column in the dataframe that has the person-level identifier.}
 
-\item{whichModel}{The name of the model that is being investigated (e.g., "inertCoord" or "clo")}
+\item{dist_name}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
 
-\item{extraVars}{An optional dataframe of cross-sectional variables to be used for more complex models that include control variables, moderators, etc. The first column must be the person ID and the second column must be the dyad ID. See the "power_user" vignette for how to make use of these variables.}
+\item{lpaData}{The object returned by the "inspectProfiles" function}
+
+\item{params}{The list called "params" returned by one of the "indiv" functions (e.g., indivInertCoord or indivClo)}
 }
 \value{
-A list containing 1) a dataframe that contains all variables needed for using the profiles to predict, or be predicted by, the system variable (called "profileData"), and 2)a dataframe containing the profile parameter estimates needed for plotting the predicted trajectories for each profile (called "profileParams").
+A dataframe that contains all variables needed for using the profiles to predict, or be predicted by, the system variable.
 }
 \description{
 Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.

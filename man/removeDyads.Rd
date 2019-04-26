@@ -4,14 +4,14 @@
 \alias{removeDyads}
 \title{Remove data for specified dyads from a dataframe}
 \usage{
-removeDyads(basedata, dyads, dyadID)
+removeDyads(basedata, dyads, dyadId)
 }
 \arguments{
 \item{basedata}{A dataframe.}
 
 \item{dyads}{A vector of dyad IDs to remove.}
 
-\item{dyadID}{The variable in the dataframe specifying dyad ID; should be in the form dataframe_name$variable_name (e.g., data$couple).}
+\item{dyadId}{The variable in the dataframe specifying dyad ID; should be in the form dataframe_name$variable_name (e.g., data$couple).}
 }
 \value{
 A dataframe with the data for the specified dyads removed.

@@ -10,5 +10,5 @@ histAll(basedata)
 \item{basedata}{A user-provided dataframe.}
 }
 \description{
-Useful for checking distributions of potential system variables to assess normality
+Useful for checking distributions to assess normality
 }
