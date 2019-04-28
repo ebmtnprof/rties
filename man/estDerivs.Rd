@@ -4,10 +4,10 @@
 \alias{estDerivs}
 \title{Estimates first and second derivatives of an oberved state variable}
 \usage{
-estDerivs(basedata, taus, embeds, delta, idConvention)
+estDerivs(prepData, taus, embeds, delta, idConvention)
 }
 \arguments{
-\item{basedata}{A dataframe that was produced with the "dataPrep" function.}
+\item{prepData}{A dataframe that was produced with the "dataPrep" function.}
 
 \item{taus}{A vector containing the values of tau to use. Tau indicates the number of time points to lag in the lagged data matrix (see Boker, S.M., Deboeck, P.R., Edler, C., & Keel, P.K. (2010). Generalized local linear approximation of derivatives from time series. In S.M. Chow & E. Ferrer (Eds.), Statistical Methods for Modeling Human Dynamics: An Interdisciplinary Dialogue (pp. 161-178). New York, NY: Taylor & Francis Group). The first derivative is estimated as the mean of the two adjacent slopes across that number of lags, e.g., if tau = 2 then the estimate of the first derivative at time = t is based on the mean of the slopes left and right of time t across 2 observations each. The second derivative is the difference in the two slopes with respect to time. Tau = 1 is sensitive to noise and increasing its value acts as smoothing.}
 

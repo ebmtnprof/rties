@@ -12,7 +12,7 @@
 #'
 #' The dataframe must be in a specific format and include several specific variables. See the "overview_data_prep" vignette for complete details on the necessary format and follow it closely if you'd like to avoid error messages. That vignette also includes information on how to structure the data if you have two variables within people (rather thean two people within dyads) or have indistinguishable dyads.
 #'
-#' @param origData A user-provided dataframe that includes all variables needed for an rties analysis.
+#' @param basedata A user-provided dataframe that includes all variables needed for an rties analysis.
 #' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
@@ -34,9 +34,8 @@
 #'}
 
 #' @export
-dataPrep <- function(origData, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL, robustScale = TRUE){
+dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL, robustScale = TRUE){
   
-  basedata <- origData
   vars <- c(dyadId, personId, obs_name, dist_name, time_name)
   basedata <- basedata[vars]
   names(basedata) <- c("dyad","id","obs","dist1","time")
@@ -82,7 +81,7 @@ dataPrep <- function(origData, dyadId, personId, obs_name, dist_name, time_name,
 
 #' Create a distinguishing variable (called "dist") for non-distinguishable dyads by assigning the partner who is lower on a chosen variable a 0 and the partner who is higher on the variable a 1. 
 #'
-#' @param origData A user-provided dataframe.
+#' @param basedata A user-provided dataframe.
 #' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
@@ -92,9 +91,8 @@ dataPrep <- function(origData, dyadId, personId, obs_name, dist_name, time_name,
 
 #' @export
 
-makeDist <- function(origData, dyadId, personId, time_name, dist_name)
+makeDist <- function(basedata, dyadId, personId, time_name, dist_name)
 {
-    basedata <- origData
     temp1 <- subset(basedata, select=c(dyadId, personId, time_name, dist_name))
     temp2 <- rties::actorPartnerDataTime(temp1, dyadId, personId)     
     temp2$dist <- ifelse(temp2[ ,4] == temp2[ ,8], NA, 
@@ -146,13 +144,16 @@ dataRobScale <- function(basedata){
 #'
 #' @param basedata A dataframe.
 #' @param dyads A vector of dyad IDs to remove.
-#' @param dyadId The variable in the dataframe specifying dyad ID; should be in the form dataframe_name$variable_name (e.g., data$couple).
+#' @param dyadId The variable in the dataframe specifying dyad ID.
 #'
 #' @return A dataframe with the data for the specified dyads removed.
 
 #' @export
+
 removeDyads <- function (basedata, dyads, dyadId){
-	basedata <- subset(basedata, !dyadId %in% dyads)
+	colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
+	basedata <- basedata[!basedata$dyad %in% dyads, ]
+	colnames(basedata)[colnames(basedata)== "dyad"] <- dyadId
 	return(basedata)
 }
 
@@ -233,7 +234,7 @@ actorPartnerDataTime <- function(basedata, dyadId, personId){
 
 #' Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.
 #'
-#' @param origData The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.
+#' @param basedata The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.
 #' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
@@ -244,9 +245,7 @@ actorPartnerDataTime <- function(basedata, dyadId, personId){
 
 #' @export
 
-makeFullData <- function(origData, dyadId, personId, dist_name, lpaData, params){
-  
-  basedata <- origData
+makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData, params){
   
   temp1 <- as.data.frame(lpaData)
   temp2 <- temp1[!duplicated(temp1$id), ]
@@ -324,7 +323,7 @@ plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=
   if(is.null(dist1name)){dist1name <- "dist1"}
   if(is.null(plot_obs_name)){plot_obs_name <- "obs"}
  
-  lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
+  lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=plot_obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
 }
 
 ################ plotDataByProfile
@@ -352,7 +351,7 @@ plotDataByProfile <- function(prepData, fullData, n_profiles, dist0name=NULL, di
     for(i in 1:n_profiles){
       tempi <- subset(temp3, profile==i)
       label <- paste("Profile", i, sep="-")   
-      print(lattice::xyplot(obs_deTrend ~ time|as.factor(dyad), data = tempi, group=dist0, type=c("l"), ylab=obs_name, main=label, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")), as.table=T, layout = c(3,3)))
+      print(lattice::xyplot(obs_deTrend ~ time|as.factor(dyad), data = tempi, group=dist0, type=c("l"), ylab=plot_obs_name, main=label, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")), as.table=T, layout = c(3,3)))
 
     }
 }

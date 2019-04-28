@@ -2,13 +2,13 @@
 % Please edit documentation in R/inertCoord.R
 \name{indivInertCoordPlots}
 \alias{indivInertCoordPlots}
-\title{Produces plots of versions of the inertia-coordination model-predicted trajectories overlaid on raw data for each dyad.}
+\title{Produces plots of the inertia-coordination model-predicted trajectories overlaid on raw data for each dyad.}
 \usage{
-indivInertCoordPlots(basedata, whichModel, dist0name = NULL,
-  dist1name = NULL, obsName = NULL, minMax = NULL)
+indivInertCoordPlots(prepData, whichModel, dist0name = NULL,
+  dist1name = NULL, plot_obs_name = NULL, minMax = NULL)
 }
 \arguments{
-\item{basedata}{A dataframe that was produced with the "dataPrep" function.}
+\item{prepData}{A dataframe that was produced with the "dataPrep" function.}
 
 \item{whichModel}{Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").}
 
@@ -16,7 +16,7 @@ indivInertCoordPlots(basedata, whichModel, dist0name = NULL,
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").}
 
-\item{obsName}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
+\item{plot_obs_name}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
 }

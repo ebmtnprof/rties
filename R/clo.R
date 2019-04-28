@@ -84,7 +84,7 @@ gllaEmbed <- function(x, embed, tau, groupby=NA, label="x", idColumn=F) {
 #'
 #' This function makes use of 2 functions written by Steven Boker, "gllaWMatrix" and "gllaEmbed" which are available on his website, http://people.virginia.edu/~smb3u/. It fits a coupled oscillator model for each dyad at different combinations of the input parameters (tau, embeds) and returns the input values and period of oscillation that maximize the R^2 for each dyad. It also estimates first and second derivatives of the observed state variable for each person at the input values that maximize the R^2 for that dyad and returns a dataframe that contains them.
 #'
-#' @param basedata A dataframe that was produced with the "dataPrep" function.
+#' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' @param taus A vector containing the values of tau to use. Tau indicates the number of time points to lag in the lagged data matrix (see Boker, S.M., Deboeck, P.R., Edler, C., & Keel, P.K. (2010). Generalized local linear approximation of derivatives from time series. In S.M. Chow & E. Ferrer (Eds.), Statistical Methods for Modeling Human Dynamics: An Interdisciplinary Dialogue (pp. 161-178). New York, NY: Taylor & Francis Group). The first derivative is estimated as the mean of the two adjacent slopes across that number of lags, e.g., if tau = 2 then the estimate of the first derivative at time = t is based on the mean of the slopes left and right of time t across 2 observations each. The second derivative is the difference in the two slopes with respect to time. Tau = 1 is sensitive to noise and increasing its value acts as smoothing. 
 #' @param embeds A vector containing the values of embeds to use. Embeds indicates the number of columns in the lagged data matrix. The minimum = 3 for 2nd order derivatives and higher values increase smoothing.
 #' @param delta A value indicating the inter-observation interval. For example, if delta = 2, then every second observation is used in the estimation process.
@@ -93,8 +93,9 @@ gllaEmbed <- function(x, embed, tau, groupby=NA, label="x", idColumn=F) {
 
 #' @export
 
-estDerivs <- function(basedata, taus, embeds, delta, idConvention)
+estDerivs <- function(prepData, taus, embeds, delta, idConvention)
 {   
+  basedata <- prepData
   basedata <- basedata[complete.cases(basedata), ] 
   params <- expand.grid(taus=taus, embeds=embeds)
   dyadId <- unique(factor(basedata$dyad))
@@ -237,15 +238,17 @@ cloUncoupledOde <- function(t, state, parameters)
 #' 
 #' Both models predict the second derivatives of the observed state variables (with linear trends removed). For the uncoupled oscillator, the predictors are each person's own observed state variables (again with linear trends removed), as well as each person's own first derivatives of the observed state variables (again with linear trends removed. For the coupled oscillator, the predictors are each person's own and partner's observed state variables (again with linear trends removed), as well as each person's own and partner's first derivatives of the observed state variables (again with linear trends removed).
 #'
-#' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' @param derivData A dataframe that was produced with the "estDerivs" function.
 #' @param whichModel Whether the model to be estimated is the "uncoupled" or "coupled" oscillator.
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), and 2) the parameter estimates for the model for each dyad (called "paramData", for use in either predicting, or being predicted by, the system variable).
+#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), and 2) the parameter estimates for the model for each dyad (called "params", for use in either predicting, or being predicted by, the system variable).
 
 #' @export
 
-indivClo <- function(basedata, whichModel)
+indivClo <- function(derivData, whichModel)
 {
+  basedata <- derivData
+  
   param <- list()
   
   if(whichModel != "uncoupled" & whichModel != "coupled") {
@@ -298,13 +301,15 @@ indivClo <- function(basedata, whichModel)
 #' 
 #' Fits an uncoupled and coupled oscillator model to each dyad's observed state variables and returns the adjusted R-squares, along with the difference between them (coupled - uncoupled, so positive values indicate better fit for the more complex model).
 #'
-#' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' @param derivData A dataframe that was produced with the "estDerivs" function.
 #' 
 #' @return The function returns a named list including: 1) the adjusted R^2 for the uncoupled model for each dyad (called "R2uncouple"), 2) the adjusted R^2 for the coupled model for each dyad (called "R2couple"), and 3) the difference between the R-squares for each dyad (coupled - uncoupled, called "R2dif").
 
 #' @export
-indivCloCompare <- function(basedata)
+indivCloCompare <- function(derivData)
 {
+  basedata <- derivData
+  
   newDiD <- unique(factor(basedata$dyad))
   R2uncouple <- vector()
   R2couple <- vector()
@@ -331,12 +336,12 @@ indivCloCompare <- function(basedata)
 #' 
 #' The observed and CLO-model predicted state variables (with linear trends removed) are plotted for each dyad individually.  
 #'
-#' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' @param derivData A dataframe that was produced with the "estDerivs" function.
 #' @param whichModel Whether the model to be estimated is the "uncoupled" or "coupled" oscillator.
 #' @param idConvention The number that was added to the dist0 partner to get the ID number for the dist1 partner.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
-#' @param obsName An optional name for the observed state variables being plotted (e.g., "Emotional Experience"). Default is observed.
+#' @param plot_obs_name An optional name for the observed state variables being plotted (e.g., "Emotional Experience"). Default is observed.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. Default is to use the minimum and maximum observed values of the state variables.
 #' 
 #' @return The function returns plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf", or "coordPlots.pdf" or "inertCoordPlots.pdf"
@@ -344,13 +349,15 @@ indivCloCompare <- function(basedata)
 #' @import ggplot2
 #' @export
 
-indivCloPlots <- function(basedata, whichModel, idConvention, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, dist1name=NULL, plot_obs_name=NULL, minMax=NULL)
 {
+  basedata <- derivData
+  
   param <- list()
   
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(obsName)){obsName <- "observed"}
+  if(is.null(plot_obs_name)){plot_obs_name <- "observed"}
   
   if(whichModel != "uncoupled" & whichModel != "coupled") {
   	stop("the model type must be either uncoupled or coupled")
@@ -428,7 +435,7 @@ indivCloPlots <- function(basedata, whichModel, idConvention, dist0name=NULL, di
 	  geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +
 	  geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + 
 	  scale_color_manual(name="Role", values=c("red","blue")) +
-	  ylab(obsName) +
+	  ylab(plot_obs_name) +
 	  ylim(min, max) +
 	  annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=3) +
 	  labs(title= "Dyad ID:", subtitle= plotTitle) +
@@ -445,7 +452,7 @@ indivCloPlots <- function(basedata, whichModel, idConvention, dist0name=NULL, di
 
 #' Produces histograms of the residuals from the oscillator model for each dyad.
 #' 
-#' @param basedata A dataframe that was produced with the "estDerivs" function.
+#' @param derivData A dataframe that was produced with the "estDerivs" function.
 #' @param whichModel Whether the model to be estimated is the uncoupled-oscillator ("uncoupled") or the coupled-oscillator ("coupled").
 #' 
 #' @return The function returns histograms of the residuals from the model for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "uncoupledResid.pdf", or "coupledResid.pdf" or "inertCoordResid.pdf"
@@ -453,8 +460,10 @@ indivCloPlots <- function(basedata, whichModel, idConvention, dist0name=NULL, di
 #' @import ggplot2
 #' @export
 
-cloResids <- function(basedata, whichModel)
+cloResids <- function(derivData, whichModel)
 {
+  basedata <- derivData
+  
   if(whichModel != "uncoupled" & whichModel != "coupled") {
   	stop("the model type must be either uncoupled or coupled")
 	
@@ -502,7 +511,6 @@ cloResids <- function(basedata, whichModel)
 #' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the observed time variable.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
-#' @param obsName An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' 
 #' @return The function returns the plots as a list. 
@@ -510,7 +518,7 @@ cloResids <- function(basedata, whichModel)
 #' @import ggplot2
 #' @export
 
-cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0name=NULL, dist1name=NULL, minMax=NULL)
 {    
     if(is.null(minMax)){
     min <- min(prepData$obs_deTrend, na.rm=T)
@@ -523,7 +531,6 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
     if(is.null(time_length)){time_length <- as.numeric(quantile(prepData$time, prob=.75))}
     if(is.null(dist0name)){dist0name <- "dist0"}
     if(is.null(dist1name)){dist1name <- "dist1"}
-    if(is.null(obsName)){obsName <- "observed"}
     if(is.null(minMax)){min <- min(prepData$obs_deTrend, na.rm=T)
     				   max <- max(prepData$obs_deTrend, na.rm=T)}
 
@@ -562,7 +569,7 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
 	  plotsi <- ggplot(plotData, aes(x=time)) +
 				geom_line(aes(y= pred, color=roleNew), linetype="solid", size=1, na.rm=T) +
 				scale_color_manual(name="Role", values=c("black","gray47")) +
-				ylab(obsName) +
+				ylab("observed") +
 				ylim(min, max) +
 				labs(title=profileName, subtitle= "Predicted Trajectory") +
 				theme(plot.title=element_text(size=11))
@@ -582,15 +589,14 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
 #' @param paramEst A dataframe created by indivClo containing the clo parameter estimates for each dyad.
 #' @param n_profiles The number of latent profiles.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
-#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
-#' @param obsName An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.
+#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' 
 #' @return The function prints the plots. 
 
 #' @import ggplot2
 
-cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
 {    
     if(is.null(minMax)){
     min <- min(prepData$obs_deTrend, na.rm=T)
@@ -603,7 +609,6 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
     time_length <- as.numeric(quantile(prepData$time, prob=.75))
     if(is.null(dist0name)){dist0name <- "dist0"}
     if(is.null(dist1name)){dist1name <- "dist1"}
-    if(is.null(obsName)){obsName <- "observed"}
     if(is.null(minMax)){min <- min(prepData$obs_deTrend, na.rm=T)
     				   max <- max(prepData$obs_deTrend, na.rm=T)}
 
@@ -642,7 +647,7 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
 	  plotsi <- ggplot(plotData, aes(x=time)) +
 				geom_line(aes(y= pred, color=roleNew), linetype="solid", size=1, na.rm=T) +
 				scale_color_manual(name="Role", values=c("black","gray47")) +
-				ylab(obsName) +
+				ylab("observed") +
 				ylim(min, max) +
 				labs(title=profileName, subtitle= "Predicted Trajectory") +
 				theme(plot.title=element_text(size=11))

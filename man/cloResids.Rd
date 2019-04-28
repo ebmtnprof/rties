@@ -4,10 +4,10 @@
 \alias{cloResids}
 \title{Produces histograms of the residuals from the oscillator model for each dyad.}
 \usage{
-cloResids(basedata, whichModel)
+cloResids(derivData, whichModel)
 }
 \arguments{
-\item{basedata}{A dataframe that was produced with the "estDerivs" function.}
+\item{derivData}{A dataframe that was produced with the "estDerivs" function.}
 
 \item{whichModel}{Whether the model to be estimated is the uncoupled-oscillator ("uncoupled") or the coupled-oscillator ("coupled").}
 }

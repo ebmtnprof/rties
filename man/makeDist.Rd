@@ -4,10 +4,10 @@
 \alias{makeDist}
 \title{Create a distinguishing variable (called "dist") for non-distinguishable dyads by assigning the partner who is lower on a chosen variable a 0 and the partner who is higher on the variable a 1.}
 \usage{
-makeDist(origData, dyadId, personId, time_name, dist_name)
+makeDist(basedata, dyadId, personId, time_name, dist_name)
 }
 \arguments{
-\item{origData}{A user-provided dataframe.}
+\item{basedata}{A user-provided dataframe.}
 
 \item{dyadId}{The name of the column in the dataframe that has the couple-level identifier.}
 

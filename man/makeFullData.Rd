@@ -4,10 +4,10 @@
 \alias{makeFullData}
 \title{Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.}
 \usage{
-makeFullData(origData, dyadId, personId, dist_name, lpaData, params)
+makeFullData(basedata, dyadId, personId, dist_name, lpaData, params)
 }
 \arguments{
-\item{origData}{The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.}
+\item{basedata}{The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.}
 
 \item{dyadId}{The name of the column in the dataframe that has the couple-level identifier.}
 

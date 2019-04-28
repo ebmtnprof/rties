@@ -4,7 +4,7 @@
 \alias{crossCorPlots}
 \title{Produces cross-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.}
 \usage{
-crossCorPlots(basedata, personId, dyadId, obs, time_name)
+crossCorPlots(basedata, personId, dyadId, obs_name, time_name)
 }
 \arguments{
 \item{basedata}{A user provided dataframe.}
@@ -13,7 +13,7 @@ crossCorPlots(basedata, personId, dyadId, obs, time_name)
 
 \item{dyadId}{The name of the column in the dataframe that has the dyad-level identifier.}
 
-\item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
+\item{obs_name}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 }

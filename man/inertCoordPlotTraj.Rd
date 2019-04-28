@@ -6,7 +6,7 @@
 \usage{
 inertCoordPlotTraj(prepData, paramEst, n_profiles, time_lag,
   time_length = NULL, dist0name = NULL, dist1name = NULL,
-  obsName = NULL, minMax = NULL, numPlots = NULL)
+  minMax = NULL, numPlots = NULL)
 }
 \arguments{
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}
@@ -20,8 +20,6 @@ inertCoordPlotTraj(prepData, paramEst, n_profiles, time_lag,
 \item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
-
-\item{obsName}{An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
 

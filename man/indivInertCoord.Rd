@@ -4,10 +4,10 @@
 \alias{indivInertCoord}
 \title{Estimates versions of the inertia-coordination model for each dyad.}
 \usage{
-indivInertCoord(basedata, whichModel)
+indivInertCoord(prepData, whichModel)
 }
 \arguments{
-\item{basedata}{A dataframe that was produced with the "dataPrep" function.}
+\item{prepData}{A dataframe that was produced with the "dataPrep" function.}
 
 \item{whichModel}{Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").}
 }

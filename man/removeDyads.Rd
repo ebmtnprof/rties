@@ -11,7 +11,7 @@ removeDyads(basedata, dyads, dyadId)
 
 \item{dyads}{A vector of dyad IDs to remove.}
 
-\item{dyadId}{The variable in the dataframe specifying dyad ID; should be in the form dataframe_name$variable_name (e.g., data$couple).}
+\item{dyadId}{The variable in the dataframe specifying dyad ID.}
 }
 \value{
 A dataframe with the data for the specified dyads removed.

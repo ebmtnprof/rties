@@ -2,22 +2,23 @@
 
 ######## This file includes all the functions needed for an inertia-coordination analysis
 
+################### autoCorPlots
 
 #' Produces auto-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
 #' 
 #' @param basedata A user provided dataframe.
-#' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
-#' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 
 #' @export
 
-autoCorPlots <- function(basedata, personId, dyadId, obs, time_name){invisible(acp(basedata, personId, dyadId, obs, time_name))}
+autoCorPlots <- function(basedata, dyadId, personId, obs_name, time_name){invisible(acp(basedata, personId, dyadId, obs_name, time_name))}
 
-acp <- function(basedata, personId, dyadId, obs, time_name)
+acp <- function(basedata, personId, dyadId, obs_name, time_name)
 {
-  basedata <- subset(basedata, select=c(personId, dyadId, obs, time_name))
+  basedata <- subset(basedata, select=c(personId, dyadId, obs_name, time_name))
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
   names(basedata)[3] <- "obs"
@@ -47,21 +48,23 @@ acp <- function(basedata, personId, dyadId, obs, time_name)
   return(acf)
 }
 
+###################### crossCorPlots
+
 #' Produces cross-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
 #' 
 #' @param basedata A user provided dataframe.
-#' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
-#' @param obs The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 
 #' @export
 
-crossCorPlots <- function(basedata, personId, dyadId, obs, time_name){invisible(ccp(basedata, personId, dyadId, obs, time_name))}
+crossCorPlots <- function(basedata, personId, dyadId, obs_name, time_name){invisible(ccp(basedata, personId, dyadId, obs_name, time_name))}
 
-ccp <- function(basedata, personId, dyadId, obs, time_name)
+ccp <- function(basedata, personId, dyadId, obs_name, time_name)
 {
-  basedata <- subset(basedata, select=c(personId, dyadId, obs, time_name))  
+  basedata <- subset(basedata, select=c(personId, dyadId, obs_name, time_name))  
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
   names(basedata)[3] <- "obs"
@@ -93,19 +96,23 @@ ccp <- function(basedata, personId, dyadId, obs, time_name)
 }
 
 
+######################## indivInertCoord
+
 #' Estimates versions of the inertia-coordination model for each dyad.
 #' 
 #' The user specifies which of 3 models are to be estimated. Each model predicts the observed state variables (with linear trends removed) from either: 1) Inertia only ("inert")- each person's intercept and each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), 2) Coordination only ("coord")- each person's intercept and each person's partner's state variable lagged at the amount specified (again with linear trends removed), or 3) Full inertia-coordination model ("inertCoord") - each person's intercept, each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), and each person's partner's state variable lagged at the amount specified (again with linear trends removed).
 #'
-#' @param basedata A dataframe that was produced with the "dataPrep" function.
+#' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
 #' 
 #' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) a dataframe containing both the parameter estimates for the model for each dyad and the system variable (called "data", for using the dynamic parameters to either predict, or be predicted by, the system variable), and 3) a dataframe with just the parameter estimates (called "params", for use in the latent profile analysis).
 
 #' @export
 
-indivInertCoord <- function(basedata, whichModel)
+indivInertCoord <- function(prepData, whichModel)
 {	
+  basedata <- prepData
+  
   if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
   	stop("the model type must be either inert, coord or inertCoord")
 	
@@ -152,14 +159,16 @@ indivInertCoord <- function(basedata, whichModel)
 #' 
 #' Fits inertia-only, coordination-only and full inertia-coordination models to each dyad's observed state variables and returns the adjusted R-squares, along with the differences between them, so positive values indicate better fit for the first model in the comparison. The 3 comparisons are inertia minus coordination, full model minus inertia, and full model minus coordination.
 #'
-#' @param basedata A dataframe that was produced with the "dataPrep" function.
+#' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' 
 #' @return The function returns a named list including: 1) the adjusted R^2 for the inertia model for each dyad (called "R2inert"), 2) the adjusted R^2 for the coordination model for each dyad (called "R2coord"), 3) the adjusted R^2 for the full inertia-coordination model for each dyad (called "R2inertCoord"), 4) the difference between the R-squares for each dyad for inertia minus coordination (called "R2dif_I_C"), 5) the difference for the full model minus inertia (called "R2dif_IC_I"), and 6) the difference for the full model minus coordination (called "R2dif_IC_C")
 
 #' @export
 
-indivInertCoordCompare <- function(basedata)
+indivInertCoordCompare <- function(prepData)
 { 
+  basedata <- prepData
+  
   newDiD <- unique(factor(basedata$dyad))
   R2inert <- vector()
   R2coord <- vector()
@@ -192,15 +201,15 @@ indivInertCoordCompare <- function(basedata)
 
 ####################### indivInertCoordPlots
 
-#' Produces plots of versions of the inertia-coordination model-predicted trajectories overlaid on raw data for each dyad.
+#' Produces plots of the inertia-coordination model-predicted trajectories overlaid on raw data for each dyad.
 #' 
 #' The observed state variables (with linear trends removed) are predicted from one of the 3 versions of the inertia-coordination model (inertia only, "inert"; coordination only, "coord"; full inertia-coordination, "inertCoord") for each dyad individually. The predicted trajectories are plotted overlaid on the observed trajectories. 
 #'
-#' @param basedata A dataframe that was produced with the "dataPrep" function.
+#' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
 #' @param dist0name An optional name for the level-0 of the distinguishing variable to appear on plots (e.g., "Women").
 #' @param dist1name An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").
-#' @param obsName An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
+#' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' 
 #' @return The function returns plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf", or "coordPlots.pdf" or "inertCoordPlots.pdf"
@@ -208,11 +217,13 @@ indivInertCoordCompare <- function(basedata)
 #' @import ggplot2
 #' @export
 
-indivInertCoordPlots <- function(basedata, whichModel, dist0name = NULL, dist1name = NULL, obsName = NULL, minMax=NULL)
+indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1name = NULL, plot_obs_name = NULL, minMax=NULL)
 {
+  basedata <- prepData
+  
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(obsName)){obsName <- "observed"}
+  if(is.null(plot_obs_name)){plot_obs_name <- "observed"}
 
   if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
   	stop("the model type must be either inert, coord or inertCoord")
@@ -249,7 +260,7 @@ indivInertCoordPlots <- function(basedata, whichModel, dist0name = NULL, dist1na
 	geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +
 	geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + 
 	scale_color_manual(name="Role", values=c("blue","red")) +
-	ylab(obsName) +
+	ylab(plot_obs_name) +
 	ylim(min, max) +
 	annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +
 	labs(title= "Dyad ID:", subtitle= plotTitle) +
@@ -266,7 +277,7 @@ indivInertCoordPlots <- function(basedata, whichModel, dist0name = NULL, dist1na
 
 #' Produces histograms of the residuals from the inertia-coordination model for each dyad.
 #' 
-#' @param basedata A dataframe that was produced with the "dataPrep" function.
+#' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
 #' 
 #' @return The function returns histograms of the residuals from the model for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertResid.pdf", or "coordResid.pdf" or "inertCoordResid.pdf"
@@ -274,8 +285,10 @@ indivInertCoordPlots <- function(basedata, whichModel, dist0name = NULL, dist1na
 #' @import ggplot2
 #' @export
 
-inertCoordResids <- function(basedata, whichModel)
+inertCoordResids <- function(prepData, whichModel)
 {
+  basedata <- prepData
+  
   if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
   	stop("the model type must be either inert, coord or inertCoord")
 	} else if (whichModel == "inert"){
@@ -325,7 +338,6 @@ inertCoordResids <- function(basedata, whichModel)
 #' @param n_profiles The number of latent profiles.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
-#' @param obsName An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' 
 #' @return The function prints the plots. 
@@ -333,12 +345,11 @@ inertCoordResids <- function(basedata, whichModel)
 #' @import ggplot2
 #' @import dplyr
 
-inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL)
+inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag, dist0name=NULL, dist1name=NULL, minMax=NULL)
 { 
   time_length <- 20
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(obsName)){obsName <- "observed"}
   
   if(is.null(minMax)){
   	min <- min(prepData$obs_deTrend, na.rm=T)
@@ -421,7 +432,7 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag,
       plots[[k]] <- ggplot(plotData, aes(x=time, y=pred, group=dist)) +
                   geom_line(aes(color=dist)) +
                   scale_color_manual(values=c("black","gray47")) +
-                  ylab(obsName) +
+                  ylab("observed") +
                   ylim(min, max) +
 	              labs(title= profileName, subtitle= "Predicted_Trajectory") +
 	              theme(plot.title=element_text(size=11)) 
@@ -444,7 +455,6 @@ print(multiPlots)
 #' @param time_length An optional value specifying how many time points to plot across. Default is 20.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
-#' @param obsName An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' @param numPlots An optional value controlling how many random examples of each profile are produced. Default is 5.
 #' 
@@ -452,14 +462,14 @@ print(multiPlots)
 
 #' @import ggplot2
 #' @import dplyr
+
 #' @export
 
-inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_length=NULL, dist0name=NULL, dist1name=NULL, obsName=NULL, minMax=NULL, numPlots=NULL)
+inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_length=NULL, dist0name=NULL, dist1name=NULL, minMax=NULL, numPlots=NULL)
 { 
   if(is.null(time_length)){time_length <- 20}
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(obsName)){obsName <- "observed"}
   
   if(is.null(minMax)){
   	min <- min(prepData$obs_deTrend, na.rm=T)
@@ -542,7 +552,7 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_le
       plots[[k]] <- ggplot(plotData, aes(x=time, y=pred, group=dist)) +
                   geom_line(aes(color=dist)) +
                   scale_color_manual(values=c("black","gray47")) +
-                  ylab(obsName) +
+                  ylab("observed") +
                   ylim(min, max) +
 	              labs(title= profileName, subtitle= "Predicted_Trajectory") +
 	              theme(plot.title=element_text(size=11)) 

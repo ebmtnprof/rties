@@ -4,10 +4,10 @@
 \alias{indivInertCoordCompare}
 \title{Compares model fit for the inertia-only, coordination-only and full inertia-coordination model for each dyad's state trajectories using an R-square comparison.}
 \usage{
-indivInertCoordCompare(basedata)
+indivInertCoordCompare(prepData)
 }
 \arguments{
-\item{basedata}{A dataframe that was produced with the "dataPrep" function.}
+\item{prepData}{A dataframe that was produced with the "dataPrep" function.}
 }
 \value{
 The function returns a named list including: 1) the adjusted R^2 for the inertia model for each dyad (called "R2inert"), 2) the adjusted R^2 for the coordination model for each dyad (called "R2coord"), 3) the adjusted R^2 for the full inertia-coordination model for each dyad (called "R2inertCoord"), 4) the difference between the R-squares for each dyad for inertia minus coordination (called "R2dif_I_C"), 5) the difference for the full model minus inertia (called "R2dif_IC_I"), and 6) the difference for the full model minus coordination (called "R2dif_IC_C")

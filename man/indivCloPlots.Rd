@@ -4,11 +4,11 @@
 \alias{indivCloPlots}
 \title{Produces plots of either an uncoupled or coupled oscillator model-predicted trajectories overlaid on raw data for each dyad.}
 \usage{
-indivCloPlots(basedata, whichModel, idConvention, dist0name = NULL,
-  dist1name = NULL, obsName = NULL, minMax = NULL)
+indivCloPlots(derivData, whichModel, idConvention, dist0name = NULL,
+  dist1name = NULL, plot_obs_name = NULL, minMax = NULL)
 }
 \arguments{
-\item{basedata}{A dataframe that was produced with the "estDerivs" function.}
+\item{derivData}{A dataframe that was produced with the "estDerivs" function.}
 
 \item{whichModel}{Whether the model to be estimated is the "uncoupled" or "coupled" oscillator.}
 
@@ -18,7 +18,7 @@ indivCloPlots(basedata, whichModel, idConvention, dist0name = NULL,
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.}
 
-\item{obsName}{An optional name for the observed state variables being plotted (e.g., "Emotional Experience"). Default is observed.}
+\item{plot_obs_name}{An optional name for the observed state variables being plotted (e.g., "Emotional Experience"). Default is observed.}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. Default is to use the minimum and maximum observed values of the state variables.}
 }

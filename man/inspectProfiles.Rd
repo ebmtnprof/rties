@@ -5,11 +5,12 @@
 \title{A wrapper for tidyLPA that provides information to help decide how many profiles to use for  subsequent rties analyses.}
 \usage{
 inspectProfiles(whichModel, time_lag = NULL, prepData, paramEst, hasNA,
-  n_profiles, dist0name = NULL, dist1name = NULL, obsName = NULL,
-  minMax = NULL)
+  n_profiles, dist0name = NULL, dist1name = NULL, minMax = NULL)
 }
 \arguments{
 \item{whichModel}{The name of the model that is being investigated (e.g., "inertCoord" or "clo")}
+
+\item{time_lag}{The time-lag used for the inertia-coordination model. This is required for the "inertCoord" model and not relevant to the "clo" model.}
 
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}
 
@@ -23,13 +24,11 @@ inspectProfiles(whichModel, time_lag = NULL, prepData, paramEst, hasNA,
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
 
-\item{obsName}{An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.}
-
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
 }
 \value{
 The function prints: 1) the number of dyads in each profile, 2) the figure created by tidyLPA's "plot_profiles", which gives a visual indicator of the quality of the LPA solution, and 3) prototypical model-predicted trajectories for each profile.
 }
 \description{
-The function prints out the number of dyads in each profile for a specified number of profiles. It also prints out the tidyLPA print_profiles figure and prototypical model-predicted trajectories for each profile. For the inertia-coordination model, it produces sets of prototypical examples by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step. This process is required because the inertia-coordination model only represents local dynamics and predictions bear no resemblance to observed variables without the addition of noise. For the coupled-oscillator, this step is not necessary and one prototypical trajectory is plotted for each profile.
+The function prints out the number of dyads in each profile for a specified number of profiles. It also prints out a figure showing the distributions of the observed parameters for each profile (produced by tidyLPA) and prototypical model-predicted trajectories for each profile (produced by rties). For the inertia-coordination model, it produces sets of prototypical examples by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step. This process is required because the inertia-coordination model only represents local dynamics and predictions bear no resemblance to observed variables without the addition of noise. For the coupled-oscillator, this step is not necessary and one prototypical trajectory is plotted for each profile.
 }

@@ -4,13 +4,13 @@
 \alias{sysVarIn}
 \title{Provides results for predicting couples' latent profile membership from the system variable.}
 \usage{
-sysVarIn(basedata, sysVar, sysVarType, n_profiles, dist0name = NULL,
-  dist1name = NULL, sysVarName = NULL, printPlots = T)
+sysVarIn(fullData, sysVar_name, sysVarType, n_profiles, dist0name = NULL,
+  dist1name = NULL, plot_sysVar_name = NULL, printPlots = T)
 }
 \arguments{
-\item{basedata}{A dataframe created by the makeLpaData function.}
+\item{fullData}{A dataframe created by the makeFullData function.}
 
-\item{sysVar}{The name of the variable in the dataframe that contains the system variable to be predicted by profile membership.}
+\item{sysVar_name}{The name of the variable in the dataframe that contains the system variable to be predicted by profile membership.}
 
 \item{sysVarType}{Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores}
 
@@ -20,7 +20,7 @@ sysVarIn(basedata, sysVar, sysVarType, n_profiles, dist0name = NULL,
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
 
-\item{sysVarName}{An optional name for the system variable being predicted (e.g., "Satisfaction"). Default is sysVar.}
+\item{plot_sysVar_name}{An optional name for the system variable being predicted (e.g., "Satisfaction"). Default is sysVar.}
 
 \item{printPlots}{Controls whether or not the plots are printed. Default is "true".}
 }

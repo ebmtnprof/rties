@@ -4,11 +4,11 @@
 \alias{dataPrep}
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
-dataPrep(origData, dyadId, personId, obs_name, dist_name, time_name,
+dataPrep(basedata, dyadId, personId, obs_name, dist_name, time_name,
   time_lag = NULL, robustScale = TRUE)
 }
 \arguments{
-\item{origData}{A user-provided dataframe that includes all variables needed for an rties analysis.}
+\item{basedata}{A user-provided dataframe that includes all variables needed for an rties analysis.}
 
 \item{dyadId}{The name of the column in the dataframe that has the dyad-level identifier.}
 

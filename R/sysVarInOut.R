@@ -1,13 +1,16 @@
+
+################### sysVarOut
+
 #' Provides results for predicting the system variable from the latent profiles of the dynamic parameters. 
 #' 
 #' The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership, 2) main effects of profile membership and the distinguishing variable, and 3) the interaction of profile membership and the distinguishing variable. If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution.
 #' 
-#' @param basedata A dataframe created by the makeLpaData function.
-#' @param sysVar The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. 
+#' @param fullData A dataframe created by the "makeFullData" function.
+#' @param sysVar_name The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. 
 #' @param sysVarType Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores
 #' @param dist0name An optional name for the level-0 of the distinguishing variable to appear as plot labels (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable to appear as plot labels (e.g., "Men"). Default is dist1
-#' @param sysVarName An optional name for the system variable to appear as plot labels (e.g., "Satisfaction"). Default is sysVar.
+#' @param plot_sysVar_name An optional name for the system variable to appear as plot labels (e.g., "Satisfaction"). Default is sysVar.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' @param family An optional argument specifying the error distribution and link function to be used in the model. Any of the "family" options supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available. Default is gaussian.
 #' @param printPlots Controls whether or not the plots are printed. Default is "true".
@@ -16,14 +19,16 @@
 
 #' @export
 
-sysVarOut <- function(basedata, sysVar, sysVarType, dist0name=NULL, dist1name=NULL, sysVarName=NULL, minMax=NULL, family=NULL, printPlots=T)
+sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1name=NULL, plot_sysVar_name=NULL, minMax=NULL, family=NULL, printPlots=T)
 {
+  basedata <- fullData
+  
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(sysVarName)){sysVarName <- "System_Variable"}
+  if(is.null(plot_sysVar_name)){plot_sysVar_name <- "System_Variable"}
   if(is.null(family)){family <- "gaussian"}
 	
-  colnames(basedata)[colnames(basedata)== sysVar] <- "sysVar" 	
+  colnames(basedata)[colnames(basedata)== sysVar_name] <- "sysVar" 	
 
   if(is.null(minMax)){
   	min <- min(basedata$sysVar, na.rm=T)
@@ -52,8 +57,8 @@ sysVarOut <- function(basedata, sysVar, sysVarType, dist0name=NULL, dist1name=NU
     }
       
     if(printPlots==T & family=="gaussian"){
-	  ylabName <- paste(sysVarName, "predicted", sep="_")
-	  xlabName <- paste(sysVarName, "observed", sep="_")
+	  ylabName <- paste(plot_sysVar_name, "predicted", sep="_")
+	  xlabName <- paste(plot_sysVar_name, "observed", sep="_")
 
 	  hist(residuals(profile))
 	  plot(profilePred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Model")
@@ -82,8 +87,8 @@ sysVarOut <- function(basedata, sysVar, sysVarType, dist0name=NULL, dist1name=NU
 	profileByDistPred <- fitted(profileByDist)
   	
     if(printPlots==T & family=="gaussian"){
-	  ylabName <- paste(sysVarName, "predicted", sep="_")
-	  xlabName <- paste(sysVarName, "observed", sep="_")
+	  ylabName <- paste(plot_sysVar_name, "predicted", sep="_")
+	  xlabName <- paste(plot_sysVar_name, "observed", sep="_")
 	  
 	  hist(residuals(profile))
 	  plot(profilePred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Model")
@@ -98,7 +103,7 @@ sysVarOut <- function(basedata, sysVar, sysVarType, dist0name=NULL, dist1name=NU
 	  interact <- ggplot(basedata, aes(x=profile, y=sysVar, fill=dist)) +
                     geom_boxplot() + 
                     scale_fill_manual(values=c("gray88","gray60")) + 
-                    ylab(sysVarName)
+                    ylab(plot_sysVar_name)
       print(interact)
 	}
   }
@@ -115,36 +120,38 @@ sysVarOut <- function(basedata, sysVar, sysVarType, dist0name=NULL, dist1name=NU
 	output <- list(models=models)
 }
 
-#############################
+################### sysVarIn
 
 #' Provides results for predicting couples' latent profile membership from the system variable. 
 #' 
 #' If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, a couple's shared score is the only predictor of their profile membership (called "sysVar"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base"). The function returns a list of the full model results and by default produces plots of profile membership against the system variable(s), but these can be turned off by setting printPlots=F.
 #' 
-#' @param basedata A dataframe created by the makeLpaData function.
-#' @param sysVar The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. 
+#' @param fullData A dataframe created by the makeFullData function.
+#' @param sysVar_name The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. 
 #' @param sysVarType Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores
 #' @param n_profiles The number of latent profiles.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
-#' @param sysVarName An optional name for the system variable being predicted (e.g., "Satisfaction"). Default is sysVar.
+#' @param plot_sysVar_name An optional name for the system variable being predicted (e.g., "Satisfaction"). Default is sysVar.
 #' @param printPlots Controls whether or not the plots are printed. Default is "true".
 #' 
 #' @return A list of model results and, by default, plots of profile membership against the system variable(s), but these can be turned off by setting printPlots=F.
 
 #' @export
 
-sysVarIn <- function(basedata, sysVar, sysVarType, n_profiles, dist0name=NULL, dist1name=NULL, sysVarName=NULL, printPlots=T){
+sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NULL, dist1name=NULL, plot_sysVar_name=NULL, printPlots=T){
 
+  basedata <- fullData
+  
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
-  if(is.null(sysVarName)){sysVarName <- "sysVar"}
+  if(is.null(plot_sysVar_name)){plot_sysVar_name <- "sysVar"}
   
   if(sysVarType != "indiv" & sysVarType != "dyadic") {
 	stop("the sysVarType must be either indiv or dyadic")
   }
 
-  colnames(basedata)[colnames(basedata)== sysVar] <- "sysVar" 	
+  colnames(basedata)[colnames(basedata)== sysVar_name] <- "sysVar" 	
 
   if(sysVarType == "dyadic"){
     
@@ -152,10 +159,10 @@ sysVarIn <- function(basedata, sysVar, sysVarType, n_profiles, dist0name=NULL, d
     
     if(n_profiles == 2){
       base <- glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
-      sysVar <- glm(profileN ~ sysVar, data=basedata, na.action=na.exclude, family="binomial")    	
+      sysVarMain <- glm(profileN ~ sysVar, data=basedata, na.action=na.exclude, family="binomial")    	
     } else {
     	base <- nnet::multinom(profileN ~ 1, data=basedata, na.action=na.exclude,)
-    	sysVar <- nnet::multinom(profileN ~ sysVar, data=basedata, na.action=na.exclude)
+    	sysVarMain <- nnet::multinom(profileN ~ sysVar, data=basedata, na.action=na.exclude)
     }	
 	  if(printPlots==T){
 	  	plot(basedata$sysVar, basedata$profile)
@@ -170,8 +177,8 @@ sysVarIn <- function(basedata, sysVar, sysVarType, n_profiles, dist0name=NULL, d
     data4 <- subset(data3, select=-c(profileN1))   
     basedata <- data4
     
-    sysVar0name <- paste(sysVarName, dist0name, sep="_")
-	sysVar1name <- paste(sysVarName, dist1name, sep="_")
+    sysVar0name <- paste(plot_sysVar_name, dist0name, sep="_")
+	sysVar1name <- paste(plot_sysVar_name, dist1name, sep="_")
 	sysVar01name <- paste(sysVar0name, sysVar1name, sep=":")
    
     if(n_profiles == 2){
@@ -207,8 +214,8 @@ sysVarIn <- function(basedata, sysVar, sysVarType, n_profiles, dist0name=NULL, d
   }
   
   if(sysVarType == "dyadic"){
-	models <- list(base=base, sysVar=sysVar)
-	message("Model names are base and sysVar")
+	models <- list(base=base, sysVarMain=sysVarMain)
+	message("Model names are base and sysVarMain")
   }
 	
   if(sysVarType == "indiv"){

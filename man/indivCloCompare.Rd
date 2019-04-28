@@ -4,10 +4,10 @@
 \alias{indivCloCompare}
 \title{Compares model fit for the uncoupled and coupled oscillator for each dyad's state trajectories using an R-square comparison.}
 \usage{
-indivCloCompare(basedata)
+indivCloCompare(derivData)
 }
 \arguments{
-\item{basedata}{A dataframe that was produced with the "estDerivs" function.}
+\item{derivData}{A dataframe that was produced with the "estDerivs" function.}
 }
 \value{
 The function returns a named list including: 1) the adjusted R^2 for the uncoupled model for each dyad (called "R2uncouple"), 2) the adjusted R^2 for the coupled model for each dyad (called "R2couple"), and 3) the difference between the R-squares for each dyad (coupled - uncoupled, called "R2dif").

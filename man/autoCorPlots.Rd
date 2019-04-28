@@ -4,16 +4,16 @@
 \alias{autoCorPlots}
 \title{Produces auto-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.}
 \usage{
-autoCorPlots(basedata, personId, dyadId, obs, time_name)
+autoCorPlots(basedata, dyadId, personId, obs_name, time_name)
 }
 \arguments{
 \item{basedata}{A user provided dataframe.}
 
-\item{personId}{The name of the column in the dataframe that has the person-level identifier.}
-
 \item{dyadId}{The name of the column in the dataframe that has the dyad-level identifier.}
 
-\item{obs}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
+\item{personId}{The name of the column in the dataframe that has the person-level identifier.}
+
+\item{obs_name}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 }

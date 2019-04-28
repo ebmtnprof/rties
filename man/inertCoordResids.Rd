@@ -4,10 +4,10 @@
 \alias{inertCoordResids}
 \title{Produces histograms of the residuals from the inertia-coordination model for each dyad.}
 \usage{
-inertCoordResids(basedata, whichModel)
+inertCoordResids(prepData, whichModel)
 }
 \arguments{
-\item{basedata}{A dataframe that was produced with the "dataPrep" function.}
+\item{prepData}{A dataframe that was produced with the "dataPrep" function.}
 
 \item{whichModel}{Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").}
 }

@@ -5,8 +5,7 @@
 \title{Plots the bivariate state variables' model-predicted temporal trajectories for each latent profile of inertia-coordination parameters. Not exported - used by inspectProfiles}
 \usage{
 inertCoordPlotTrajInternal(prepData, paramEst, n_profiles, time_lag,
-  dist0name = NULL, dist1name = NULL, obsName = NULL,
-  minMax = NULL)
+  dist0name = NULL, dist1name = NULL, minMax = NULL)
 }
 \arguments{
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}
@@ -18,8 +17,6 @@ inertCoordPlotTrajInternal(prepData, paramEst, n_profiles, time_lag,
 \item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
-
-\item{obsName}{An optional name for the state variables being plotted (e.g., "heart rate"). Default is obsName.}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
 }
