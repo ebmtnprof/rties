@@ -173,7 +173,7 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
     
     data1 <- subset(basedata, select=c(dyad, sysVar, dist0, profileN))
     data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")   
-   data3 <- dplyr::rename(data2, dyad=dyad, sysVar0=sysVar.0, profileN1= profileN.1, sysVar1= sysVar.1, profileN=profileN.0)
+   data3 <- dplyr::rename(data2, dyad=dyad, sysVar0=sysVar.1, profileN1= profileN.1, sysVar1= sysVar.0, profileN=profileN.0)
     data4 <- subset(data3, select=-c(profileN1))   
     basedata <- data4
     
