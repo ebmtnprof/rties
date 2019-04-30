@@ -19,7 +19,6 @@
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param time_lag An optional argument for the number of lags for the lagged observable.
-#' @param robustScale An optional argument to perform robust scaling of the de-trended observed state variable, one person at a time, using the DescTools package. Recommended to reduce noise. Default is "TRUE"
 #'
 #' @return The function returns a dataframe that has all the variables needed for modeling system dynamics, each renamed to a generic variable name, which are:
 #' \itemize{
@@ -34,7 +33,7 @@
 #'}
 
 #' @export
-dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL, robustScale = TRUE){
+dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL){
   
   vars <- c(dyadId, personId, obs_name, dist_name, time_name)
   basedata <- basedata[vars]
@@ -64,10 +63,6 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 	    
   basedata <- lineCenterById(basedata)
   
-  if (robustScale == TRUE){
-  	dataRobScale(basedata)
-  }
-	   
   if(!is.null(time_lag)){
 	lag <- time_lag
 	basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))
@@ -118,11 +113,11 @@ lineCenterById <- function(basedata)
   basedata <- as.data.frame(do.call(rbind, dataCent)) 	
 }		
 
-############# dataRobScale
+############# robustScale
 
-#' Apply robust scaling from the DescTools package one person at a time to the detrended observed variable (obs_deTrend).
+#' Apply robust scaling from the DescTools package one person at a time to the detrended observed variable (obs_deTrend). Currently not implemented since it wasn't clear it was working, or the optimal thing to do.
 
-dataRobScale <- function(basedata){
+robustScale <- function(basedata){
   newId <- unique(factor(basedata$id))
   dataRobust <- list()
   

@@ -15,7 +15,8 @@ Imports:
     scales,
     tidyLPA,
     interactions,
-    dplyr
+    dplyr,
+    DescTools
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
