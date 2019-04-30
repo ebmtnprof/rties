@@ -209,6 +209,13 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
      if(printPlots==T){
 	  	plot(basedata$sysVar0, basedata$profile, xlab=sysVar0name, ylab="Profile")
 	  	plot(basedata$sysVar1, basedata$profile, xlab=sysVar1name, ylab="Profile")
+	  	
+	  	data1$dist <- factor(data1$dist0, labels=c(dist1name, dist0name))
+        data1$profile <- factor(data1$profileN)
+        print(ggplot(data1, aes(x=profile, y=sysVar, fill=dist)) +
+                    geom_boxplot() + 
+                    scale_fill_manual(values=c("gray88","gray60")) + 
+                    ylab(plot_sysVar_name))
 	  }
     }	
   }
