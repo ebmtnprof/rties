@@ -10,7 +10,6 @@
 #' @param time_lag The time-lag used for the inertia-coordination model. This is required for the "inertCoord" model and not relevant to the "clo" model.
 #' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' @param paramEst A dataframe created by either indivInertCoord or indivClo containing the parameter estimates for each dyad.
-#' @param hasNA Indicates whether paramEst contains missing data (TRUE) or not (FALSE). If it does (hasNA=T) then random-forest imputation is done prior to estimating the latent profiles.
 #' @param n_profiles The number of latent profiles.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
@@ -21,28 +20,18 @@
 #' @import ggplot2
 #' @export
 
-inspectProfiles <- function(whichModel, time_lag=NULL, prepData, paramEst, hasNA, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
+inspectProfiles <- function(whichModel, time_lag=NULL, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
 {   
-   if(whichModel == "clo" & hasNA == TRUE){
-    lpa <- paramEst %>%
-        select(obs_0:p_d1_1) %>%
-        tidyLPA::single_imputation(method="missForest") %>%
-        tidyLPA::estimate_profiles(n_profiles)
-  } else if (whichModel == "clo" & hasNA == FALSE){
+   if(whichModel == "clo"){
   	  lpa <- paramEst %>%
         select(obs_0:p_d1_1) %>%
         tidyLPA::estimate_profiles(n_profiles)
-    } else if (whichModel == "inertCoord" & hasNA == TRUE){
-  	    lpa <- paramEst %>%
-          select(inert1, coord1, coord0, inert0) %>%
-          tidyLPA::single_imputation(method="missForest") %>%
-          tidyLPA::estimate_profiles(n_profiles)
-       } else if (whichModel == "inertCoord" & hasNA == FALSE){
+    } else if (whichModel == "inertCoord"){
   	      lpa <- paramEst %>%
             select(inert1, coord1, coord0, inert0) %>%
             tidyLPA::estimate_profiles(n_profiles)
          } else 
-        print("Model must be inertCoord or clo and hasNA must be T or F")      
+        print("Model must be inertCoord or clo")      
         
   profileData <- as.data.frame(tidyLPA::get_data(lpa))
   temp1 <- profileData[!duplicated(profileData$id), ]

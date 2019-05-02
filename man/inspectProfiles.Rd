@@ -4,7 +4,7 @@
 \alias{inspectProfiles}
 \title{A wrapper for tidyLPA that provides information to help decide how many profiles to use for  subsequent rties analyses.}
 \usage{
-inspectProfiles(whichModel, time_lag = NULL, prepData, paramEst, hasNA,
+inspectProfiles(whichModel, time_lag = NULL, prepData, paramEst,
   n_profiles, dist0name = NULL, dist1name = NULL, minMax = NULL)
 }
 \arguments{
@@ -15,8 +15,6 @@ inspectProfiles(whichModel, time_lag = NULL, prepData, paramEst, hasNA,
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}
 
 \item{paramEst}{A dataframe created by either indivInertCoord or indivClo containing the parameter estimates for each dyad.}
-
-\item{hasNA}{Indicates whether paramEst contains missing data (TRUE) or not (FALSE). If it does (hasNA=T) then random-forest imputation is done prior to estimating the latent profiles.}
 
 \item{n_profiles}{The number of latent profiles.}
 
