@@ -93,7 +93,7 @@ makeDist <- function(basedata, dyadId, personId, time_name, dist_name)
     temp2$dist <- ifelse(temp2[ ,4] == temp2[ ,8], NA, 
 				ifelse(temp2[ ,4] < temp2[ ,8], 0, 1))
     temp3 <- subset(temp2, select=c(dyadId, personId, time_name, "dist"))
-    temp4 <- plyr::join(data1, temp3)
+    temp4 <- plyr::join(basedata, temp3)
     return(temp4)
  }
 
