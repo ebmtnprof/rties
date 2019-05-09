@@ -49,7 +49,7 @@ library(rties)
 
 The _rties_ package includes functions to do all the data processing necessary for any of the models, but you must provide it with a dataframe that meets a number of criteria. The example dataframe called "demo" shows the necessary format. It only contains data for 2 dyads with just 3 time points, which is not enough for any of the _rties_ models, but makes it easy to see the needed data structure. Here we assign the demo data to a dataframe and view its contents.
 ```{r}
-demoData <- rties_ExampeData_Demo
+demoData <- rties_ExampleData_Demo
 head(demoData, 12)
 ```
 
@@ -119,7 +119,7 @@ The function returns a dataframe that has all the variables needed for the next 
 * dist0 = 0/1 variable where the 1's indicate the 0's in the original distinguishing variable
 * time = the variable indicating temporal sequence
 * obs_deTrend = the observed state variable with each person's linear trend removed
-* obs_deTrendLag = the lagged version of the obs_deTrend variable
+* obs_deTrend_Lag = the lagged version of the obs_deTrend variable
 * p_ = all the same variables, but for a person's partner rather than themselves    
 
 __A note about choosing the lag__: First, it is only relevant for the Inertia-Coordination model and you should not use this argument for the Coupled-Oscillator model. When using the Inertia-Coordination model, however, it requires lagging by some number of steps to be meaningful and the decision about how many steps to lag should be driven by theory and prior research. In our example, emotional experience was assessed in 2 second intervals and so a 1-step lag is very small and doesn't leave time for meaningful change between observations. We chose a lag of 5 steps, which is equivalent to 10 seconds, because 10 seconds is a common unit to aggregate over in the emotional experience literature and if emotions unfold over several minutes (as suggested by many theories), then 10 second steps are large enough to allow meaningful change between each step, but small enough to not miss important changes.    
