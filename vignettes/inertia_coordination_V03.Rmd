@@ -4,7 +4,7 @@ author: "Emily Butler, eabutler@u.arizona.edu"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{inertia_coordination}
+  %\VignetteIndexEntry{inertia_coordination_V03}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,8 +22,6 @@ As for all _rties_ analyses, the first step for an Inertia-Coordination analysis
 ```{r}
 library(rties)
 data1 <- rties_ExampleData_2
-```
-```{r, include=FALSE}
 dyads <- c(19)
 data1 <- removeDyads(data1, dyads, data1$couple)
 ```
