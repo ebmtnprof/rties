@@ -12,7 +12,7 @@ indivInertCoord(prepData, whichModel)
 \item{whichModel}{Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").}
 }
 \value{
-The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) a dataframe containing both the parameter estimates for the model for each dyad and the system variable (called "data", for using the dynamic parameters to either predict, or be predicted by, the system variable), and 3) a dataframe with just the parameter estimates (called "params", for use in the latent profile analysis).
+The function returns a dataframe containing the parameter estimates, called "params", for use in the latent profile analysis.
 }
 \description{
 The user specifies which of 3 models are to be estimated. Each model predicts the observed state variables (with linear trends removed) from either: 1) Inertia only ("inert")- each person's intercept and each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), 2) Coordination only ("coord")- each person's intercept and each person's partner's state variable lagged at the amount specified (again with linear trends removed), or 3) Full inertia-coordination model ("inertCoord") - each person's intercept, each person's own observed state variable lagged at the amount specified during the dataPrep step (again with linear trends removed), and each person's partner's state variable lagged at the amount specified (again with linear trends removed).

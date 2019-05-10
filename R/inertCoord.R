@@ -105,7 +105,7 @@ ccp <- function(basedata, personId, dyadId, obs_name, time_name)
 #' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
 #' 
-#' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), 2) a dataframe containing both the parameter estimates for the model for each dyad and the system variable (called "data", for using the dynamic parameters to either predict, or be predicted by, the system variable), and 3) a dataframe with just the parameter estimates (called "params", for use in the latent profile analysis).
+#' @return The function returns a dataframe containing the parameter estimates, called "params", for use in the latent profile analysis.
 
 #' @export
 
@@ -149,7 +149,7 @@ indivInertCoord <- function(prepData, whichModel)
   data <- suppressMessages(plyr::join(param, temp2))
   params <- data[data$dist0 == 1, ]
   
-  results <- list(R2=R2, data=data, params=params)
+  results <- list(params=params)
 }
 
 
