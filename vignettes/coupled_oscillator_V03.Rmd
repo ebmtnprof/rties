@@ -1,10 +1,10 @@
 ---
-title: "coupled_oscillator"
+title: "coupled_oscillator_V03"
 author: "Emily Butler, eabutler@u.arizona.edu"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{coupled_oscillator}
+  %\VignetteIndexEntry{coupled_oscillator_V03}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -35,7 +35,7 @@ where “d2” is the second derivative of the observed state variable (the time
 
 The term “obs_deTrend” is the observed state variable with individual linear trends removed. When considered in isolation, this parameter represents how quickly the observed process oscillates, but its values are not interpretable until transformed into frequency (cycles per time), or its reciprocal, period (time for one cycle). Estimates for the parameter (we will call it η here) also need to be negative in order to be interpretable. Assuming a negative estimate, η < 0, the time for one complete cycle (period) is estimated by ((2π) / (sqrt(-[η]))). Larger absolute values of η are indicative of more rapid oscillations. The term “p_obs_deTrend” is the observed state variable for a person’s partner with individual linear trends removed and, in isolation, represents coupling with respect to frequency (e.g., the impact of the partner on one’s own oscillatory frequency). The term “d1” is the first derivative of the observed state variable with linear trends removed. Negative estimates of this term represent damping, or the tendency for the state variable to converge back to homeostatic levels. Positive estimates, in contrast, represent amplification, or the tendency of the state variable to increasingly deviate away from homeostatic levels. A zero estimate suggests a continuously oscillating process of constant amplitude. Finally, the term “p_d1” is the first derivative of a person’s partner’s state variable with linear trend removed and represents coupling with respect to damping/amplification (e.g., the impact of the partner on one’s own damping/amplification). Note that we estimate this model separately for each dyad (e.g., “datai” is the data from couple “i”) and hence it is not a multilevel model.
 
-It is important to realize that the parameters of the CLO model (or any other non-linear model) do not act in isolation - they work together as a set to determine potentially complex trajectories for both partners over time. As with any non-linear model, it is impossible to inspect the CLO parameters and draw any conclusions about the dynamic pattern implied without actually plotting it using the full set of parameter estimates. The _rties_ package provides a variety of functions for doing so that are described below.
+It is important to realize that the parameters of the CLO model (or any other non-linear model) do not act in isolation - they work together as a set to determine potentially complex trajectories for both partners over time. As with any non-linear model, it is impossible to inspect the CLO parameters individually and draw any conclusions about the dynamic pattern implied without actually plotting it using the full set of parameter estimates. The _rties_ package provides a variety of functions for doing so that are described below.
 
 ### Sample Size Considerations
 
@@ -68,6 +68,7 @@ summary(derivs$fitTable[ ,4])
 We can see that the coupled oscillator model, with the tau and embed options we have provided, gives a fairly good fit to the data, with a mean R^2 of .66. The next consideration is whether these tau/embed combinations are also picking up a period of oscillation that is relevant to our process of interest. In our case, we are investigating emotional experience, which we speculate should oscillate every few minutes based on theories about the time-course of emotions and our prior research. To address this, the last two columns in fitTable gives the estimated period of oscillation for each person, given the tau/embed combination that resulted in that dyad's maximal R^2. We can inspect this as usual:
 ```{r}
 summary(derivs$fitTable[ ,5])
+summary(derivs$fitTable[ ,6])
 ```
 The values are given in the temporal units of the raw data, which in our example was 2-second units. Thus to translate the periods back into original time units of seconds we multiply the period by the size of time units over which the observed variable was aggregated. So, for example, for a period of 150 (the approximate mean period estimated for both partners) and an observed variable in 2 second units, we have 150 * 2 = 300 seconds. We can then divide by 60 to get the estimate in minutes if desired, which in this case would be 5 minutes. A period of this length is theoretically a little long for emotional experience, but would allow approximately 3 cycles per conversation, since they were about 15 minutes in length, and so seems like an adequate solution.
 
@@ -83,17 +84,23 @@ summary(compare$R2dif)
 
 In this example, we see that the simpler uncoupled model accounts on average for about 61% of the variance in the observed state variables, while the full coupled model accounts for about 66% and adds only a neglible amount of predictive ability (an R^2 difference of about 3%). These results suggest that coupling is not critical for describing the dynamics of the system, but it is still possible that the small amount of variance explained by coupling may predict system variables, such as relationship quality or health, better than the uncoupled model.    
 
-In addition to the model comparison results, we provide a function, "indivCloPlots"", to plot the observed state variables for each dyad, superimposed with their model predicted trajectories. The function takes as arguments the name of the dataframe produced by "estDerivs" ("derivs$data"" in this example), which of the variants of the oscillator model to plot the results for ("uncoupled" or "coupled"), and an argument called "idConvention" which is the number that was added to the dist0 partner to get the ID number for the dist1 partner (see overview_data_prep vignette). The function also takes optional strings providing labels for the level-0 and level-1 of the distinguishing variable, as well as the name of the observed state variable (default is "observed") and minimum/maximum values for the y-axis in terms of quantiles (default is the observed minimum and maximum of the state variable). These plots provide a visual tool for assessing model fit at the individual dyad level. The figures can be accessed from the returned list called “plots” and they are also automatically saved as a .pdf file in the working directory (this process takes awhile). The following figures show examples of poor and good fit respectively:
+In addition to the model comparison results, we provide a function, "indivCloPlots"", to plot the observed state variables for each dyad, superimposed with their model predicted trajectories. The function takes as arguments the name of the dataframe produced by "estDerivs" ("derivs$data"" in this example) and which of the variants of the oscillator model to plot the results for ("uncoupled" or "coupled"). The function also requires the argument "idConvention" which is the value you added to the level-1 person ID to get the level-0 person ID (see "overview_data_prep"). Use ?indivCloPlot to see the other optional arguments that are possible. These plots provide a visual tool for assessing model fit at the individual dyad level. The figures can be accessed from the returned list called “plots” and they are also automatically saved as a .pdf file in the working directory (this process takes awhile). The following figures show examples of poor and good fit respectively:
 ```{r, eval=FALSE}
-plots <- indivCloPlots(derivs$data, whichModel="coupled", idConvention=500)
+pplots <- indivCloPlots(derivData=derivs$data, whichModel="coupled", idConvention=500, plot_obs_name="dial")
 ```
-![Alt text](CLO_poorFit.png) ![](CLO_goodFit.png) 
+![](CLO_poorFit.png) ![](CLO_goodFit.png) 
+
+Finally, we provide a function that plots the residuals from fitting the model to each dyad. As with any regression model, a good fit is indicated by normally distributed residuals with a mean of zero and suggests that the model assumptions have been met. In our use case, it provides evidence that the state variables are normally distributed enough to be appropriate for this model. The figures can be accessed from the returned list called “plots” and they are also automatically saved as a .pdf file in the working directory. Here we show a few examples of such plots.
+```{r, eval=FALSE}
+residPlots <- cloResids(derivData=derivs$data, whichModel="coupled")
+```
+![](cloResid.png)  
 
 ### Generating Dynamic Parameter Estimates
 
-The next step is to use the function “indivClo” to generate the dynamic parameter estimates for each dyad. The function takes the name of the dataframe produced by "estDerivs" ("derivs$data" in this example) and the name of the version of the oscillator model that you want the parameter estimates for ("uncoupled" or "coupled"). It returns: 1) a dataframe containing the parameter estimates (called "params", for use in the latent profile analysis), and 2) a vector with the adjusted R^2 for the model fit to each dyad's data (called R^2; this R^2 information is identical to that returned by "indivCloCompare").
+The next step is to use the function “indivClo” to generate the dynamic parameter estimates for each dyad. The function takes the name of the dataframe produced by "estDerivs" ("derivs$data" in this example) and the name of the version of the oscillator model that you want the parameter estimates for ("uncoupled" or "coupled"). It returns a dataframe containing the parameter estimates (called "params"), for use in the latent profile analysis.
 ```{r}
-clo <- indivClo(derivs$data, whichModel="coupled")
+clo <- indivClo(derivData=derivs$data, whichModel="coupled")
 head(clo$params)
 ```
 
@@ -101,88 +108,60 @@ In the returned dataframe, the variables are: obs_0 = the frequency estimate for
 
 ### Latent Profile Analysis (LPA)
 
-The next step is to use the data generated by “indivInertCoord” as input to a latent profile analysis. Because the models in _rties_ all represent non-linear dynamics, the behavior of the dyadic system cannot be intuited by examining individual parameter estimates from the model. Rather, they operate together as a set to produce potentially complex temporal trajectories of both partner's state variables (emotional experience in this example). Thus when it comes to using the dynamic parameter estimates to predict, or be predicted by, system variables such as conversation quality, we wish the parameters to be operating as a set, not as isolated individual predictors or outcomes (such as would be the case if we used them as predictors in a regression model). Instead, we use them as input to a latent profile analysis in order to estimate qualitatively distinct groups of dyads based on the dynamics assessed by the Inertia-Coordination model. In other words, we wish to group the dyads based on their similarities and differences in terms of patterns of inertia and coordination. 
+The next step is to use the parameter estimates generated by “indivClo” as input to a latent profile analysis. Because the models in _rties_ all represent non-linear dynamics, the behavior of the dyadic system cannot be intuited by examining individual parameter estimates from the model. Rather, they operate together as a set to produce potentially complex temporal trajectories of both partner's state variables (emotional experience in this example). Thus when it comes to using the dynamic parameter estimates to predict, or be predicted by, system variables such as conversation quality, we wish the parameters to be operating as a set, not as isolated individual predictors or outcomes such as would be the case if we used them as predictors in a regression model. Instead, we use them as input to a latent profile analysis in order to estimate qualitatively distinct groups of dyads based on the dynamics assessed by the Coupled-Oscillator model. In other words, we wish to group the dyads based on their similarities and differences in terms of patterns of frequency, between-partner phase-relationships and damping/amplification. 
 
-Prior to conducting the LPA, it is a good idea to look at histograms of the parameter estimates to check that there is adequate variance across dyads for them to be meaningful as input for a latent profile analysis. In addition, LPA can be sensitive to non-normally distributed variables, so caution should be used if some of the parameters are clearly non-Gaussian. This issue is less problematic, however, if you choose the number of profiles a-priori (as we recommend) rather than based purely on fit statistics. In this example, we see there is adequate variance for all parameters, but many are not normally distributed. We proceed with them anyway, but it would be good for a serious analysis to see how much the results change if they were transformed to be more normally distributed.
-```{r, include=FALSE}
-par(mar=c(4,1,1,1))
+The latent profile analysis makes use of the _tidyLPA_ package (Rosenberg, J. M. et al, 2018). Specifically, the _rties_ function "inspectProfiles" provides a wrapper to some of the functionality provided by _tidyLPA_. LPA is a form of Gaussian Mixture Model, which assumes an underlying multivariate normal distribution and groups cases based on a set of observed variables (in our case the Coupled-Oscillator parameter estimates for each dyad). In much of the literature on LPA the focus is on trying to estimate the "true" number of underlying profiles by using fit statistics such as the BIC, but simulation studies tend to show that this process doesn't work very well unless you have a huge sample and large effect size (see for example Tein, Coxe & Cham, 2013). Thus, in the context of _rties_ we completely ignore fit statistics and suggest choosing the number of profiles based on: 1) interpretability in terms of meaningful dynamics, 2) the number of cases assigned to each profile, and 3) how well separated the profiles are. The "inspectProfiles" function provides results relevant to each of the these criteria, which we discuss below. Another issue is that a number of different LPA models are possible. For the simplest, only the means of the observed variables are used to define the profiles. More complex models allow the variances and/or covariances to differ across profiles as well. In order to avoid over-fitting, we only provide results for the simplest, means-only model. Thus the only decision to be made is the number of profiles. We suggest considering results for 2, 3 and 4 profiles. More than that is unlikely to be interpretable, unless you have a theory that suggests 5 or more distinct dynamic patterns. As an example, the following syntax runs the "inspectProfiles" function for 3 profiles and returns the profile membership scores in a dataframe for subsequent analyses. It also produces a frequency table and a number of plots, which we discuss below. 
+```{r, warning=F, fig.width=4}
+lpaData <- inspectProfiles(whichModel="clo", prepData=data2, paramEst=clo$params, n_profiles=3)
 ```
+
+In choosing the number of profiles, we first consider the number of dyads included in each profile and prefer solutions where there are at least about 10% of the dyads in the smallest profile. The rationale here is that we do not want a solution that is driven by a very small portion of our data, since that is unlikely to be a robust finding. In this example, the first part of the output (before the plots) is a frequency table which shows that there are 6 dyads in Profile 1, 10 in Profile 2 and 63 in Profile 3. Thus this is not ideal, since there are only about 8% of the dyads in the first profile and the second profile is small as well. 
+
+Next we consider the first plot above showing the distributions of the parameters across the profiles and prefer solutions where the profiles are clearly separated on at least some of the parameters. In this example, we see pretty clear separation for Profile 1 on the "obs_0" and "obs_1" parameters, along with some separation for Profile 2 on the damping/amplification parameters, which again suggests an adequate solution (it would better to see better separation on additional parameters, especially for Profile 3). 
+
+Finally, and most importantly, we consider how meaningful the dynamics of each profile are, which can be established by inspecting the model predicted trajectories of the state variable for each profile. The remaining plots above show these predicted trajectories for each profile. From these, we can see that Profile 1 is characterized by low amplitude, high frequency anti-phase oscillations, Profile 2 shows higher amplitude in-phase oscillations, and Profile 3 shows a lower amplitude anti-phase pattern that is at a much slower frequency than Profile 1.
+
+Due to the importance of the plots for deciding the number of profiles, we also provide a stand-alone function, "cloPlotTraj" that produces the same type of plots as "inspectProfiles", but with more optional arguments for controlling the presentation. The following syntax provides an example. The most useful arguments are "minMax," which allows you to scale the y-axis by setting the minimum and maximum values based on quantiles (in this example, we set them to the 5th and 95th percentiles of the observed state variable) and "time_length" which sets the x-axis to however many time steps you would like.
+```{r, eval=FALSE}
+plots <- cloPlotTraj(prepData=data2, paramEst=clo$params, n_profiles=3, time_length=350, minMax=c(.1, .9))
+```
+
+Once you have decided on the number of profiles you would like to use, you should re-run "inspectProfiles" with that number set. It will return a dataframe (called "lpaData"" in this example) that includes the profile membership scores to be used as a predictor or outcome of any system variables of interest. The function "makeFullData" then combines the profile membership data with your original dataframe containing the system variables you would like to explore as predictors and outcomes of the profile membership.
 ```{r}
-cloParams <- subset(clo$params, select=-c(dyad))
-histAll(cloParams)
+fullData <- makeFullData(basedata=data1, personId="person", dyadId="couple", dist_name="female", lpaData=lpaData, params=clo$params)
+head(fullData)
 ```
 
-The latent profile analysis makes use of the _tidyLPA_ package and we recommend consulting their documentation for a full understanding. We focus here on its specific use in the context of _rties_. We first load the _tidyLPA_ package (you will need to install it if you haven't already) and use the dynamic parameter estimates in "clo$params" as input to the _tidyLPA_ "compare_solutions" function. It takes the name of the dataframe we just created with the parameter estimates and the names of which parameter estimates to include in the analysis. Here we include all possible dynamic parameters. The result is a plot showing the BIC fit statistic for various models with various numbers of profiles (see _tidyLPA_ documentation for a full interpretation).
-```{r, fig.width=8}
-library(tidyLPA)
-compare_solutions(clo$params, obs_0:p_d1_1)
+Finally, if the number of profiles you have chosen provides a good representation of the data, you should be able to at least fantasize that you can see the prototypical trajectories reflected in the raw data. Of course, the raw data has a lot of noise which makes it hard to see patterns, but a good LPA solution should produce groups of dyads that appear to at least have some similarity to each other and the prototypical trajectories. In order to assess this, we provide the function "plotDataByProfile" that produces plots of the raw data grouped by profile membership. Here we show a few examples from each profile. Although the patterns are somewhat apparent (higher frequency in Profile 1, more in-phase in Profile 2, more anti-phase in Profile 3), we would prefer cleaner separation, suggesting that this profile solution in combination with these derivative estimates may not be optimal.
+```{r, eval=FALSE}
+plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 3, dist0name="men", dist1name="women", plot_obs_name="Dial")
 ```
-
-The previous output can help to inform decisions about which model and how many profiles to use. We recommend reading some papers on latent profile analysis if this is new to you. In general, we recommend choosing based on a combination of how many dyads are included in each profile (e.g., we prefer solutions where there is at least 10% of the dyads in the smallest profile) and how meaningful the dynamics of each profile are, which can be established by inspecting the model predicted trajectories of the state variable for each profile (described below). We recommend only considering fit statistics to the extent that our chosen model has an adequate fit (e.g., we don't care if it has the best fit, just an adequate one). Here we choose model 3 with 2 profiles based on a combination of the entropy estimates and the clearly distinguishable dynamics when we plot them later. The next step is to investigate the makeup of the estimated profiles using the "estimate_profiles" function.
-```{r, fig.width=4}
-lpaStep1 <- estimate_profiles(clo$params, obs_0:p_d1_1, n_profiles=2, variances="equal", covariances="equal")
-plot_profiles(lpaStep1)
-```
-
-We see from the resulting plot that the profiles are primarily distinguished by different frequency parameters and coupling with respect to frequency. You could repeat the previous steps with different models and numbers of profiles. Once you have chosen the final combination you want to use moving forward, the next step is to run the "estimate_profiles" two more times with different return options in order to collect the information needed for using the latent profiles as either predictors or outcomes of the system variable. Specifically, the object "lpaStep2" below is created using the "return_orig_df=T" argument, while the object "lpaStep3" uses the "to_return="mclust"" argument. Those objects are then used as input to the _rties_ function "makeLpaData", along with the dataframe created by the "estDerivs" function and the name of the model that generated the estimates (either "inertCoord" or "clo"). The result (called "lpaVars" in this example) contains the needed data (called "profileData") and parameter estimates (called "profileParams") for all subsequent steps in an _rties_ analysis.
-```{r}
-lpaStep2 <- estimate_profiles(clo$params, obs_0, obs_1, d1_0, d1_1, p_obs_0, p_obs_1, p_d1_0, p_d1_1, n_profiles=2, variances="equal", covariances="equal", return_orig_df=T)
-
-lpaStep3 <- estimate_profiles(clo$params, obs_0, obs_1, d1_0, d1_1, p_obs_0, p_obs_1, p_d1_0, p_d1_1, n_profiles=2, variances="equal", covariances="equal", to_return="mclust")
-
-lpaVars <- makeLpaData(derivs$data, lpaStep2, lpaStep3, "clo")
-```
-
-### Plotting the Dynamic Trajectories for Each Profile
-
-As described above, to interpret the dynamic parameter estimates obtained from the Coupled-Oscillator model (or any other _rties_ model), we need to plot the model predicted temporal trajectories. The "cloPredTraj" function does this and takes as arguments the name of the processed dataframe ("data2" in this example), the 2 dataframes produced by the "makeLpaData" function ("profileData" and "profileParams"), the number of profiles, an optional "time_length" argument that specifies the number of time points to plot across (the default is 20), optional names for the levels of the distinguishing variable and the observed state variable, and an optional argument for the minimum/maximum values for the y-axis in terms of quantiles (default is the observed minimum and maximum of the state variable). We see that Profile 1 is characterized by a somewhat chaotic pattern with partner's having similar amplitude but different frequecies of oscillation, while Profile 2 is characterized by in-phase steady oscillations, with men having higher amplitude oscillations than women.
-```{r, fig.width=4}
-profilePlots <- cloPredTraj(origData=data2, lpaData=lpaVars$profileData, lpaParams=lpaVars$profileParams, n_profiles=2, dist0name="Men", dist1name="Women", obsName="Dial", minMax= c(.2, .8))
-```
+![](cloP1raw.png) ![](cloP2raw.png)![](cloP3raw.png)
 
 ### Predicting the System Variable From the Profiles 
 
-The next step in the analysis is to use each dyad's profile membership to predict the system variable using the "sysVarOut" function. The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership ("profile"), 2) main effects of profile membership and the distinguishing variable ("profilePlusDist"), and 3) the interaction of profile membership and the distinguishing variable ("profileByDist"). If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution.
+The next step in the analysis is to use each dyad's profile membership to predict the system variable using the "sysVarOut" function. The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). It takes as arguments the name of the dataframe containing the profile membership scores combined with your original dataframe (created by the "makeFullData" function), the name of the column in the dataframe containing the variable you would like to use as the system variable, and whether the system variable is "dyadic" or "individual". For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership ("profile"), 2) main effects of profile membership and the distinguishing variable ("profilePlusDist"), and 3) the interaction of profile membership and the distinguishing variable ("profileByDist"). If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution (use ?sysVarOut for more information).
 
-For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). These results can be inspected using the usual "summary" function and the models can be compared using the "anova" function. Similarly, for non-normal system variables, the function returns a list of the glm or glmmPQL objects containing the full results for the models. By default, the function also displays histograms of the residuals and plots of the predicted values against observed values for each model, but these can be turned off by setting "printPlots=F". In this example, we find evidence for an interaction, such that in Profile 1 men and women report higher efforts to influence each other than in Profile 2, but the difference in influence levels between profiles is larger for women.
-```{r, include=FALSE, fig.width=4}
-par(mar=c(1,1,1,1))
-```
+For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). These results can be inspected using the usual "summary" function and the models can be compared using the "anova" function. Similarly, for non-normal system variables, the function returns a list of the glm or glmmPQL objects containing the full results for the models. By default, the function also displays a boxplot of the system variable for each profile, histograms of the residuals and plots of the predicted values against observed values for each model, but these can be turned off by setting "printPlots=F". In this example, we find a significant interaction between profile membership and sex (see summary and anova output). The boxplot helps to interpret this result and shows that the system variable ("cpos" which is self-reported positive emotion during the conversation) is predicted to be higher for women than men in Profiles 1 and 2, but fairly similar between partners in Profile 3. We do not find this result to be very intuitive, again suggesting that our combination of derivative settings and number of profiles is likely not optimal.
 ```{r}
-sysOut <- sysVarOut(lpaVars$profileData, "indiv", dist0name="Men", dist1name="Women", sysVarName = "Influence")
-summary(sysOut$models$profile)
-summary(sysOut$models$profilePlusDist)
+sysOut <- sysVarOut(fullData=fullData, sysVar_name="cpos", sysVarType="indiv", dist0name="Men", dist1name="Women", printPlots=F)
 summary(sysOut$models$profileByDist)
-anova(sysOut$models$profilePlusDist, sysOut$models$profileByDist)
+anova(sysOut$models$profileByDist)
 ```
+![](cloSysVarOut.png)  
 
 ### Predicting Profile Membership From the System Variable
 
-The last step in the analysis is to turn the direction of prediction around and use the system variable to predict couples' profile membership. The function "sysVarIn" accomplishes this. It takes as arguments the name of the dataframe containing the profileData (created by the "makeLpaData" function), whether the system variable is "dyadic" or "individual", the number of profiles, and optional names for the levels of the distinguisher and the system variable. If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. For dyadic system variables, a couple's shared score is the only predictor of their profile membership (called "sysVar"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base"). 
+Finally, you can turn the direction of prediction around and use the system variable to predict couples' profile membership. The function "sysVarIn" accomplishes this. It takes as arguments the name of the dataframe containing the profile membership scores combined with your original dataframe (created by the "makeFullData" function), the name of the column in the dataframe containing the variable you would like to use as the system variable, whether the system variable is "dyadic" or "individual", the number of profiles, and optional names to use in the plots for the levels of the distinguisher and the system variable. If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. For dyadic system variables, a couple's shared score is the only predictor of their profile membership (the model is called "sysVarMain"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base").
 
-The function returns a list of the full model results and by default produces plots of profile membership against the system variable(s), but these can be turned off by setting printPlots=F. The results below show evidence for men's influence predicting profile membership, such that at higher influence there is less likelihood of the couple being in Profile 2. Exponentiating the parameter estimates translates them into odds-ratios (since this is an example of logistic regression) and shows that odds ratio for men's influence is .56, which is a relatively large effect size. 
-```{r, include=FALSE, fig.width=4.5}
-par(mar=c(1,1,1,1))
-```
+The function returns a list of the full model results and by default produces a boxplot of the system variable for each profile and plots of profile membership against the system variable(s), but these can be turned off by setting printPlots=F. Due to these being either logistic or multinomial models, interpretation is somewhat more complicated than for the sysVarOut results. In this example, it is a multinomial model since we used 3 profiles. To aid intrepretation, we exponentiate the coefficients from the sysVarInteract model to get odds ratios and then calculate p-values for them. We see we again have evidence of an interaction between profile membership an sex. The boxplot of the system variable (global love in this example) for each profile suggests that the interaction is driven by partners in Profile 1 reporting fairly similar love, while in the other two profiles the women reported more love than the men. We again do not find this result intuitive.
 ```{r}
-sysIn <- sysVarIn(lpaVars$profileData, "indiv", n_profiles=2, dist0name="Men", dist1name="Women", sysVarName="Influence")
-summary(sysIn$models$sysVarMain)
+sysIn <- sysVarIn(fullData=fullData, sysVar_name="love", sysVarType="indiv", n_profiles=3, dist0name="Men", dist1name="Women", printPlots=F)
 summary(sysIn$models$sysVarInteract)
-exp(coef(sysIn$models$sysVarMain))
+coefs <- coef(sysIn$models$sysVarInteract)
+exp(coef(sysIn$models$sysVarInteract))
+z <- summary(sysIn$models$sysVarInteract)$coefficients/summary(sysIn$models$sysVarInteract)$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1)) * 2
+round(p, 3)
 ```
-In summary, taken together, the results from this example provide some evidence that the dynamics represented by the Coupled-Oscillator model are associated with partner's attempting to influence each other, such that a more chaotic pattern of emotional oscillations is associated with more influence attempts, especially when it is the women trying to influence the men.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![](icSysVarIn.png)  

@@ -17,4 +17,4 @@ overview_data_prep_V03: http://rpubs.com/ebmtnprof/484725
 
 inertia_coordination_V03: http://rpubs.com/ebmtnprof/495166
 
-coupled_oscillator_V03: 
+coupled_oscillator_V03: http://rpubs.com/ebmtnprof/495181
