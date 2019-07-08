@@ -164,7 +164,7 @@ removeDyads <- function (basedata, dyads, dyadId){
 #'
 #' @return A dataframe in actor-partner format.
 
-# @export
+#' @export
 
 actorPartnerDataCross <- function(basedata, dyadId, personId){
 	
