@@ -343,7 +343,6 @@ inertCoordResids <- function(prepData, whichModel)
 #' @return The function prints the plots. 
 
 #' @import ggplot2
-#' @import dplyr
 
 inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag, dist0name=NULL, dist1name=NULL, minMax=NULL)
 { 
@@ -359,11 +358,10 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag,
 	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
 
-  temp1 <- paramEst %>%
-        select(inert1, coord1, coord0, inert0) %>%
-        tidyLPA::estimate_profiles(n_profiles)
-        profileParams <- as.data.frame(tidyLPA::get_estimates(temp1))
-  
+  temp1 <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
+  lpa <- mclust::Mclust(temp1, G=n_profiles)
+  profileParams <- as.data.frame(lpa$parameters$mean) 
+    
   noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.exclude, data=prepData, control=nlme::lmeControl(opt="optim"))
   
   noise <- noiseModel$sigma
@@ -384,10 +382,9 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag,
 	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
   	
       start <- c(start1, start0)  
-      
-      tempParams <- subset(profileParams, Category == "Means" & Class==i, select=c(Parameter, Estimate))
-	  temp1 <- tempParams[ ,2]
-      names <- tempParams[ ,1]
+     
+	  temp1 <- profileParams[ ,i]
+      names <- rownames(profileParams)
       names(temp1) <- names
       paramsi <- temp1
 
@@ -479,11 +476,10 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_le
 	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
 
-  temp1 <- paramEst %>%
-        select(inert1, coord1, coord0, inert0) %>%
-        tidyLPA::estimate_profiles(n_profiles)
-        profileParams <- as.data.frame(tidyLPA::get_estimates(temp1))
-  
+  temp1 <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
+  lpa <- mclust::Mclust(temp1, G=n_profiles)
+  profileParams <- as.data.frame(lpa$parameters$mean) 
+     
   noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.omit, data=prepData, control=nlme::lmeControl(opt="optim"))
   
   noise <- noiseModel$sigma
@@ -505,9 +501,8 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_le
   	
       start <- c(start1, start0)  
       
-      tempParams <- subset(profileParams, Category == "Means" & Class==i, select=c(Parameter, Estimate))
-	  temp1 <- tempParams[ ,2]
-      names <- tempParams[ ,1]
+	  temp1 <- profileParams[ ,i]
+      names <- rownames(profileParams)
       names(temp1) <- names
       paramsi <- temp1
 

@@ -2,7 +2,7 @@
 
 #################### inspectProfiles
 
-#' A wrapper for tidyLPA that provides information to help decide how many profiles to use for  subsequent rties analyses. 
+#' Provides information to help decide how many profiles to use for subsequent rties analyses. 
 #'
 #' The function prints out the number of dyads in each profile for a specified number of profiles. It also prints out a figure showing the distributions of the observed parameters for each profile (produced by tidyLPA) and prototypical model-predicted trajectories for each profile (produced by rties). For the inertia-coordination model, it produces sets of prototypical examples by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step. This process is required because the inertia-coordination model only represents local dynamics and predictions bear no resemblance to observed variables without the addition of noise. For the coupled-oscillator, this step is not necessary and one prototypical trajectory is plotted for each profile.
 #' 
@@ -23,24 +23,30 @@
 inspectProfiles <- function(whichModel, time_lag=NULL, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
 {   
    if(whichModel == "clo"){
-  	  lpa <- paramEst %>%
-        select(obs_0:p_d1_1) %>%
-        tidyLPA::estimate_profiles(n_profiles)
+  	  params <- subset(paramEst, select=c(obs_0:p_d1_1))
+  	  lpa <- mclust::Mclust(params, G=n_profiles)
     } else if (whichModel == "inertCoord"){
-  	      lpa <- paramEst %>%
-            select(inert1, coord1, coord0, inert0) %>%
-            tidyLPA::estimate_profiles(n_profiles)
+  	    params <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
+  	    lpa <- mclust::Mclust(params, G=n_profiles)
          } else 
         print("Model must be inertCoord or clo")      
-        
-  profileData <- as.data.frame(tidyLPA::get_data(lpa))
-  temp1 <- profileData[!duplicated(profileData$id), ]
-  nPerProfile <- data.frame(table(temp1$Class))
-  colnames(nPerProfile) <- c("Profile", "Frequency")
-  print(nPerProfile)  
-  
-  tidyLPA::plot_profiles(lpa)
    
+   # classification table     
+  print(table(lpa$classification)) 
+  
+  # plot quality of solution
+  dr <- mclust::MclustDR(lpa, lambda=1)
+  plot(dr, what ="contour")
+  
+  # plot content of solution
+  means <- as.data.frame(lpa$parameters$mean)
+  means$varNames <- rownames(means)
+  means$var <- c(1:dim(means)[1])
+  meansL <- reshape(means, idvar="varNames", varying=list(1:n_profiles), timevar="profile", sep="", direction="long")
+
+  print(ggplot(data=meansL, aes(x=varNames, y=V1, group=profile)) +
+		geom_line(aes(colour=as.factor(profile))))
+
   if(whichModel=="clo") {
   cloPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax)
   } else if (whichModel=="inertCoord"){

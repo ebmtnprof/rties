@@ -13,9 +13,8 @@ Imports:
     lattice,
     plyr,
     scales,
-    tidyLPA,
-    interactions,
-    dplyr
+    mclust,
+    interactions
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

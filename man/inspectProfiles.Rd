@@ -2,7 +2,7 @@
 % Please edit documentation in R/lpa.R
 \name{inspectProfiles}
 \alias{inspectProfiles}
-\title{A wrapper for tidyLPA that provides information to help decide how many profiles to use for  subsequent rties analyses.}
+\title{Provides information to help decide how many profiles to use for subsequent rties analyses.}
 \usage{
 inspectProfiles(whichModel, time_lag = NULL, prepData, paramEst,
   n_profiles, dist0name = NULL, dist1name = NULL, minMax = NULL)

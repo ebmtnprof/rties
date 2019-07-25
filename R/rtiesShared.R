@@ -61,13 +61,16 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
       rm(notEqual, envir = .GlobalEnv)
 	}
 	    
+  # center each person's data around their own regression line
   basedata <- lineCenterById(basedata)
   
+  # create lagged variables
   if(!is.null(time_lag)){
 	lag <- time_lag
 	basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))
   }
   
+  # put data in actor-partner format
   basedata <- actorPartnerDataTime(basedata, "dyad", "id")  
   return(basedata)
 }
