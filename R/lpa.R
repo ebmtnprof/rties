@@ -4,7 +4,7 @@
 
 #' Provides information to help decide how many profiles to use for subsequent rties analyses. 
 #'
-#' The function prints out the number of dyads in each profile for a specified number of profiles. It also prints out a figure showing the distributions of the observed parameters for each profile (produced by tidyLPA) and prototypical model-predicted trajectories for each profile (produced by rties). For the inertia-coordination model, it produces sets of prototypical examples by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step. This process is required because the inertia-coordination model only represents local dynamics and predictions bear no resemblance to observed variables without the addition of noise. For the coupled-oscillator, this step is not necessary and one prototypical trajectory is plotted for each profile.
+#' The function prints out the number of dyads in each profile for a specified number of profiles. It also prints out: 1) a figure showing the best clustering solution as indicated by BIC (e.g., the observed data separated into clusters, produced by mclust), 2) a line plot showing the content of the best solution (e.g., the mean parameter estimates for each profile) and 3) prototypical model-predicted trajectories for each profile. For the inertia-coordination model, it produces sets of prototypical examples by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step. This process is required because the inertia-coordination model only represents local dynamics and predictions bear no resemblance to observed variables without the addition of noise. For the coupled-oscillator, this step is not necessary and one prototypical trajectory is plotted for each profile.
 #' 
 #' @param whichModel The name of the model that is being investigated (e.g., "inertCoord" or "clo")
 #' @param time_lag The time-lag used for the inertia-coordination model. This is required for the "inertCoord" model and not relevant to the "clo" model.
@@ -15,13 +15,15 @@
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' 
-#' @return The function prints: 1) the number of dyads in each profile, 2) the figure created by tidyLPA's "plot_profiles", which gives a visual indicator of the quality of the LPA solution, and 3) prototypical model-predicted trajectories for each profile. 
+#' @return The function returns a dataframe called "profileData" that contains the profile classification for each dyad. 
 
 #' @import ggplot2
 #' @export
 
 inspectProfiles <- function(whichModel, time_lag=NULL, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
-{   
+{  
+	profileData <- list() 
+   
    if(whichModel == "clo"){
   	  params <- subset(paramEst, select=c(obs_0:p_d1_1))
   	  lpa <- mclust::Mclust(params, G=n_profiles)
@@ -30,6 +32,12 @@ inspectProfiles <- function(whichModel, time_lag=NULL, prepData, paramEst, n_pro
   	    lpa <- mclust::Mclust(params, G=n_profiles)
          } else 
         print("Model must be inertCoord or clo")      
+   
+   # profileData
+   profileData$profile <- factor(lpa$classification)
+   profileData$profileN <- as.numeric(lpa$classification) - 1
+   profileData$dyad <- paramEst$dyad
+   profileData <- as.data.frame(profileData)
    
    # classification table     
   print(table(lpa$classification)) 

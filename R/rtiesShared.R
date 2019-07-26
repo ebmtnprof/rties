@@ -244,17 +244,6 @@ actorPartnerDataTime <- function(basedata, dyadId, personId){
 #' @export
 
 makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData, params){
-  
-  temp1 <- as.data.frame(lpaData)
-  temp2 <- temp1[!duplicated(temp1$id), ]
-  temp3 <- subset(temp2, select=c(Class))
-  colnames(temp3) <- "profile"
-  temp3$profileN <- as.numeric(temp3$profile) - 1 
-  temp3$profile <- factor(temp3$profile)
-
-  dyad <- params$dyad
-  temp4 <- cbind(temp3, dyad)
-
   colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
   colnames(basedata)[colnames(basedata)== personId] <- "person"
   colnames(basedata)[colnames(basedata)== dist_name ] <- "dist1"
@@ -262,7 +251,7 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData, params)
   basedata <- basedata[!duplicated(basedata$person), ]
   basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)
 
-  fullData <- plyr::join(basedata, temp4)
+  fullData <- plyr::join(basedata, lpaData)
   
   return(fullData)
 }
