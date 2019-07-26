@@ -24,6 +24,7 @@
 inspectProfiles <- function(whichModel, time_lag=NULL, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
 {  
 	profileData <- list() 
+	paramEst <- paramEst[complete.cases(paramEst), ]
    
    if(whichModel == "clo"){
   	  params <- subset(paramEst, select=c(obs_0:p_d1_1))
