@@ -462,8 +462,10 @@ print(multiPlots)
 
 #' @export
 
-inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_length=NULL, dist0name=NULL, dist1name=NULL, minMax=NULL, numPlots=NULL)
+inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, dist0name=NULL, dist1name=NULL, minMax=NULL, time_length=NULL, numPlots=NULL)
 { 
+  paramEst <- paramEst[complete.cases(paramEst), ]
+  
   if(is.null(time_length)){time_length <- 20}
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
@@ -479,14 +481,14 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_le
   temp1 <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
   lpa <- mclust::Mclust(temp1, G=n_profiles)
   profileParams <- as.data.frame(lpa$parameters$mean) 
-     
-  noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.omit, data=prepData, control=nlme::lmeControl(opt="optim"))
+    
+  noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.exclude, data=prepData, control=nlme::lmeControl(opt="optim"))
   
   noise <- noiseModel$sigma
+
+  if(is.null(numPlots)){numPlots <- 3}
   
   stateCutOff <- time_lag + 5
-
-  if(is.null(numPlots)){numPlots <- 5}
   
   multiPlots <- list()
   plots <- list()
@@ -500,7 +502,7 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_le
 	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
   	
       start <- c(start1, start0)  
-      
+     
 	  temp1 <- profileParams[ ,i]
       names <- rownames(profileParams)
       names(temp1) <- names
@@ -555,7 +557,6 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, time_le
     multiPlots[[i]] <- plots
   }
 print(multiPlots)
-return(multiPlots)
 }
 
 
