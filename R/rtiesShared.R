@@ -256,6 +256,75 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData, params)
   return(fullData)
 }
 
+############# Max_Min_CCF_Signed
+
+#' A helper function for makeCrossCorr
+
+Max_Min_CCF_Signed <- function (a, b) {
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)
+cor = d$acf[ ,,1] 
+lag = d$lag[ ,,1] 
+res = data.frame(cor,lag) 
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {
+res_max = res[which.max(res$cor),] 
+res_min = res[which.min(res$cor),]
+res_min_abs = abs(res_min)
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))
+if (res.max.abs==1) max=res_max else max=res_min}
+output <<-data.frame(max = max)
+output
+}
+
+
+############# makeCrossCorr
+
+#' Calculates cross-correlations for a given variable and returns a dataframe with the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms).
+#'
+#' @param basedata The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.
+#' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
+#'
+#' @return The original dataframe with maximal absolute-value cross-correlations and their lags added.
+
+#' @export
+
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){
+  
+  colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
+  colnames(basedata)[colnames(basedata)== personId] <- "person"
+  colnames(basedata)[colnames(basedata)== obs_name] <- "dv"
+  colnames(basedata)[colnames(basedata)== dist_name ] <- "dist1"
+
+  crossCorr <- list()
+  dID <- unique(factor(basedata$dyad))
+
+  for (i in 1:length(dID)){
+  datai <- basedata[basedata$dyad == dID[i], ]
+  dist1 <- subset(datai, dist1==1, select=dv)
+  dist0 <- subset(datai, dist1==0, select=dv)
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)
+  }
+
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))
+  cc <- as.data.frame(do.call(rbind, cc2))
+  cc$newID <- dyadId
+  colnames(cc) <- c("maxCor","maxLag", dyadId)
+  ccBoth <- rbind(cc, cc)
+  ccBoth$maxCor <- as.numeric(ccBoth$maxCor)
+  ccBoth$maxLag <- as.numeric(ccBoth$maxLag)
+  
+  temp1 <- basedata[!duplicated(basedata$person), ]
+  temp2 <- cbind(temp1, ccBoth)
+  
+  crossCorr <- temp2
+  return(crossCorr)
+ }
+
+
+
 ################ Plotting functions
 
 ########## histAll
