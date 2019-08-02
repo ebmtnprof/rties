@@ -550,9 +550,8 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
 
 	  state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
 	  
-	  tempParams <- subset(profileParams, Category == "Means" & Class==i, select=c(Parameter, Estimate))
-	  temp1 <- tempParams[ ,2]
-      names <- tempParams[ ,1]
+	  temp1 <- profileParams[ ,i]
+      names <- rownames(profileParams)
       names(temp1) <- names
       paramsi <- temp1
 		  
@@ -628,9 +627,8 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
 
 	  state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
 	  
-	  tempParams <- subset(profileParams, Category == "Means" & Class==i, select=c(Parameter, Estimate))
-	  temp1 <- tempParams[ ,2]
-      names <- tempParams[ ,1]
+	  temp1 <- profileParams[ ,i]
+      names <- rownames(profileParams)
       names(temp1) <- names
       paramsi <- temp1
 		  
