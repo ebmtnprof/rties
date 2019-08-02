@@ -534,11 +534,10 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
     if(is.null(minMax)){min <- min(prepData$obs_deTrend, na.rm=T)
     				   max <- max(prepData$obs_deTrend, na.rm=T)}
 
-    temp1 <- paramEst %>%
-        select(obs_0:p_d1_1) %>%
-        tidyLPA::estimate_profiles(n_profiles)
-        profileParams <- as.data.frame(tidyLPA::get_estimates(temp1))
-        
+    temp1 <- subset(paramEst, select=c(obs_0:p_d1_1))
+    lpa <- mclust::Mclust(temp1, G=n_profiles)
+    profileParams <- as.data.frame(lpa$parameters$mean) 
+
     plots <- list()
   
     for(i in 1:n_profiles){
@@ -612,11 +611,11 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
     if(is.null(minMax)){min <- min(prepData$obs_deTrend, na.rm=T)
     				   max <- max(prepData$obs_deTrend, na.rm=T)}
 
-    temp1 <- paramEst %>%
-        select(obs_0:p_d1_1) %>%
-        tidyLPA::estimate_profiles(n_profiles)
-        profileParams <- as.data.frame(tidyLPA::get_estimates(temp1))
-        
+    
+     temp1 <- subset(paramEst, select=c(obs_0:p_d1_1))
+     lpa <- mclust::Mclust(temp1, G=n_profiles)
+     profileParams <- as.data.frame(lpa$parameters$mean) 
+
     plots <- list()
   
     for(i in 1:n_profiles){
