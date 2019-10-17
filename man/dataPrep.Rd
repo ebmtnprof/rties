@@ -20,7 +20,7 @@ dataPrep(basedata, dyadId, personId, obs_name, dist_name, time_name,
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
-\item{time_lag}{An optional argument for the number of lags for the lagged observable.}
+\item{time_lag}{An optional argument for the number of lags for the lagged observable. If a number is provided, the observed variable is lagged that amount. The other option is to use "absMaxCC". In this case the maximum cross-correlation is found for each dyad and the lag at which that occurs is used to lag their observed variables.}
 }
 \value{
 The function returns a dataframe that has all the variables needed for modeling system dynamics, each renamed to a generic variable name, which are:

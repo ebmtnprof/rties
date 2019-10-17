@@ -4,7 +4,7 @@
 \alias{inertCoordPlotTrajInternal}
 \title{Plots the bivariate state variables' model-predicted temporal trajectories for each latent profile of inertia-coordination parameters. Not exported - used by inspectProfiles}
 \usage{
-inertCoordPlotTrajInternal(prepData, paramEst, n_profiles, time_lag,
+inertCoordPlotTrajInternal(prepData, paramEst, n_profiles,
   dist0name = NULL, dist1name = NULL, minMax = NULL)
 }
 \arguments{

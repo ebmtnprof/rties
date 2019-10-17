@@ -21,7 +21,7 @@
 #' @import mclust
 #' @export
 
-inspectProfiles <- function(whichModel, time_lag=NULL, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
+inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
 {  
 	profileData <- list() 
 	paramEst <- paramEst[complete.cases(paramEst), ]
@@ -60,7 +60,7 @@ inspectProfiles <- function(whichModel, time_lag=NULL, prepData, paramEst, n_pro
   if(whichModel=="clo") {
   cloPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax)
   } else if (whichModel=="inertCoord"){
-  	  inertCoordPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, time_lag=time_lag, dist0name=dist0name, dist1name=dist1name, minMax=minMax)
+  	  inertCoordPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax)
   } else
   print("Model must be inertCoord or clo")
   

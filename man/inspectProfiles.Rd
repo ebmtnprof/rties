@@ -4,13 +4,11 @@
 \alias{inspectProfiles}
 \title{Provides information to help decide how many profiles to use for subsequent rties analyses.}
 \usage{
-inspectProfiles(whichModel, time_lag = NULL, prepData, paramEst,
-  n_profiles, dist0name = NULL, dist1name = NULL, minMax = NULL)
+inspectProfiles(whichModel, prepData, paramEst, n_profiles,
+  dist0name = NULL, dist1name = NULL, minMax = NULL)
 }
 \arguments{
 \item{whichModel}{The name of the model that is being investigated (e.g., "inertCoord" or "clo")}
-
-\item{time_lag}{The time-lag used for the inertia-coordination model. This is required for the "inertCoord" model and not relevant to the "clo" model.}
 
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}
 
@@ -23,6 +21,8 @@ inspectProfiles(whichModel, time_lag = NULL, prepData, paramEst,
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
+
+\item{time_lag}{The time-lag used for the inertia-coordination model. This is required for the "inertCoord" model and not relevant to the "clo" model.}
 }
 \value{
 The function returns a dataframe called "profileData" that contains the profile classification for each dyad.
