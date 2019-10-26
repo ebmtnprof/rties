@@ -1,1552 +1,827 @@
-summary(inertCoord$R2)
-head(inertCoord$paramData)
-indivCoord <- function(basedata){#
+basedata <- data1#
+dyadId <- "couple"#
+personId <- "person"#
+obs_name <- "dial"#
+dist_name <- "female"
+newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
 #
-  suppressMessages()#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","coord0","coord1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- plyr::join(param, temp2)#
-  results <- list(R2=r2, paramData=paramData)#
-}
-inert <- indivInert(data3)
-indivCoord <- function(basedata){#
-#
-  suppressMessages("Joining by: ")#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","coord0","coord1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- plyr::join(param, temp2)#
-  results <- list(R2=r2, paramData=paramData)#
-}
-inert <- indivInert(data3)
-plyr::join
-indivCoord <- function(basedata){#
-#
-  suppressMessages("Joining by: ", paste(by, collapse = ", ")#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","coord0","coord1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- plyr::join(param, temp2)#
-  results <- list(R2=r2, paramData=paramData)#
-}
-indivCoord <- function(basedata){#
-#
-  suppressMessages("Joining by: ", paste(by, collapse = ", "))#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","coord0","coord1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- plyr::join(param, temp2)#
-  results <- list(R2=r2, paramData=paramData)#
-}
-inert <- indivInert(data3)
-indivCoord <- function(basedata){#
-#
-  suppressMessages("Joining by: ", paste(by, collapse = ", "))#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","coord0","coord1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  sink("aux")#
-  paramData <- plyr::join(param, temp2)#
-  sink(NULL)#
-  results <- list(R2=r2, paramData=paramData)#
-}
-inertCoord <- indivInertCoord(data3)
-indivInert <- function(basedata){#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","inert0","inert1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  suppressMessages(library(plyr))#
-  paramData <- plyr::join(param, temp2)#
-  results <- list(R2=r2, paramData=paramData)#
-}
-inert <- indivInert(data3)
-indivInert <- function(basedata){#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","inert0","inert1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- plyr::join(param, temp2, quietly=T)#
-  results <- list(R2=r2, paramData=paramData)#
-}
-inert <- indivInert(data3)
-indivInert <- function(basedata){#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","inert0","inert1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- plyr::join(param, temp2, silent=T)#
-  results <- list(R2=r2, paramData=paramData)#
-}
-inert <- indivInert(data3)
-indivInert <- function(basedata){#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","inert0","inert1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- suppressMessages(plyr::join(param, temp2))#
-  results <- list(R2=r2, paramData=paramData)#
-}
-inert <- indivInert(data3)
-summary(inert$R2)
-head(inert$paramData)
-indivInertCoord <- function(basedata){#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","inert0","coord0","inert1","coord1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- suppressMessages(plyr::join(param, temp2))#
-  results <- list(R2=r2, paramData=paramData)#
-}
-inertCoord <- indivInertCoord(data3)
-summary(inertCoord$R2)
-coord <- indivCoord(data3)
-indivCoord <- function(basedata){#
-#
-  suppressMessages("Joining by: ", paste(by, collapse = ", "))#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","coord0","coord1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- suppressMessages(plyr::join(param, temp2))#
-  results <- list(R2=r2, paramData=paramData)#
-}
-coord <- indivCoord(data3)
-indivCoord <- function(basedata){#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-    model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","coord0","coord1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- suppressMessages(plyr::join(param, temp2))#
-  results <- list(R2=r2, paramData=paramData)#
-}
-coord <- indivCoord(data3)
-ls()
-minMax <- c(.2, .8)
-if(is.null(minMax)){#
-  	min <- min(basedata$obs_deTrend, na.rm=T)#
-	max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))
+length(dID)
+for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
   }
-min
-max
-minMax <- NULL
-if(is.null(minMax)){#
-  	min <- min(basedata$obs_deTrend, na.rm=T)#
-	max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
+crossCorr
+cctest <- as.data.frame(crossCorr)
+head(cctest)
+cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))
+cc1
+cc <- as.data.frame(do.call(rbind, crossCorr))
+head(cc)
+fix(c)
+fix(cc)
+cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)
+dim(cc)
+temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(temp1, cc)
+dim(temp2)
+fix(temp2)
+fix(cc)
+fix(temp1)
+fix(cc)
+fix(temp2)
+cc$couple
+temp1$couple
+temp2 <- plyr::join(cc, temp1)
+fix(temp2)
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}
+basedata <- data1#
+dyadId <- "couple"#
+personId <- "person"#
+obs_name <- "dial"#
+dist_name <- "female"
+newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
   }
-min
-max
-summary(data3$sysVar)
-summary(data3$obs_deTrend)
-indivInertPlots <- function(basedata, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  if(is.null(minMax)){#
-  	min <- min(basedata$obs_deTrend, na.rm=T)#
-	max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
   }#
 #
-  newDiD <- unique(factor(basedata$dyad))#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	datai$obsPred <- predict(m)#
-	datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) #
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(datai, ggplot2::aes(x=time)) +#
-	geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +#
-	geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + #
-	scale_color_manual(name="Role", values=c("blue","red")) +#
-	ylab(obsName) +#
-	ylim(min, max) +#
-	annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +#
-	labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	theme(plot.title=element_text(size=11)) +#
-	theme(plot.subtitle=element_text(size=10))			#
-  }#
-  inertPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave('inertPlots.pdf', inertPlots)#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+crossCorr <- makeCrossCorr(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+fix(crossCorr)
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))
+lag <- ifelse(lag == 0, 1, lag)
+lagTemp
+type(lagTemp)
+typeof(lagTemp)
+lag <- ifelse(lag = 0, 1, lag)
+lag <- ifelse(lagTemp == 0, 1, lagTemp)
+lag
+length(lag)
+pID <- unique(factor(basedata$person))
+length(pID)
+for (i in 1:length(pID)){#
+lagi <- lag[i]#
+test <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lagi))#
 }
-test <- indivInertPlots(data3, "w","m","dial", minMax=c(.3, .9))
-library(ggplot2)
-test <- indivInertPlots(data3, "w","m","dial", minMax=c(.3, .9))
-names(test)
+for (i in 1:length(pID)){#
+lagi <- lag[i]#
+test <- suppressMessages(DataCombine::slide(basedata, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))#
+}
+fix(test)
+lag[3]
+lag[1]
+i <- 2
+lagi <- lag[i]
+lagi
+test <- suppressMessages(DataCombine::slide(basedata, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))
+test
+dID <- unique(factor(basedata$dyad))
+dID <- unique(factor(basedata$dyad))
+lagi <- lag[i]#
+datai <- basedata[baseddata$dyad == dID[i], ]
+datai <- basedata[basedata$dyad == dID[i], ]
+test <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))
+lagi
+head(datai)
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
+  }#
+#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+crossCorr <- makeCrossCorr(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+fix(crossCorr)
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))
+lag <- ifelse(lagTemp == 0, 1, lagTemp)
+lag
+dID <- unique(factor(basedata$dyad))
+dID <- unique(factor(data1$dyad))
+i <- 2
+lagi <- lag[i]
+lagi
+datai <- basedata[basedata$dyad == dID[i], ]
+basedata <- data1
+dID <- unique(factor(basedata$dyad))
+lagi <- lag[i]
+datai <- basedata[basedata$dyad == dID[i], ]
+head(datai)
+dID
+dID <- unique(factor(basedata$couple))
+dID
+datai <- basedata[basedata$dyad == dID[i], ]
+head(datai)
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
+  }#
+#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+basedata <- data1
+i <- 2
+crossCorr <- makeCrossCorr(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))#
+lag <- ifelse(lagTemp == 0, 1, lagTemp)
+lag
+names(basedata)
+dID <- unique(factor(basedata$couple))
+dID
+lagi <- lag[i]
+lagi
+datai <- basedata[basedata$couple == dID[i], ]
+head(datai)
+test <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))
 head(test)
-str(test)
-typof(test)
-typeof(test)
-ls()
-test[1]
-indivInertPlots <- function(basedata, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  if(is.null(minMax)){#
-  	min <- min(basedata$obs_deTrend, na.rm=T)#
-	max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
-  }#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	datai$obsPred <- predict(m)#
-	datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) #
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(datai, ggplot2::aes(x=time)) +#
-	geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +#
-	geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + #
-	scale_color_manual(name="Role", values=c("blue","red")) +#
-	ylab(obsName) +#
-	ylim(min, max) +#
-	annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +#
-	labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	theme(plot.title=element_text(size=11)) +#
-	theme(plot.subtitle=element_text(size=10))			#
-  }#
-  inertPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave('inertPlots.pdf', inertPlots)#
-  results <- list(plots=plots)#
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+test <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))#
 }
-test2 <- indivInertPlots(data3, "w","m","dial")
-names(test2)
-test2$plots[1]
-test <- indivInertPlots(data3, "w","m","dial", minMax=c(.1, .9))
-test$plots[5]
-summary(inert$R2)
-whichModel <- "coord"
-if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag) #
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend) #
-        }
-model
-whichModel <- "inert"
-model
-if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag) #
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend) #
-        }
-model
-whichModel <- "inertCoord"
-if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag) #
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend) #
-        }
-model
-whichModel <- "test"
-if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag) #
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend) #
-        }
-data1 <- rties_ExampleData_1
-dyads <- 19#
-data2 <- removeDyads(data1, dyads, data1$couple)
-data3 <- dataPrep(data2, "person","couple", "dial","sub","sexm","time", time_lag=5)
-inertCoord <- indivInertCoord(data3, "inert")
-indivInertCoord <- function(basedata, whichModel)#
-{	#
-  if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag) #
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend) #
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend) #
-        }#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- c("int0","int1","inert0","inert1","dyad")#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- suppressMessages(plyr::join(param, temp2))#
-  results <- list(R2=r2, paramData=paramData)#
+head(test)
+fix(test)
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))#
 }
-inertCoord <- indivInertCoord(data3, "inert")
-summary(inertCoord$R2)
-head(inertCoord$paramData)
-inertCoord <- indivInertCoord(data3, "coord")
-summary(inertCoord$R2)
-head(inertCoord$paramData)
-indivInertCoord <- function(basedata, whichModel)#
-{	#
-  if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)#
-	  paramNames <- c("int0","int1","inert0","inert1","dyad") #
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend)#
-      	paramNames <- c("int0","int1","coord0","coord1","dyad")#
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend)#
-          paramNames <- c("int0","int1","inert0","coord0","inert1","coord1","dyad")#
-        }#
-  newDiD <- unique(factor(basedata$dyad))#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){  #
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	r2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- paramNames#
-  temp <- subset(basedata, select=c("id","dyad","sysVar","dist0"))#
-  temp2 <- unique(temp)#
-  paramData <- suppressMessages(plyr::join(param, temp2))#
-  results <- list(R2=r2, paramData=paramData)#
+lagi <- lag[i]
+datai <- basedata[basedata$couple == dID[i], ]
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))
+test <- list()
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))#
 }
-inertCoord <- indivInertCoord(data3, "coord")
-summary(inertCoord$R2)
-head(inertCoord$paramData)
-inertCoord <- indivInertCoord(data3, "inert")
-summary(inertCoord$R2)
-head(inertCoord$paramData)
-inertCoord <- indivInertCoord(data3, "inertCoord")
-summary(inertCoord$R2)
-head(inertCoord$paramData)
-indivInertPlots <- function(basedata, whichModel, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)#
-	  plotFileName < "inertPlots.pdf"#
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend)#
-      	plotFileName < "coordPlots.pdf"#
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend)#
-          plotFileName < "inertCoordPlots.pdf"#
-        }#
-#
-  if(is.null(minMax)){#
-  	min <- min(basedata$obs_deTrend, na.rm=T)#
-	max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
-  }#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	datai$obsPred <- predict(m)#
-	datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) #
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(datai, ggplot2::aes(x=time)) +#
-	geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +#
-	geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + #
-	scale_color_manual(name="Role", values=c("blue","red")) +#
-	ylab(obsName) +#
-	ylim(min, max) +#
-	annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +#
-	labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	theme(plot.title=element_text(size=11)) +#
-	theme(plot.subtitle=element_text(size=10))			#
-  }#
-  modelPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave(plotFileName, modelPlots)#
-  results <- list(plots=plots)#
+warnings()
+fix(test)
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))#
 }
-indivInertCoordPlots <- function(basedata, whichModel, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)#
-	  plotFileName < "inertPlots.pdf"#
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend)#
-      	plotFileName < "coordPlots.pdf"#
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend)#
-          plotFileName < "inertCoordPlots.pdf"#
-        }#
-#
-  if(is.null(minMax)){#
-  	min <- min(basedata$obs_deTrend, na.rm=T)#
-	max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
-  }#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	datai$obsPred <- predict(m)#
-	datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) #
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(datai, ggplot2::aes(x=time)) +#
-	geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +#
-	geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + #
-	scale_color_manual(name="Role", values=c("blue","red")) +#
-	ylab(obsName) +#
-	ylim(min, max) +#
-	annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +#
-	labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	theme(plot.title=element_text(size=11)) +#
-	theme(plot.subtitle=element_text(size=10))			#
-  }#
-  modelPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave(plotFileName, modelPlots)#
-  results <- list(plots=plots)#
-}
-test <- indivInertCoordPlots(data3, inert, "w","m","dial", minMax=c(.1, .9))
-test <- indivInertCoordPlots(data3, "inert", "w","m","dial", minMax=c(.1, .9))
-indivInertCoordPlots <- function(basedata, whichModel, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)#
-	  plotFileName < "inertPlots.pdf"#
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend)#
-      	plotFileName < "coordPlots.pdf"#
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend)#
-          plotFileName < "inertCoordPlots.pdf"#
-        }#
-#
-  if(is.null(minMax)){#
-  	min <- min(basedata$obs_deTrend, na.rm=T)#
-	max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
-  }#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	datai$obsPred <- predict(m)#
-	datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) #
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(datai, ggplot2::aes(x=time)) +#
-	geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +#
-	geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + #
-	scale_color_manual(name="Role", values=c("blue","red")) +#
-	ylab(obsName) +#
-	ylim(min, max) +#
-	annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +#
-	labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	theme(plot.title=element_text(size=11)) +#
-	theme(plot.subtitle=element_text(size=10))			#
-  }#
-  modelPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave(plotFileName, modelPlots)#
-  results <- list(plots=plots)#
-}
-test <- indivInertCoordPlots(data3, "inert", "w","m","dial", minMax=c(.1, .9))
-whichModel <- "inert"
-if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)#
-	  plotFileName < "inertPlots.pdf"#
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend)#
-      	plotFileName < "coordPlots.pdf"#
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend)#
-          plotFileName < "inertCoordPlots.pdf"#
-        }
-indivInertCoordPlots <- function(basedata, whichModel, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {#
-  	stop("the model type must be either inert, coord or inertCoord")#
-	} else if (whichModel == "inert"){#
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)#
-	  plotFileName <- "inertPlots.pdf"#
-      } else if (whichModel == "coord"){#
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend + dist1:p_obs_deTrend)#
-      	plotFileName <- "coordPlots.pdf"#
-        } else {#
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend)#
-          plotFileName <- "inertCoordPlots.pdf"#
-        }#
-#
-  if(is.null(minMax)){#
-  	min <- min(basedata$obs_deTrend, na.rm=T)#
-	max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
-  }#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	datai$obsPred <- predict(m)#
-	datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) #
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(datai, ggplot2::aes(x=time)) +#
-	geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +#
-	geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + #
-	scale_color_manual(name="Role", values=c("blue","red")) +#
-	ylab(obsName) +#
-	ylim(min, max) +#
-	annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=2) +#
-	labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	theme(plot.title=element_text(size=11)) +#
-	theme(plot.subtitle=element_text(size=10))			#
-  }#
-  modelPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave(plotFileName, modelPlots)#
-  results <- list(plots=plots)#
-}
-test <- indivInertCoordPlots(data3, "inert", "w","m","dial", minMax=c(.1, .9))
-test$plots[5]
-test3 <- indivInertCoordPlots(data3, "coord", "w","m","dial")
-test3[16]
-str(test3)
-length(test3)
-head(test3)
-test3[[16]]
-test3[[2]]
-test3$plots[16 ]
-test4 <- indivInertCoordPlots(data3, "inertCoord", "w","m","dial", minMax=c(.07, .93))
-library(rties)
-data1 <- rties_ExampleData_1
-taus <- c(7,8,9)#
-embeds <- c(5,7,9,10)#
-delta <- 1#
-#
-derivs <- estDerivs(data3, taus, embeds, delta)
-dyads <- 19#
-data2 <- removeDyads(data1, dyads, data1$couple)
-data3 <- dataPrep(data2, "person","couple", "dial","sub","sexm","time", time_lag=5)
-taus <- c(7,8,9)#
-embeds <- c(5,7,9,10)#
-delta <- 1#
-#
-derivs <- estDerivs(data3, taus, embeds, delta)
-cloData <- derivs$data
-indivClo <- function(basedata, idConvention, whichModel)#
-{#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[[i]][1]	#
-	  d1_0 <- param[[i]][2]#
-	  obs_1 <- param[[i]][3]#
-	  d1_1 <- param[[i]][4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-#
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[[i]][1]	#
-		d1_0 <- param[[i]][2]#
-		p_obs_0 <- param[[i]][3]#
-		p_d1_0 <- param[[i]][4]#
-	    obs_1 <- param[[i]][5]#
-		d1_1 <- param[[i]][6]#
-		p_obs_1 <- param[[i]][7]#
-		p_d1_1 <- param[[i]][8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-  }	#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  basedata <- basedata[complete.cases(basedata), ]#
-  r2 <- vector()#
-  param <- list()#
-  for (i in 1:length(newDiD)){#
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	R2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }			#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- paramNames	#
-  results <- list(R2=R2, paramData=paramData)#
-}
-test <- indivClo(cloData, 500, "uncoupled")
-indivClo <- function(basedata, idConvention, whichModel)#
-{#
-  param <- list()#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[[i]][1]	#
-	  d1_0 <- param[[i]][2]#
-	  obs_1 <- param[[i]][3]#
-	  d1_1 <- param[[i]][4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-#
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[[i]][1]	#
-		d1_0 <- param[[i]][2]#
-		p_obs_0 <- param[[i]][3]#
-		p_d1_0 <- param[[i]][4]#
-	    obs_1 <- param[[i]][5]#
-		d1_1 <- param[[i]][6]#
-		p_obs_1 <- param[[i]][7]#
-		p_d1_1 <- param[[i]][8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-  }	#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  basedata <- basedata[complete.cases(basedata), ]#
-  r2 <- vector()#
-  for (i in 1:length(newDiD)){#
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	R2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }			#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- paramNames	#
-  results <- list(R2=R2, paramData=paramData)#
-}
-test <- indivClo(cloData, 500, "uncoupled")
-indivClo <- function(basedata, idConvention, whichModel)#
-{#
-  param <- list()#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[1]	#
-	  d1_0 <- param[2]#
-	  obs_1 <- param[3]#
-	  d1_1 <- param[4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-#
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[1]	#
-		d1_0 <- param[2]#
-		p_obs_0 <- param[3]#
-		p_d1_0 <- param[4]#
-	    obs_1 <- param[5]#
-		d1_1 <- param[6]#
-		p_obs_1 <- param[7]#
-		p_d1_1 <- param[8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-  }	#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  basedata <- basedata[complete.cases(basedata), ]#
-  r2 <- vector()#
-  for (i in 1:length(newDiD)){#
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	R2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }			#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- paramNames	#
-  results <- list(R2=R2, paramData=paramData)#
-}
-test <- indivClo(cloData, 500, "uncoupled")
-indivClo <- function(basedata, idConvention, whichModel)#
-{#
-  param <- list()#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[1]	#
-	  d1_0 <- param[2]#
-	  obs_1 <- param[3]#
-	  d1_1 <- param[4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-#
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[1]	#
-		d1_0 <- param[2]#
-		p_obs_0 <- param[3]#
-		p_d1_0 <- param[4]#
-	    obs_1 <- param[5]#
-		d1_1 <- param[6]#
-		p_obs_1 <- param[7]#
-		p_d1_1 <- param[8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-  }	#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  basedata <- basedata[complete.cases(basedata), ]#
-  R2 <- vector()#
-  for (i in 1:length(newDiD)){#
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	R2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }			#
-  param <- as.data.frame(do.call(rbind, param))#
-  colnames(param) <- paramNames	#
-  results <- list(R2=R2, paramData=paramData)#
-}
-test <- indivClo(cloData, 500, "uncoupled")
-indivClo <- function(basedata, idConvention, whichModel)#
-{#
-  param <- list()#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[1]	#
-	  d1_0 <- param[2]#
-	  obs_1 <- param[3]#
-	  d1_1 <- param[4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-#
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[1]	#
-		d1_0 <- param[2]#
-		p_obs_0 <- param[3]#
-		p_d1_0 <- param[4]#
-	    obs_1 <- param[5]#
-		d1_1 <- param[6]#
-		p_obs_1 <- param[7]#
-		p_d1_1 <- param[8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-  }	#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  basedata <- basedata[complete.cases(basedata), ]#
-  R2 <- vector()#
-  for (i in 1:length(newDiD)){#
-    datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	R2[[i]] <- summary(m)$adj.r.squared#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-  }			#
-  paramData <- as.data.frame(do.call(rbind, param))#
-  colnames(paramData) <- paramNames	#
-  results <- list(R2=R2, paramData=paramData)#
-}
-test <- indivClo(cloData, 500, "uncoupled")
-names(test)
-summary(test$R2)
-head(test$paramData)
-test2 <- indivClo(cloData, 500, "coupled")
-summary(test2$R2)
-head(test2$paramData)
-test2 <- indivClo(cloData, 500, "test")
-library(rties)
-data1 <- rties_ExampleData_1
-dyads <- 19#
-data2 <- removeDyads(data1, dyads, data1$couple)
-data3 <- dataPrep(data2, "person","couple", "dial","sub","sexm","time", time_lag=5)
-taus <- c(7,8,9)#
-embeds <- c(5,7,9,10)#
-delta <- 1#
-#
-derivs <- estDerivs(data3, taus, embeds, delta)
-cloData <- derivs$data
-indivCloPlots <- function(basedata, whichModel, idConvention, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  param <- list()#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[1]	#
-	  d1_0 <- param[2]#
-	  obs_1 <- param[3]#
-	  d1_1 <- param[4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-	  plotFileName <- "uncoupledCloPlots.pdf"#
-#
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[1]	#
-		d1_0 <- param[2]#
-		p_obs_0 <- param[3]#
-		p_d1_0 <- param[4]#
-	    obs_1 <- param[5]#
-		d1_1 <- param[6]#
-		p_obs_1 <- param[7]#
-		p_d1_1 <- param[8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-		plotFileName <- "coupledCloPlots.pdf"#
-  }	#
-  if(is.null(minMax)){#
-    min <- min(basedata$obs_deTrend, na.rm=T)#
-    max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
-  }#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  basedata <- basedata[complete.cases(basedata), ]#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-    statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,] #
-  	maxtime <- max(statedatai$time) #
- 	plotTimes <- seq(1, maxtime, by=1)#
- 	start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))#
-	y1 <- mean(start$obs_deTrend, na.rm=T)#
- 	y2 <- 0#
-	y3 <- mean(start$p_obs_deTrend, na.rm=T)#
- 	y4 <- 0#
- 	statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloCoupleOde, parms= paramClo))#
-	temp2 <- subset(temp, select=-c(y2, y4))#
-	names(temp2) <- c("time","d0.pred","d1.pred")#
-	temp2$dyad <- statedatai$dyad#
-	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")#
-	temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad + idConvention)#
-	temp4 <- suppressMessages(plyr::join(datai, temp3))#
-	temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) #
-	plotData <- temp4[complete.cases(temp4), ]	#
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(plotData, aes(x=time)) +#
-	  geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +#
-	  geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + #
-	  scale_color_manual(name="Role", values=c("red","blue")) +#
-	  ylab(obsName) +#
-	  ylim(min, max) +#
-	  annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=3) +#
-	  labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	  theme(plot.title=element_text(size=11)) +#
-	  theme(plot.subtitle=element_text(size=10))			#
-  }#
-  cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave(plotFileName, cloPlots)#
-  results <- list(plots=plots)#
-}
-test <- indivCloPlots(cloData, "uncoupled", 500, "w", "m", "dial", minMax=NULL)
-cloCoupleOde <- function(t, state, parameters)#
-{#
-  with(as.list(c(state, parameters)), {#
-	dy1 <- y2#
-	dy2 <- y1*obs_0 + y2*d1_0 + y3*p_obs_0 + y4*p_d1_0#
-	dy3 <- y4#
-	dy4 <- y3*obs_1 + y4*d1_1 + y1*p_obs_1 + y2*p_d1_1#
-	list(c(dy1, dy2, dy3, dy4))		#
-  })#
+lagi <- lag[i]
+lagi
+i <- 2
+lagi <- lag[i]
+lagi
+datai <- basedata[basedata$couple == dID[i], ]
+head(datai)
+test <- list()
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))
+lag
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= 4))
+test
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", NewVar="dial_Lag", slideBy= 4))
+test[i]
+fix(datai)
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -4))
+names(datai)
+datai[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -1))
+head(datai)
+datai <- basedata[basedata$couple == dID[i], ]
+head(datai)
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -1))
+head(datai)
+lagi <- lag[i]
+lagi
+datai <- basedata[basedata$couple == dID[i], ]
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -1))
+datai <- basedata[basedata$couple == dID[i], ]
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))
+head(datai)
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= "lagi"))
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= 4))
+head(datai)
+fix(datai)
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
 }#
 #
-#' Provides the equation for an un-coupled oscillator model for the differential equation solver (ode) to plot#
+basedata <- data1
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
 #
-cloUncoupleOde <- function(t, state, parameters)#
-{#
-  with(as.list(c(state, parameters)), {#
-	dy1 <- y2#
-	dy2 <- y1*obs_0 + y2*d1_0 #
-	dy3 <- y4#
-	dy4 <- y3*obs_1 + y4*d1_1 #
-	list(c(dy1, dy2, dy3, dy4))		#
-  })#
-}
-test <- indivCloPlots(cloData, "uncoupled", 500, "w", "m", "dial", minMax=NULL)
-names(cloData)
-indivCloPlots <- function(basedata, whichModel, idConvention, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  param <- list()#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[1]	#
-	  d1_0 <- param[2]#
-	  obs_1 <- param[3]#
-	  d1_1 <- param[4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-	  plotFileName <- "uncoupledCloPlots.pdf"#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
 #
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[1]	#
-		d1_0 <- param[2]#
-		p_obs_0 <- param[3]#
-		p_d1_0 <- param[4]#
-	    obs_1 <- param[5]#
-		d1_1 <- param[6]#
-		p_obs_1 <- param[7]#
-		p_d1_1 <- param[8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-		plotFileName <- "coupledCloPlots.pdf"#
-  }	#
-  if(is.null(minMax)){#
-    min <- min(basedata$obs_deTrend, na.rm=T)#
-    max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
   }#
 #
-  newDiD <- unique(factor(basedata$dyad))#
-  basedata <- basedata[complete.cases(basedata), ]#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-    statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,] #
-  	maxtime <- max(statedatai$time) #
- 	plotTimes <- seq(1, maxtime, by=1)#
- 	start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))#
-	y1 <- mean(start$obs_deTrend, na.rm=T)#
- 	y2 <- 0#
-	y3 <- mean(start$p_obs_deTrend, na.rm=T)#
- 	y4 <- 0#
- 	statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-	temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloCoupleOde, parms= paramClo))#
-	temp2 <- subset(temp, select=-c(y2, y4))#
-	names(temp2) <- c("time","d0.pred","d1.pred")#
-	temp2$dyad <- statedatai$dyad#
-	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")#
-	temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad + idConvention)#
-	temp4 <- suppressMessages(plyr::join(datai, temp3))#
-	temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) #
-	plotData <- temp4[complete.cases(temp4), ]	#
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(plotData, aes(x=time)) +#
-	  geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +#
-	  geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + #
-	  scale_color_manual(name="Role", values=c("red","blue")) +#
-	  ylab(obsName) +#
-	  ylim(min, max) +#
-	  annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=3) +#
-	  labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	  theme(plot.title=element_text(size=11)) +#
-	  theme(plot.subtitle=element_text(size=10))			#
-  }#
-  cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave(plotFileName, cloPlots)#
-  results <- list(plots=plots)#
-}
-test <- indivCloPlots(cloData, "uncoupled", 500, "w", "m", "dial", minMax=NULL)
-names(cloData)
-basedata <- cloData#
-whichModel <- "uncoupled"#
-idConvention <- 500
-i <- 6
-param <- list()#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[1]	#
-	  d1_0 <- param[2]#
-	  obs_1 <- param[3]#
-	  d1_1 <- param[4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-	  plotFileName <- "uncoupledCloPlots.pdf"#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+crossCorr <- makeCrossCorr(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))#
+lag <- ifelse(lagTemp == 0, 1, lagTemp)#
 #
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[1]	#
-		d1_0 <- param[2]#
-		p_obs_0 <- param[3]#
-		p_d1_0 <- param[4]#
-	    obs_1 <- param[5]#
-		d1_1 <- param[6]#
-		p_obs_1 <- param[7]#
-		p_d1_1 <- param[8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-		plotFileName <- "coupledCloPlots.pdf"#
-  }
-plotFileName
-param
-names(param)
-model
-dim(param)
-paramNames
-paramClo
-newDiD <- unique(factor(basedata$dyad))
-basedata <- basedata[complete.cases(basedata), ]
-plots <- list()
-statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,]
-head(statedatai)
-maxtime <- max(statedatai$time)
-plotTimes <- seq(1, maxtime, by=1)
-maxtime
-plotTimes <- seq(1, maxtime, by=1)
-start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))
-y1 <- mean(start$obs_deTrend, na.rm=T)#
- 	y2 <- 0#
-	y3 <- mean(start$p_obs_deTrend, na.rm=T)#
- 	y4 <- 0#
- 	statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)
-statei
-datai <- basedata[basedata$dyad == newDiD[i], ]
+dID <- unique(factor(basedata$couple))#
+#
+lagData <- list()
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))#
+lagData[i] <- datai#
+}
+warnings()
 head(datai)
-m <- lm(model, na.action=na.exclude, data=datai)
-param[[i]] <- round(as.numeric(m$coefficients), 5)
-param[[i]]
-numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)
-param[[i]]
-colnames(param[[i]]) <- paramNames
-paramNames
-param[[i]]
-names(param[[i]]) <- paramNames
-param[[i]]
-indivCloPlots <- function(basedata, whichModel, idConvention, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  param <- list()#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[1]	#
-	  d1_0 <- param[2]#
-	  obs_1 <- param[3]#
-	  d1_1 <- param[4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-	  plotFileName <- "uncoupledCloPlots.pdf"#
-#
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[1]	#
-		d1_0 <- param[2]#
-		p_obs_0 <- param[3]#
-		p_d1_0 <- param[4]#
-	    obs_1 <- param[5]#
-		d1_1 <- param[6]#
-		p_obs_1 <- param[7]#
-		p_d1_1 <- param[8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-		plotFileName <- "coupledCloPlots.pdf"#
-  }	#
-  if(is.null(minMax)){#
-    min <- min(basedata$obs_deTrend, na.rm=T)#
-    max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
-  }#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  basedata <- basedata[complete.cases(basedata), ]#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-    statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,] #
-  	maxtime <- max(statedatai$time) #
- 	plotTimes <- seq(1, maxtime, by=1)#
- 	start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))#
-	y1 <- mean(start$obs_deTrend, na.rm=T)#
- 	y2 <- 0#
-	y3 <- mean(start$p_obs_deTrend, na.rm=T)#
- 	y4 <- 0#
- 	statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-    names(param[[i]]) <- paramNames#
-#
-	temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloCoupleOde, parms= paramClo))#
-	temp2 <- subset(temp, select=-c(y2, y4))#
-	names(temp2) <- c("time","d0.pred","d1.pred")#
-	temp2$dyad <- statedatai$dyad#
-	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")#
-	temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad + idConvention)#
-	temp4 <- suppressMessages(plyr::join(datai, temp3))#
-	temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) #
-	plotData <- temp4[complete.cases(temp4), ]	#
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(plotData, aes(x=time)) +#
-	  geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +#
-	  geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + #
-	  scale_color_manual(name="Role", values=c("red","blue")) +#
-	  ylab(obsName) +#
-	  ylim(min, max) +#
-	  annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=3) +#
-	  labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	  theme(plot.title=element_text(size=11)) +#
-	  theme(plot.subtitle=element_text(size=10))			#
-  }#
-  cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave(plotFileName, cloPlots)#
-  results <- list(plots=plots)#
+lag
+head(lagData)
+lagData <- list()
+dID
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))#
+lagData[i] <- datai#
 }
-test <- indivCloPlots(cloData, "uncoupled", 500, "w", "m", "dial", minMax=NULL)
-temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloCoupleOde, parms= paramClo))
-indivCloPlots <- function(basedata, whichModel, idConvention, dist0name, dist1name, obsName, minMax=NULL)#
-{#
-  param <- list()#
-  if(whichModel != "uncoupled" & whichModel != "coupled") {#
-  	stop("the model type must be either uncoupled or coupled")#
-	} else if (whichModel == "uncoupled"){#
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)#
-	  obs_0 <- param[1]	#
-	  d1_0 <- param[2]#
-	  obs_1 <- param[3]#
-	  d1_1 <- param[4]#
-	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)#
-	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")#
-	  plotFileName <- "uncoupledCloPlots.pdf"#
-#
-      } else if (whichModel == "coupled"){#
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
-      	obs_0 <- param[1]	#
-		d1_0 <- param[2]#
-		p_obs_0 <- param[3]#
-		p_d1_0 <- param[4]#
-	    obs_1 <- param[5]#
-		d1_1 <- param[6]#
-		p_obs_1 <- param[7]#
-		p_d1_1 <- param[8]#
-		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)#
-		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")#
-		plotFileName <- "coupledCloPlots.pdf"#
-  }	#
-  if(is.null(minMax)){#
-    min <- min(basedata$obs_deTrend, na.rm=T)#
-    max <- max(basedata$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)#
-  }#
-#
-  newDiD <- unique(factor(basedata$dyad))#
-  basedata <- basedata[complete.cases(basedata), ]#
-  plots <- list()#
-  for (i in 1:length(newDiD)){#
-    statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 1,] #
-  	maxtime <- max(statedatai$time) #
- 	plotTimes <- seq(1, maxtime, by=1)#
- 	start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))#
-	y1 <- mean(start$obs_deTrend, na.rm=T)#
- 	y2 <- 0#
-	y3 <- mean(start$p_obs_deTrend, na.rm=T)#
- 	y4 <- 0#
- 	statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)#
-	datai <- basedata[basedata$dyad == newDiD[i], ]#
-	m <- lm(model, na.action=na.exclude, data=datai)#
-	param[[i]] <- round(as.numeric(m$coefficients), 5)#
-	numParam <- length(m$coefficients)#
-	param[[i]][numParam + 1] <- unique(datai$dyad)#
-    names(param[[i]]) <- paramNames#
-#
-	temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func=cloUncoupleOde, parms= paramClo))#
-	temp2 <- subset(temp, select=-c(y2, y4))#
-	names(temp2) <- c("time","d0.pred","d1.pred")#
-	temp2$dyad <- statedatai$dyad#
-	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")#
-	temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad + idConvention)#
-	temp4 <- suppressMessages(plyr::join(datai, temp3))#
-	temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) #
-	plotData <- temp4[complete.cases(temp4), ]	#
-	plotTitle <- as.character(unique(datai$dyad))#
-	plots[[i]] <- ggplot(plotData, aes(x=time)) +#
-	  geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +#
-	  geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + #
-	  scale_color_manual(name="Role", values=c("red","blue")) +#
-	  ylab(obsName) +#
-	  ylim(min, max) +#
-	  annotate("text", x=-Inf, y=-Inf, hjust=0, vjust=0, label="Dots = Observed; Lines = Predicted", size=3) +#
-	  labs(title= "Dyad ID:", subtitle= plotTitle) +#
-	  theme(plot.title=element_text(size=11)) +#
-	  theme(plot.subtitle=element_text(size=10))			#
-  }#
-  cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)#
-  ggsave(plotFileName, cloPlots)#
-  results <- list(plots=plots)#
-}
-test <- indivCloPlots(cloData, "uncoupled", 500, "w", "m", "dial", minMax=NULL)
-library(rties)
-data1 <- rties_ExampleData_1
-dyads <- 19#
-data2 <- removeDyads(data1, dyads, data1$couple)
-data3 <- dataPrep(data2, "person","couple", "dial","sub","sexm","time", time_lag=5)
-library(rties)
+head(datai)
+fix(datai)
+lagi
+lag
+fix(lag)
+crossCorr <- makeCrossCorr(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))#
+lag <- ifelse(lagTemp == 0, 1, lagTemp)
+length(crossCorr)
+dim(crossCorr)
+length(lag)
+dID <- unique(factor(basedata$couple))
+length(dID)
+i <- 3
+lagData <- list()
+lagi <- lag[i]
+lagi
+datai <- basedata[basedata$couple == dID[i], ]
+head(datai)
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))
+head(datai)
+fix(datai)
+lagData[i] <- datai
+lagData[[i]] <- datai
+lagData
+fix(lagData)
 data1 <- rties_ExampleData_2
-dyads <- c(19)#
-data1 <- removeDyads(basedata=data1, dyads=dyads, dyadId="couple")
-data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag=1)
-ic <- indivInertCoord(prepData=data2, whichModel="inertCoord")
-head(ic$params)
-whichModel <- "inertCoord"#
-time_lag <- 1#
-prepData <- data2#
-paramEst <- ic$params#
-n_profiles <- 2
-if(whichModel == "clo"){#
-  	  params <- subset(paramEst, select=c(obs_0:p_d1_1))#
-  	  lpa <- mclust::Mclust(params, G=n_profiles)#
-    } else if (whichModel == "inertCoord"){#
-  	    params <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))#
-  	    lpa <- mclust::Mclust(params, G=n_profiles)#
-         } else #
-        print("Model must be inertCoord or clo")
-params
-lpa <- mclust::Mclust(params, G=n_profiles)
-library(mclust)
-lpa <- mclust::Mclust(params, G=n_profiles)
-summary(lpa)
-names(lpa)
-print(table(lpa$classification))
-t <- table(lpa$classification)
-dr <- mclust::MclustDR(lpa, lambda=1)
-plot(dr, what ="contour")
-means <- as.data.frame(lpa$parameters$mean)
-means$varNames <- rownames(means)
-means$var <- c(1:dim(means)[1])
-means
-meansL <- reshape(means, idvar="varNames", varying=list(1:n_profiles), timevar="profile", sep="", direction="long")
-meansL
-library(ggplot2)
-ggplot(data=meansL, aes(x=varNames, y=V1, group=profile)) +#
-		geom_line(aes(colour=as.factor(profile)))
-time_length <- 20
-min <- min(prepData$obs_deTrend, na.rm=T)
-max <- max(prepData$obs_deTrend, na.rm=T)
-temp1 <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
-lpa <- mclust::Mclust(temp1, G=n_profiles)
-profileParams <- as.data.frame(lpa$parameters$mean)
-profileParams
-noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.exclude, data=prepData, control=nlme::lmeControl(opt="optim"))
-noise <- noiseModel$sigma
-numPlots <- 3
-stateCutOff <- time_lag + 5
-multiPlots <- list()#
-  plots <- list()#
-  label <- vector()
-temp1 <- profileParams[ ,i]
-i <- 1
-temp1 <- profileParams[ ,i]
-temp1
-names <- rownames(profileParams)
-names
-names(temp1) <- names
-paramsi <- temp1
-paramsi
-i <- 2
-temp1 <- profileParams[ ,i]
-names <- rownames(profileParams)#
-      names(temp1) <- names#
-      paramsi <- temp1
-paramsi
-A <- matrix(paramsi, ncol=2, byrow=T)
-A
-inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag, dist0name=NULL, dist1name=NULL, minMax=NULL)#
-{ #
-  time_length <- 20#
-  if(is.null(dist0name)){dist0name <- "dist0"}#
-  if(is.null(dist1name)){dist1name <- "dist1"}#
-  if(is.null(minMax)){#
-  	min <- min(prepData$obs_deTrend, na.rm=T)#
-	max <- max(prepData$obs_deTrend, na.rm=T)#
-  } else {#
-  	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)#
-	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)#
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}#
+#
+basedata <- data1
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
   }#
 #
-  temp1 <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))#
-  lpa <- mclust::Mclust(temp1, G=n_profiles)#
-  profileParams <- as.data.frame(lpa$parameters$mean)#
-  noiseModel <- nlme::lme(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag, random = ~ dist0 + dist1 | dyad, na.action=na.exclude, data=prepData, control=nlme::lmeControl(opt="optim"))#
-  noise <- noiseModel$sigma#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+crossCorr <- makeCrossCorr(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))#
+lag <- ifelse(lagTemp == 0, 1, lagTemp)#
 #
-  numPlots <- 3#
-  stateCutOff <- time_lag + 5#
-  multiPlots <- list()#
-  plots <- list()#
-  label <- vector()#
-#
-  for(i in 1:n_profiles){#
-  	for (k in 1:numPlots){#
-      statedata0 <- prepData[prepData$dist0 == 1 & prepData$time <= stateCutOff,] #
-	  start0 <- median(statedata0$obs_deTrend, na.rm=T)#
-  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time <= stateCutOff,] #
-	  start1 <- median(statedata1$obs_deTrend, na.rm=T)#
-      start <- c(start1, start0)  #
-	  temp1 <- profileParams[ ,i]#
-      names <- rownames(profileParams)#
-      names(temp1) <- names#
-      paramsi <- temp1#
-#
-      A <- matrix(paramsi, ncol=2, byrow=T)#
-#
-      results1 <- list()#
-      results0 <- list()#
-      nextStep <- list()#
-#
-      for (t in 1:time_length){#
-        if(t == 1){#
-  	      pred <- A %*% start#
-  	      dist <- c(1, 0)#
-  	      time <- t#
-  	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)#
-  	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)#
-   	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))#
-        } else {#
-  	      pred <- A %*% nextStep[[t-1]]#
-  	      dist <- c(1, 0)#
-  	      time <- t#
-  	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)#
-  	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)#
-  	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))#
-          }#
-        }#
-      final1 <- data.frame(do.call(rbind, results1))#
-      temp1 <- data.frame(matrix(unlist(final1), ncol=3, byrow=F))#
-      colnames(temp1) <- c("pred1", "dist1", "time")#
-      final0 <- data.frame(do.call(rbind, results0))#
-      temp0 <- data.frame(matrix(unlist(final0), ncol=3, byrow=F))#
-      colnames(temp0) <- c("pred0", "dist0", "time") #
-      temp2 <- suppressMessages(plyr::join(temp1, temp0))#
-      temp3 <- reshape(temp2, idvar="dist", varying=list(c("pred1", "pred0"), c("dist1", "dist0")), direction="long")#
-      temp4 <- temp3[ , - 1]#
-      colnames(temp4) <- c("pred","dist","time")#
-      temp4$dist <- factor(temp4$dist, labels=c(dist0name, dist1name))#
-      plotData <- temp4#
-      profileName <- paste("Profile", i , sep="_")#
-      plots[[k]] <- ggplot(plotData, aes(x=time, y=pred, group=dist)) +#
-                  geom_line(aes(color=dist)) +#
-                  scale_color_manual(values=c("black","gray47")) +#
-                  ylab("observed") +#
-                  ylim(min, max) +#
-	              labs(title= profileName, subtitle= "Predicted_Trajectory") +#
-	              theme(plot.title=element_text(size=11)) #
-    }#
-    multiPlots[[i]] <- plots#
-  }#
-print(multiPlots)#
+dID <- unique(factor(basedata$couple))
+lagData <- list()
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))#
+lagData[[i]] <- datai#
 }
-plots <- inertCoordPlotTraj(prepData=data2, time_lag=1, paramEst=ic$params, n_profiles=2, minMax=c(.05,.95), time_length=30)
-lpaData <- inspectProfiles(whichModel="inertCoord", time_lag=1, prepData=data2, paramEst=ic$params, n_profiles=2)
-inertCoordPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, time_lag=time_lag, dist0name=dist0name, dist1name=dist1name, minMax=minMax)
+lagData <- as.data.frame(do.call(rbind, lagData))
+fix(lagData)
+lag
+fix(lagData)
+dID
+fix(lagData)
+i <- 4
+lagi <- lag[i]
+lagi
+lag <- ifelse(lagTemp == 0, 1, lagTemp)
+lag
+pID  <- unique(factor(basedata$person))
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))
+head(lagTemp)
+head(crossCorr)
+cc <- crossCorr[unique(crossCorr$couple), ]
+head(cc)
+cc <- crossCorr[!duplicated(crossCorr$couple), ]
+head(cc)
+lagTemp <- as.numeric(unlist(cc$maxLag))
+lag <- ifelse(lagTemp == 0, 1, lagTemp)
+dID <- unique(factor(basedata$couple))
+lagData <- list()
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))#
+lagData[[i]] <- datai#
+}
+head(lagData)
+lagData <- as.data.frame(do.call(rbind, lagData))
+fix(lagData)
+lag
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
+  }#
+#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL){#
+  vars <- c(dyadId, personId, obs_name, dist_name, time_name)#
+  basedata <- basedata[vars]#
+  names(basedata) <- c("dyad","id","obs","dist1","time")#
+      # check distinguishing variable is numeric #
+  if (!is.numeric(basedata$dist1)){#
+	stop("the distinguishing variable must be a 0/1 numeric variable")#
+  }#
+#
+  # create the dist0 variable#
+  basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)#
+  # check partners have same number of observations #
+  notEqual <- vector()#
+  t <- table(basedata$dist1, basedata$dyad)#
+  for(i in 1:ncol(t)){		#
+    if (t[1,i] != t[2,i]){#
+	notEqual <- append(notEqual, as.numeric(dimnames(t)[[2]][i]))#
+	}#
+  }				#
+	if (length(notEqual) > 0){#
+	  print(notEqual)#
+	  stop("the partners in these dyads have unequal number of observations")#
+      rm(notEqual, envir = .GlobalEnv)#
+	}#
+  # center each person's data around their own regression line#
+  basedata <- lineCenterById(basedata)#
+  # create lagged variables#
+  if(!is.null(time_lag)){#
+	lag <- time_lag#
+	  if(lag == 0){#
+	   crossCorr <- makeCrossCorr(basedata=data1, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")#
+	   cc <- crossCorr[!duplicated(crossCorr$dyad), ]#
+       lagTemp <- as.numeric(unlist(cc$maxLag))#
+       lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+       dID <- unique(factor(basedata$dyad))#
+       lagData <- list()#
+#
+       for (i in 1:length(dID)){#
+         lagi <- lag[i]#
+         datai <- basedata[basedata$dyad == dID[i], ]#
+         datai <- suppressMessages(DataCombine::slide(datai, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= lagi))#
+         lagData[[i]] <- datai#
+       }#
+         basedata <- as.data.frame(do.call(rbind, lagData))#
+#
+       } else {#
+	       basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))#
+  }#
+  # put data in actor-partner format#
+  basedata <- actorPartnerDataTime(basedata, "dyad", "id")  #
+  return(basedata)#
+}#
+lineCenterById <- function(basedata)#
+{#
+  newId <- unique(factor(basedata$id))#
+  dataCent <- list()#
+  for(i in 1:length(newId)){#
+	datai <- basedata[basedata$id == newId[i],]#
+	datai$obs_deTrend <- resid(lm(obs ~ time, data=datai, na.action=na.exclude))#
+	dataCent[[i]] <- datai#
+  }		#
+  basedata <- as.data.frame(do.call(rbind, dataCent)) 	#
+}		#
+#
+actorPartnerDataTime <- function(basedata, dyadId, personId){#
+    basedata$d <- basedata[, dyadId]#
+    basedata$p <- basedata[, personId]#
+    basedata <- basedata[order(basedata$p), ]#
+    dID <- unique(factor(basedata$d))#
+	dataAP <- list()#
+#
+	for(i in 1:length(dID))#
+		{#
+		datai <- basedata[basedata$d == dID[i],]#
+		dataA <- datai#
+		P1 <- subset(datai, datai$d == datai$p)#
+		P2 <- subset(datai, datai$d != datai$p)#
+		P1_part <- P2#
+		P2_part <- P1#
+		colnames(P1_part) <- paste("p", colnames(P1_part), sep="_")#
+		colnames(P2_part) <- paste("p", colnames(P2_part), sep="_")#
+		dataP <- rbind(P1_part, P2_part)#
+		APi <- cbind(dataA, dataP)#
+		APi <- subset(APi, select=-c(d, p, p_d, p_p))#
+		dataAP[[i]] <- APi		#
+		}		#
+	dataAP <- as.data.frame(do.call(rbind, dataAP))#
+}
+}}
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
+  }#
+#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+lineCenterById <- function(basedata)#
+{#
+  newId <- unique(factor(basedata$id))#
+  dataCent <- list()#
+  for(i in 1:length(newId)){#
+	datai <- basedata[basedata$id == newId[i],]#
+	datai$obs_deTrend <- resid(lm(obs ~ time, data=datai, na.action=na.exclude))#
+	dataCent[[i]] <- datai#
+  }		#
+  basedata <- as.data.frame(do.call(rbind, dataCent)) 	#
+}
+actorPartnerDataTime <- function(basedata, dyadId, personId){#
+    basedata$d <- basedata[, dyadId]#
+    basedata$p <- basedata[, personId]#
+    basedata <- basedata[order(basedata$p), ]#
+    dID <- unique(factor(basedata$d))#
+	dataAP <- list()#
+#
+	for(i in 1:length(dID))#
+		{#
+		datai <- basedata[basedata$d == dID[i],]#
+		dataA <- datai#
+		P1 <- subset(datai, datai$d == datai$p)#
+		P2 <- subset(datai, datai$d != datai$p)#
+		P1_part <- P2#
+		P2_part <- P1#
+		colnames(P1_part) <- paste("p", colnames(P1_part), sep="_")#
+		colnames(P2_part) <- paste("p", colnames(P2_part), sep="_")#
+		dataP <- rbind(P1_part, P2_part)#
+		APi <- cbind(dataA, dataP)#
+		APi <- subset(APi, select=-c(d, p, p_d, p_p))#
+		dataAP[[i]] <- APi		#
+		}		#
+	dataAP <- as.data.frame(do.call(rbind, dataAP))#
+}
+dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL){#
+  vars <- c(dyadId, personId, obs_name, dist_name, time_name)#
+  basedata <- basedata[vars]#
+  names(basedata) <- c("dyad","id","obs","dist1","time")#
+      # check distinguishing variable is numeric #
+  if (!is.numeric(basedata$dist1)){#
+	stop("the distinguishing variable must be a 0/1 numeric variable")#
+  }#
+#
+  # create the dist0 variable#
+  basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)#
+  # check partners have same number of observations #
+  notEqual <- vector()#
+  t <- table(basedata$dist1, basedata$dyad)#
+  for(i in 1:ncol(t)){		#
+    if (t[1,i] != t[2,i]){#
+	notEqual <- append(notEqual, as.numeric(dimnames(t)[[2]][i]))#
+	}#
+  }				#
+	if (length(notEqual) > 0){#
+	  print(notEqual)#
+	  stop("the partners in these dyads have unequal number of observations")#
+      rm(notEqual, envir = .GlobalEnv)#
+	}#
+  # center each person's data around their own regression line#
+  basedata <- lineCenterById(basedata)#
+  # create lagged variables#
+  if(!is.null(time_lag)){#
+	lag <- time_lag#
+	  if(lag == 0){#
+	   crossCorr <- makeCrossCorr(basedata=data1, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")#
+	   cc <- crossCorr[!duplicated(crossCorr$dyad), ]#
+       lagTemp <- as.numeric(unlist(cc$maxLag))#
+       lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+       dID <- unique(factor(basedata$dyad))#
+       lagData <- list()#
+#
+       for (i in 1:length(dID)){#
+         lagi <- lag[i]#
+         datai <- basedata[basedata$dyad == dID[i], ]#
+         datai <- suppressMessages(DataCombine::slide(datai, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= lagi))#
+         lagData[[i]] <- datai#
+       }#
+         basedata <- as.data.frame(do.call(rbind, lagData))#
+#
+       } else {#
+	       basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))#
+	  }#
+   }#
+  # put data in actor-partner format#
+  basedata <- actorPartnerDataTime(basedata, "dyad", "id")  #
+  return(basedata)#
+}
+test <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag=0)
+names(data1)
+basedata <- data1#
+dyadId <- "couple"#
+personId <- "person"#
+obs_name <- "dial"#
+dist_name <- "female"#
+time_name <- "time"#
+time_lag <- 0
+vars <- c(dyadId, personId, obs_name, dist_name, time_name)
+basedata <- basedata[vars]
+head(basedata)
+names(basedata) <- c("dyad","id","obs","dist1","time")
+basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)
+head(basedata)
+basedata <- lineCenterById(basedata)
+head(basedata)
+lag <- time_lag
+lag
+if(lag == 0){#
+	   crossCorr <- makeCrossCorr(basedata=data1, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")#
+	   cc <- crossCorr[!duplicated(crossCorr$dyad), ]#
+       lagTemp <- as.numeric(unlist(cc$maxLag))#
+       lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+       dID <- unique(factor(basedata$dyad))#
+       lagData <- list()#
+#
+       for (i in 1:length(dID)){#
+         lagi <- lag[i]#
+         datai <- basedata[basedata$dyad == dID[i], ]#
+         datai <- suppressMessages(DataCombine::slide(datai, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= lagi))#
+         lagData[[i]] <- datai#
+       }
+if(lag == 0){#
+	   crossCorr <- makeCrossCorr(basedata=data1, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")#
+	   cc <- crossCorr[!duplicated(crossCorr$dyad), ]#
+       lagTemp <- as.numeric(unlist(cc$maxLag))#
+       lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+       dID <- unique(factor(basedata$dyad))#
+       lagData <- list()#
+#
+       for (i in 1:length(dID)){#
+         lagi <- lag[i]#
+         datai <- basedata[basedata$dyad == dID[i], ]#
+         datai <- suppressMessages(DataCombine::slide(datai, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= lagi))#
+         lagData[[i]] <- datai#
+       }#
+         basedata <- as.data.frame(do.call(rbind, lagData))#
+#
+       }
+lag <- time_lag
+||
