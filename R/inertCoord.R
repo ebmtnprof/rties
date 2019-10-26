@@ -344,7 +344,7 @@ inertCoordResids <- function(prepData, whichModel)
 
 #' @import ggplot2
 
-inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag, dist0name=NULL, dist1name=NULL, minMax=NULL)
+inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
 { 
   time_length <- 20
   if(is.null(dist0name)){dist0name <- "dist0"}
@@ -368,17 +368,15 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, time_lag,
 
   numPlots <- 3
   
-  stateCutOff <- time_lag + 5
-  
   multiPlots <- list()
   plots <- list()
   label <- vector()
 
   for(i in 1:n_profiles){
   	for (k in 1:numPlots){
-      statedata0 <- prepData[prepData$dist0 == 1 & prepData$time <= stateCutOff,] 
+      statedata0 <- prepData[prepData$dist0 == 1,] 
 	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
-  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time <= stateCutOff,] 
+  	  statedata1 <- prepData[prepData$dist0 == 0,] 
 	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
   	
       start <- c(start1, start0)  
@@ -462,7 +460,7 @@ print(multiPlots)
 
 #' @export
 
-inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, dist0name=NULL, dist1name=NULL, minMax=NULL, time_length=NULL, numPlots=NULL)
+inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL, time_length=NULL, numPlots=NULL)
 { 
   paramEst <- paramEst[complete.cases(paramEst), ]
   
@@ -488,17 +486,15 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, time_lag, dist0na
 
   if(is.null(numPlots)){numPlots <- 3}
   
-  stateCutOff <- time_lag + 5
-  
   multiPlots <- list()
   plots <- list()
   label <- vector()
 
   for(i in 1:n_profiles){
   	for (k in 1:numPlots){
-      statedata0 <- prepData[prepData$dist0 == 1 & prepData$time <= stateCutOff,] 
+      statedata0 <- prepData[prepData$dist0 == 1,] 
 	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
-  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time <= stateCutOff,] 
+  	  statedata1 <- prepData[prepData$dist0 == 0,] 
 	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
   	
       start <- c(start1, start0)  

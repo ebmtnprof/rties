@@ -18,7 +18,7 @@
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
-#' @param time_lag An optional argument for the number of lags for the lagged observable.
+#' @param time_lag An optional argument for the number of lags for the lagged observable. If a number is provided, the observed variable is lagged that amount. The other option is to use "absMaxCC". In this case the maximum cross-correlation is found for each dyad and the lag at which that occurs is used to lag their observed variables.
 #'
 #' @return The function returns a dataframe that has all the variables needed for modeling system dynamics, each renamed to a generic variable name, which are:
 #' \itemize{
@@ -66,14 +66,32 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
   
   # create lagged variables
   if(!is.null(time_lag)){
-	lag <- time_lag
-	basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))
-  }
+	lag <- time_lag}
+	  
+  if(lag == "absMaxCC"){
+	crossCorr <- makeCrossCorr(basedata=basedata, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")
+	cc <- crossCorr[!duplicated(crossCorr$dyad), ]
+    lagTemp <- as.numeric(unlist(cc$maxLag))
+    lag <- ifelse(lagTemp == 0, 1, lagTemp)
+    dID <- unique(factor(basedata$dyad))
+    lagData <- list()
+
+      for (i in 1:length(dID)){
+        lagi <- lag[i]
+        datai <- basedata[basedata$dyad == dID[i], ]
+        datai <- suppressMessages(DataCombine::slide(datai, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= lagi))
+        lagData[[i]] <- datai
+       }
+         basedata <- as.data.frame(do.call(rbind, lagData))
+   } else {
+	  basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))
+	 }
   
   # put data in actor-partner format
   basedata <- actorPartnerDataTime(basedata, "dyad", "id")  
   return(basedata)
 }
+
 
 ################## makeDist
 
@@ -292,16 +310,17 @@ output
 
 makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){
   
-  colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
-  colnames(basedata)[colnames(basedata)== personId] <- "person"
-  colnames(basedata)[colnames(basedata)== obs_name] <- "dv"
-  colnames(basedata)[colnames(basedata)== dist_name ] <- "dist1"
+  newdata <- basedata
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"
+  colnames(newdata)[colnames(newdata)== personId] <- "person"
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"
 
   crossCorr <- list()
-  dID <- unique(factor(basedata$dyad))
+  dID <- unique(factor(newdata$dyad))
 
   for (i in 1:length(dID)){
-  datai <- basedata[basedata$dyad == dID[i], ]
+  datai <- newdata[newdata$dyad == dID[i], ]
   dist1 <- subset(datai, dist1==1, select=dv)
   dist0 <- subset(datai, dist1==0, select=dv)
   crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)
@@ -309,20 +328,16 @@ makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){
 
   cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))
   cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))
-  cc <- as.data.frame(do.call(rbind, cc2))
-  cc$newID <- dyadId
+  cc <- as.data.frame(do.call(rbind, crossCorr))
+  cc$newID <- dID
   colnames(cc) <- c("maxCor","maxLag", dyadId)
-  ccBoth <- rbind(cc, cc)
-  ccBoth$maxCor <- as.numeric(ccBoth$maxCor)
-  ccBoth$maxLag <- as.numeric(ccBoth$maxLag)
   
   temp1 <- basedata[!duplicated(basedata$person), ]
-  temp2 <- cbind(temp1, ccBoth)
+  temp2 <- plyr::join(cc, temp1)
   
   crossCorr <- temp2
   return(crossCorr)
  }
-
 
 
 ################ Plotting functions
