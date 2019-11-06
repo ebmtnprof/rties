@@ -66,7 +66,7 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
   
   # create lagged variables
   if(!is.null(time_lag)){
-	lag <- time_lag}
+	lag <- time_lag
 	  
   if(lag == "absMaxCC"){
 	crossCorr <- makeCrossCorr(basedata=basedata, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")
@@ -86,6 +86,7 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
    } else {
 	  basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))
 	 }
+  }
   
   # put data in actor-partner format
   basedata <- actorPartnerDataTime(basedata, "dyad", "id")  
