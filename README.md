@@ -1,7 +1,7 @@
 # rties
 
 ## Please cite as : 
-Butler, E. A. & Barnard, J. K. (2019). Quantifying interpersonal dynamics for studying socio-emotional processes and adverse health behaviors. Psychosomatic Medicine.
+Butler, E. A. & Barnard, J. K. (2019). Quantifying interpersonal dynamics for studying socio-emotional processes and adverse health behaviors. Psychosomatic Medicine, 81(8), 749-758.
 -- see documentation folder for the pdf
 
 ## Tools for Modeling Interpersonal Dynamics
