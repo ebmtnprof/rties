@@ -4,8 +4,15 @@
 \alias{inertCoordPlotTrajInternal}
 \title{Plots the bivariate state variables' model-predicted temporal trajectories for each latent profile of inertia-coordination parameters. Not exported - used by inspectProfiles}
 \usage{
-inertCoordPlotTrajInternal(prepData, paramEst, n_profiles,
-  dist0name = NULL, dist1name = NULL, minMax = NULL)
+inertCoordPlotTrajInternal(
+  prepData,
+  paramEst,
+  n_profiles,
+  dist0name = NULL,
+  dist1name = NULL,
+  minMax = NULL,
+  seed = NULL
+)
 }
 \arguments{
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}
@@ -19,6 +26,8 @@ inertCoordPlotTrajInternal(prepData, paramEst, n_profiles,
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
+
+\item{set.seed}{An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories.}
 }
 \value{
 The function prints the plots.

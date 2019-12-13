@@ -4,8 +4,14 @@
 \alias{indivInertCoordPlots}
 \title{Produces plots of the inertia-coordination model-predicted trajectories overlaid on raw data for each dyad.}
 \usage{
-indivInertCoordPlots(prepData, whichModel, dist0name = NULL,
-  dist1name = NULL, plot_obs_name = NULL, minMax = NULL)
+indivInertCoordPlots(
+  prepData,
+  whichModel,
+  dist0name = NULL,
+  dist1name = NULL,
+  plot_obs_name = NULL,
+  minMax = NULL
+)
 }
 \arguments{
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}

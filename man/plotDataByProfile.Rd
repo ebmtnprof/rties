@@ -4,8 +4,14 @@
 \alias{plotDataByProfile}
 \title{Plots of de-trended observed variable over time, with dyads separated into groups based on LPA profile membership.}
 \usage{
-plotDataByProfile(prepData, fullData, n_profiles, dist0name = NULL,
-  dist1name = NULL, plot_obs_name = NULL)
+plotDataByProfile(
+  prepData,
+  fullData,
+  n_profiles,
+  dist0name = NULL,
+  dist1name = NULL,
+  plot_obs_name = NULL
+)
 }
 \arguments{
 \item{prepData}{A dataframe created by the dataPrep function.}

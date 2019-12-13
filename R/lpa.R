@@ -21,7 +21,7 @@
 #' @import mclust
 #' @export
 
-inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL)
+inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL, seed = NULL)
 {  
 	profileData <- list() 
 	paramEst <- paramEst[complete.cases(paramEst), ]
@@ -33,7 +33,9 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
   	    params <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
   	    lpa <- Mclust(params, G=n_profiles)
          } else 
-        print("Model must be inertCoord or clo")      
+        print("Model must be inertCoord or clo") 
+	  
+	  if(! is.null(seed)) {set.seed = seed}
    
    # profileData
    profileData$profile <- factor(lpa$classification)
@@ -58,9 +60,9 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
 		geom_line(aes(colour=as.factor(profile))))
 
   if(whichModel=="clo") {
-  cloPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax)
+  cloPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax, seed=seed)
   } else if (whichModel=="inertCoord"){
-  	  inertCoordPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax)
+  	  inertCoordPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax, seed=seed)
   } else
   print("Model must be inertCoord or clo")
   

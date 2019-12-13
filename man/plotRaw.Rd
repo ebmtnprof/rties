@@ -4,8 +4,16 @@
 \alias{plotRaw}
 \title{Plots of observed variable over time by dyad.}
 \usage{
-plotRaw(basedata, dyadId, obs_name, dist_name, time_name,
-  dist0name = NULL, dist1name = NULL, plot_obs_name = NULL)
+plotRaw(
+  basedata,
+  dyadId,
+  obs_name,
+  dist_name,
+  time_name,
+  dist0name = NULL,
+  dist1name = NULL,
+  plot_obs_name = NULL
+)
 }
 \arguments{
 \item{basedata}{A dataframe.}
