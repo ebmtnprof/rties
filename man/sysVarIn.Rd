@@ -4,16 +4,8 @@
 \alias{sysVarIn}
 \title{Provides results for predicting couples' latent profile membership from the system variable.}
 \usage{
-sysVarIn(
-  fullData,
-  sysVar_name,
-  sysVarType,
-  n_profiles,
-  dist0name = NULL,
-  dist1name = NULL,
-  plot_sysVar_name = NULL,
-  printPlots = T
-)
+sysVarIn(fullData, sysVar_name, sysVarType, n_profiles, dist0name = NULL,
+  dist1name = NULL, plot_sysVar_name = NULL, printPlots = T)
 }
 \arguments{
 \item{fullData}{A dataframe created by the makeFullData function.}

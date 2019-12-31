@@ -4,14 +4,8 @@
 \alias{cloPlotTrajInternal}
 \title{Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters. Not exported - used by "inspectProfiles"}
 \usage{
-cloPlotTrajInternal(
-  prepData,
-  paramEst,
-  n_profiles,
-  dist0name = NULL,
-  dist1name = NULL,
-  minMax = NULL
-)
+cloPlotTrajInternal(prepData, paramEst, n_profiles, dist0name = NULL,
+  dist1name = NULL, minMax = NULL)
 }
 \arguments{
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}

@@ -4,17 +4,9 @@
 \alias{sysVarOut}
 \title{Provides results for predicting the system variable from the latent profiles of the dynamic parameters.}
 \usage{
-sysVarOut(
-  fullData,
-  sysVar_name,
-  sysVarType,
-  dist0name = NULL,
-  dist1name = NULL,
-  plot_sysVar_name = NULL,
-  minMax = NULL,
-  family = NULL,
-  printPlots = T
-)
+sysVarOut(fullData, sysVar_name, sysVarType, dist0name = NULL,
+  dist1name = NULL, plot_sysVar_name = NULL, minMax = NULL,
+  family = NULL, printPlots = T)
 }
 \arguments{
 \item{fullData}{A dataframe created by the "makeFullData" function.}

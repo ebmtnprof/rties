@@ -4,15 +4,8 @@
 \alias{dataPrep}
 \title{Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling}
 \usage{
-dataPrep(
-  basedata,
-  dyadId,
-  personId,
-  obs_name,
-  dist_name,
-  time_name,
-  time_lag = NULL
-)
+dataPrep(basedata, dyadId, personId, obs_name, dist_name, time_name,
+  time_lag = NULL)
 }
 \arguments{
 \item{basedata}{A user-provided dataframe that includes all variables needed for an rties analysis.}

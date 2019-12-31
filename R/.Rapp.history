@@ -1,8 +1,3 @@
-basedata <- data1#
-dyadId <- "couple"#
-personId <- "person"#
-obs_name <- "dial"#
-dist_name <- "female"
 newdata <- basedata#
   colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
   colnames(newdata)[colnames(newdata)== personId] <- "person"#
@@ -133,7 +128,6 @@ lagi <- lag[i]
 lagi
 test <- suppressMessages(DataCombine::slide(basedata, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))
 test
-dID <- unique(factor(basedata$dyad))
 dID <- unique(factor(basedata$dyad))
 lagi <- lag[i]#
 datai <- basedata[baseddata$dyad == dID[i], ]
@@ -825,3 +819,5 @@ if(lag == 0){#
        }
 lag <- time_lag
 ||
+devtools::install_github("ebmtnprof/rties", force=T)
+devtools::install_github("ebmtnprof/rties", force=T)

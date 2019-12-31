@@ -4,15 +4,8 @@
 \alias{cloPlotTraj}
 \title{Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters.}
 \usage{
-cloPlotTraj(
-  prepData,
-  paramEst,
-  n_profiles,
-  time_length = NULL,
-  dist0name = NULL,
-  dist1name = NULL,
-  minMax = NULL
-)
+cloPlotTraj(prepData, paramEst, n_profiles, time_length = NULL,
+  dist0name = NULL, dist1name = NULL, minMax = NULL)
 }
 \arguments{
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}
