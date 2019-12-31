@@ -4,8 +4,15 @@
 \alias{indivCloPlots}
 \title{Produces plots of either an uncoupled or coupled oscillator model-predicted trajectories overlaid on raw data for each dyad.}
 \usage{
-indivCloPlots(derivData, whichModel, idConvention, dist0name = NULL,
-  dist1name = NULL, plot_obs_name = NULL, minMax = NULL)
+indivCloPlots(
+  derivData,
+  whichModel,
+  idConvention,
+  dist0name = NULL,
+  dist1name = NULL,
+  plot_obs_name = NULL,
+  minMax = NULL
+)
 }
 \arguments{
 \item{derivData}{A dataframe that was produced with the "estDerivs" function.}

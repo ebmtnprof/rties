@@ -4,8 +4,16 @@
 \alias{inspectProfiles}
 \title{Provides information to help decide how many profiles to use for subsequent rties analyses.}
 \usage{
-inspectProfiles(whichModel, prepData, paramEst, n_profiles,
-  dist0name = NULL, dist1name = NULL, minMax = NULL, seed = NULL)
+inspectProfiles(
+  whichModel,
+  prepData,
+  paramEst,
+  n_profiles,
+  dist0name = NULL,
+  dist1name = NULL,
+  minMax = NULL,
+  seed = NULL
+)
 }
 \arguments{
 \item{whichModel}{The name of the model that is being investigated (e.g., "inertCoord" or "clo")}
