@@ -12,7 +12,8 @@ inertCoordPlotTraj(
   dist1name = NULL,
   minMax = NULL,
   time_length = NULL,
-  numPlots = NULL
+  numPlots = NULL,
+  seed = NULL
 )
 }
 \arguments{

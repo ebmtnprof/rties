@@ -360,7 +360,9 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
 	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
   
-  if(!is.null(seed)) {set.seed = seed}
+  if(!is.null(seed)) 
+  {set.seed = seed
+  	numPlots=1} else {numPlots <- 3}
   
   temp1 <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
   lpa <- mclust::Mclust(temp1, G=n_profiles)
@@ -370,8 +372,6 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
   
   noise <- noiseModel$sigma
 
-  numPlots <- 3
-  
   multiPlots <- list()
   plots <- list()
   label <- vector()
@@ -411,7 +411,7 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
   	      time <- t
   	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)
   	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)
-  	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
+   	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
           }
         }
       
@@ -465,7 +465,7 @@ print(multiPlots)
 
 #' @export
 
-inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL, time_length=NULL, numPlots=NULL)
+inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL, time_length=NULL, numPlots=NULL, seed=NULL)
 { 
   paramEst <- paramEst[complete.cases(paramEst), ]
   
@@ -480,7 +480,9 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
   	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
 	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
-
+   
+  if(!is.null(seed)) {seed = seed}
+  
   temp1 <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
   lpa <- mclust::Mclust(temp1, G=n_profiles)
   profileParams <- as.data.frame(lpa$parameters$mean) 
@@ -489,7 +491,7 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
   
   noise <- noiseModel$sigma
 
-  if(is.null(numPlots)){numPlots <- 3}
+  if(is.null(numPlots)) {numPlots <- 3}
   
   multiPlots <- list()
   plots <- list()
@@ -522,6 +524,7 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
   	      time <- t
   	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)
   	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)
+   	      set.seed(seed)
    	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
         } else {
   	      pred <- A %*% nextStep[[t-1]]
@@ -529,7 +532,7 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
   	      time <- t
   	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)
   	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)
-  	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
+   	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
           }
         }
       
