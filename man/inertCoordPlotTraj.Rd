@@ -32,6 +32,8 @@ inertCoordPlotTraj(
 \item{time_length}{An optional value specifying how many time points to plot across. Default is 20.}
 
 \item{numPlots}{An optional value controlling how many random examples of each profile are produced. Default is 5.}
+
+\item{set.seed}{An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the "numPlots" can be set to one - otherwise each plot is replicated 5 times.}
 }
 \value{
 The function prints the plots and returns them as a list.
