@@ -86,7 +86,7 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 	profilePlusDistPred <- fitted(profilePlusDist)
 	profileByDistPred <- fitted(profileByDist)
   	
-    if(printPlots==T & family=="gaussian"){
+    if(family=="gaussian"){
 	  ylabName <- paste(plot_sysVar_name, "predicted", sep="_")
 	  xlabName <- paste(plot_sysVar_name, "observed", sep="_")
 	  
