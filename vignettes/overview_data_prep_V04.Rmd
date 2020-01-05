@@ -1,6 +1,6 @@
 ---
-title: "overview_data_prep_V03"
-author: "Emily Butler, eabutler@u.arizona.edu"
+title: "overview_data_prep_V04"
+author: "Emily Butler, eabutler@u.arizona.edu & Ashley Kuelz, akuelz@email.arizona.edu"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -17,7 +17,7 @@ knitr::opts_knit$set(global.par=TRUE)
 )
 ```
 
-The _rties_ package simplifies exploring whether a set of bivariate temporal patterns either predict, or are predicted by, global variables of interest. Although we focus on time-series data from both people in dyads, the models are appropriate for any bivariate normal time-series data (e.g., heart rate and skin conductance from one person over time).
+The _rties_ package was designed to explore interpersonal dynamics and their correlates. More specifically, it provides tools to explore whether a set of bivariate temporal patterns either predict, or are predicted by, global variables of interest. Although we focus on time-series data from both people in dyads, the models are appropriate for any bivariate normal time-series data (e.g., heart rate and skin conductance from one person over time).
 
 The analysis starts with an observed variable, assessed repeatedly over time for both partners in a sample of dyads. We provide a set of models that represent different aspects of the bivariate dynamics of the partners' observed variables. The parameter estimates from those models are then used as input variables for a latent profile analysis and the profile membership for each dyad is used either to predict, or be predicted by, cross-sectional variables of interest (e.g., each person’s self-reported health).
 

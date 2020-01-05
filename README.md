@@ -13,7 +13,7 @@ Note: We are updating the package regularly, fixing bugs and adding functionalit
 
 These vignettes provide an overview of rties functionality and work flow. Many of the functions have optional arguments that are not documentd in the vignettes. For full information, use ?functionName (where functionName is the name of the function you want information for).
 
-overview_data_prep_V03: http://rpubs.com/ebmtnprof/484725
+overview_data_prep_V04: http://rpubs.com/ebmtnprof/563963
 
 inertia_coordination_V03: http://rpubs.com/ebmtnprof/495166
 
