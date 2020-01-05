@@ -124,7 +124,7 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 
 #' Provides results for predicting couples' latent profile membership from the system variable. 
 #' 
-#' If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, a couple's shared score is the only predictor of their profile membership (called "sysVar"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base"). The function returns a list of the full model results and by default produces plots of profile membership against the system variable(s), but these can be turned off by setting printPlots=F.
+#' If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, a couple's shared score is the only predictor of their profile membership (called "sysVar"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base"). The function returns a list of the full model results and produces plots of the probability of profile membership against the system variable(s).
 #' 
 #' @param fullData A dataframe created by the makeFullData function.
 #' @param sysVar_name The name of the variable in the dataframe that contains the system variable to be predicted by profile membership. 
@@ -133,13 +133,12 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
 #' @param plot_sysVar_name An optional name for the system variable being predicted (e.g., "Satisfaction"). Default is sysVar.
-#' @param printPlots Controls whether or not the plots are printed. Default is "true".
 #' 
 #' @return A list of model results and, by default, plots of profile membership against the system variable(s), but these can be turned off by setting printPlots=F.
 
 #' @export
 
-sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NULL, dist1name=NULL, plot_sysVar_name=NULL, printPlots=T){
+sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NULL, dist1name=NULL, plot_sysVar_name=NULL){
 
   basedata <- fullData
   
@@ -147,9 +146,7 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
   if(is.null(dist1name)){dist1name <- "dist1"}
   if(is.null(plot_sysVar_name)){plot_sysVar_name <- "sysVar"}
   
-  if(sysVarType != "indiv" & sysVarType != "dyadic") {
-	stop("the sysVarType must be either indiv or dyadic")
-  }
+  if(sysVarType != "indiv" & sysVarType != "dyadic") {stop("the sysVarType must be either indiv or dyadic")}
 
   colnames(basedata)[colnames(basedata)== sysVar_name] <- "sysVar" 	
 
@@ -160,20 +157,18 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
     if(n_profiles == 2){
       base <- glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
       sysVarMain <- glm(profileN ~ sysVar, data=basedata, na.action=na.exclude, family="binomial")    	
-    } else {
-    	base <- nnet::multinom(profileN ~ 1, data=basedata, na.action=na.exclude,)
-    	sysVarMain <- nnet::multinom(profileN ~ sysVar, data=basedata, na.action=na.exclude)
-    }	
-	  if(printPlots==T){
+     } else {
+     	 base <- nnet::multinom(profileN ~ 1, data=basedata, na.action=na.exclude,)
+     	 sysVarMain <- nnet::multinom(profileN ~ sysVar, data=basedata, na.action=na.exclude)
+     }	
 	  	plot(basedata$sysVar, basedata$profile)
-	  }
   }
   
     if(sysVarType == "indiv"){
     
     data1 <- subset(basedata, select=c(dyad, sysVar, dist0, profileN))
     data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")   
-   data3 <- dplyr::rename(data2, dyad=dyad, sysVar0=sysVar.1, profileN1= profileN.1, sysVar1= sysVar.0, profileN=profileN.0)
+    data3 <- dplyr::rename(data2, dyad=dyad, sysVar0=sysVar.1, profileN1= profileN.1, sysVar1= sysVar.0, profileN=profileN.0)
     data4 <- subset(data3, select=-c(profileN1))   
     basedata <- data4
     
@@ -187,17 +182,12 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
       names(sysVarMain$coefficients) <- c("Intercept", sysVar0name, sysVar1name)
       sysVarInteract <- glm(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude, family="binomial") 
       names(sysVarInteract$coefficients) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
-           
-     if(printPlots==T){
-	  	plot(basedata$sysVar0, basedata$profile, xlab=sysVar0name, ylab="Profile")
-	  	plot(basedata$sysVar1, basedata$profile, xlab=sysVar1name, ylab="Profile")
-	  	
-	  	if(is.factor(basedata$sysVar0)){
-	  		print(interactions::cat_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T))
-	  		} else {
+      
+      if(is.factor(basedata$sysVar0)){
+	  	print(interactions::cat_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T))
+	   } else {
 	  	print(interactions::interact_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T))
-	  	   }
-	  	}
+	   }
 
     } else {
     	base <- nnet::multinom(profileN ~ 1, data=basedata)
@@ -205,19 +195,84 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
     	names(sysVarMain$coefnames) <- c("Intercept", sysVar0name, sysVar1name)
     	sysVarInteract <- nnet::multinom(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude)
     	names(sysVarInteract$coefnames) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
-    	     
-     if(printPlots==T){
-	  	plot(basedata$sysVar0, basedata$profile, xlab=sysVar0name, ylab="Profile")
-	  	plot(basedata$sysVar1, basedata$profile, xlab=sysVar1name, ylab="Profile")
-	  	
-	  	data1$dist <- factor(data1$dist0, labels=c(dist1name, dist0name))
-        data1$profile <- factor(data1$profileN)
-        print(ggplot(data1, aes(x=profile, y=sysVar, fill=dist)) +
-                    geom_boxplot() + 
-                    scale_fill_manual(values=c("gray88","gray60")) + 
-                    ylab(plot_sysVar_name))
-	  }
-    }	
+ 
+    sysVar0L <- mean(basedata$sysVar0) - sd(basedata$sysVar0)
+    sysVar0H <- mean(basedata$sysVar0) + sd(basedata$sysVar0)
+    sysVar1L <- mean(basedata$sysVar1) - sd(basedata$sysVar1)
+    sysVar1H <- mean(basedata$sysVar1) + sd(basedata$sysVar1)
+
+    dataTemp<- matrix(c(sysVar0L, sysVar0H, sysVar0L, sysVar0H, sysVar1L, sysVar1L, sysVar1H, sysVar1H), nrow=4, ncol=2)
+    dataTemp2 <- data.frame(dataTemp)
+    colnames(dataTemp2) <- c("sysVar0", "sysVar1")
+
+    prob <- data.frame(predict(sysVarInteract, newdata=dataTemp2, "probs"))
+    prob$sysVar0 <- c(1,2,1,2)
+    prob$sysVar1 <- c(1,1,2,2)
+    prob$sysVar0 <- factor(prob$sysVar0, levels=c(1,2), labels=c("Low", "High"))
+    prob$sysVar1 <- factor(prob$sysVar1, levels=c(1,2), labels=c("Low", "High"))
+
+    if(n_profiles==3){
+      prob1 <- subset(prob, select=c(X0, sysVar0, sysVar1))
+      prob2 <- subset(prob, select=c(X1, sysVar0, sysVar1))
+      prob3 <- subset(prob, select=c(X2, sysVar0, sysVar1))
+
+      p1 <- ggplot(prob1, aes(x = sysVar0, y=X0, group=sysVar1)) + 
+        geom_line(aes(linetype=sysVar1)) +
+        ylim(0,1) +
+        labs(title="Profile-1",y="Probabilty", x=sysVar0name) + 
+        scale_linetype_discrete(name=sysVar1name)
+  
+      p2 <- ggplot(prob2, aes(x = sysVar0, y=X1, group=sysVar1)) + 
+        geom_line(aes(linetype=sysVar1)) +
+        ylim(0,1) +
+        labs(title="Profile-2",y="Probabilty", x=sysVar0name) + 
+        scale_linetype_discrete(name=sysVar1name)
+  
+      p3 <- ggplot(prob3, aes(x = sysVar0, y=X2, group=sysVar1)) + 
+        geom_line(aes(linetype=sysVar1)) +
+        ylim(0,1) +
+        labs(title="Profile-3",y="Probabilty", x=sysVar0name) + 
+        scale_linetype_discrete(name=sysVar1name)
+
+      pAll <- gridExtra::grid.arrange(p1,p2,p3, nrow=3)
+     }
+
+     if(n_profiles==4){
+       prob1 <- subset(prob, select=c(X0, sysVar0, sysVar1))
+       prob2 <- subset(prob, select=c(X1, sysVar0, sysVar1))
+       prob3 <- subset(prob, select=c(X2, sysVar0, sysVar1))
+       prob4 <- subset(prob, select=c(X3, sysVar0, sysVar1))
+
+       p1 <- ggplot(prob1, aes(x = sysVar0, y=X0, group=sysVar1)) + 
+         geom_line(aes(linetype=sysVar1)) +
+         ylim(0,1) +
+         labs(title="Profile-1",y="Probabilty", x=sysVar0name) + 
+         scale_linetype_discrete(name=sysVar1name)
+  
+       p2 <- ggplot(prob2, aes(x = sysVar0, y=X1, group=sysVar1)) + 
+         geom_line(aes(linetype=sysVar1)) +
+         ylim(0,1) +
+         labs(title="Profile-2",y="Probabilty", x=sysVar0name) + 
+         scale_linetype_discrete(name=sysVar1name)
+  
+       p3 <- ggplot(prob3, aes(x = sysVar0, y=X2, group=sysVar1)) + 
+         geom_line(aes(linetype=sysVar1)) +
+         ylim(0,1) +
+         labs(title="Profile-3",y="Probabilty", x=sysVar0name) + 
+         scale_linetype_discrete(name=sysVar1name)
+  
+       p4 <- ggplot(prob4, aes(x = sysVar0, y=X3, group=sysVar1)) + 
+         geom_line(aes(linetype=sysVar1)) +
+         ylim(0,1) +
+         labs(title="Profile-4",y="Probabilty", x=sysVar0name) + 
+         scale_linetype_discrete(name=sysVar1name)
+
+         pAll <- gridExtra::grid.arrange(p1,p2,p3,p4, nrow=4)
+       }
+
+       if(n_profiles > 4) {message("plots are not provided if there are more than 4 profiles")}
+
+     }	
   }
   
   if(sysVarType == "dyadic"){
