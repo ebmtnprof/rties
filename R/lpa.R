@@ -63,7 +63,7 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
 		geom_line(aes(colour=as.factor(profile))))
 
   if(whichModel=="clo") {
-  cloPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax, seed=seed)
+  cloPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax)
   } else if (whichModel=="inertCoord"){
   	  inertCoordPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax, seed=seed)
   } else
