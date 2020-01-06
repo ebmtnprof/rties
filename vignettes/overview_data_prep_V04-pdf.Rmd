@@ -2,9 +2,10 @@
 title: "overview_data_prep_V04"
 author: "Emily Butler, eabutler@u.arizona.edu & Ashley Kuelz, akuelz@email.arizona.edu"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: rmarkdown::pdf_document
+geometry: margin=1.5cm
 vignette: >
-  %\VignetteIndexEntry{overview_data_prep}
+  %\VignetteIndexEntry{overview_data_prep_V04}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -23,11 +24,16 @@ The analysis starts with an observed variable, assessed repeatedly over time for
 
 Currently the package includes two models: 1) the “Inertia-Coordination” model, which can represent within-person inertia and between-person in-phase or anti-phase coordination (Figure 1), and 2) a “Coupled-Oscillator” model, which can represent between-person damping (a.k.a. coregulation) and amplification (a.k.a. co-dysregulation) of coupled oscillations (Figure 2).
 ```
-Figure 1: Patterns represented by the Inertia-Coordination model. The bivariate time-series variable is on the y-axis. Panel A shows low and high inertia. Panel B shows in-phase coordination. Panel C shows anti-phase coordination.
+Figure 1: Patterns represented by the Inertia-Coordination model.
+    The bivariate time-series variable is on the y-axis. Panel A shows low and high inertia. 
+    Panel B shows in-phase coordination. Panel C shows anti-phase coordination.
 ```
 ![Alt text](inertia.png) ![](inphase.png) ![](antiphase.png)
 ```
-Figure 2: Patterns represented by the Coupled-Oscillator model. The bivariate time-series variable is on the y-axis. Panel A shows between-person damping of oscillations (a.k.a. coregulation). Panel B shows between-person amplification of oscillations (a.k.a. co-dysregulation).
+Figure 2: Patterns represented by the Coupled-Oscillator model.
+    The bivariate time-series variable is on the y-axis.
+    Panel A shows between-person damping of oscillations (a.k.a. coregulation).
+    Panel B shows between-person amplification of oscillations (a.k.a. co-dysregulation).
 ```
 ![Alt text](coreg.png) ![](codysreg.png) 
 
@@ -68,7 +74,8 @@ __How to handle bivariate data within-person__: If you have data from two variab
 
 __How to handle indistinguishable dyads__: As described above, one approach is to use an arbitrary distinguisher, where one partner in each dyad is randomly assigned to be 0 and the other to be 1. In that case, you should not pay any attention to any output or results related to the distinguisher; it is simply there to keep the data in order by person and is otherwise meaningless. An alternate approach is to create a distinguisher using some substantive variable that you have theoretical grounds to think may play a role in your system. For example, if you think that differences in empathy between partners may impact the dynamics, and you have a person-level measure of empathy in the relationship, you would assign the partner scoring lower on empathy in a given dyad a 0 and the partner scoring higher on empathy in that dyad would be scored a 1. The following function creates such a 0/1 distinguishing variable and adds it to "demoData" based on person-level scores on the measure of empathy. Note that continuous variables will work best for this purpose, because if partner's have identical scores on the variable (e.g., identical "empathy" scores in this example), then they will end up with missing values on the 0/1 distinguisher and will be effectively dropped from the rest of the analysis. 
 ```{r, eval=FALSE}
-demoData <- makeDist(basedata=demoData, dyadId="couple", personId="person", time_name="time", dist_name="empathy")
+demoData <- makeDist(basedata=demoData, dyadId="couple", personId="person", time_name="time",
+                     dist_name="empathy")
 ```
 
 Once you have your data in an appropriate format, we recommend saving it as a .csv file because that is the easiest way to read it into R, as shown in following syntax. Note the path and file name are specific to where the data is saved on my computer and you would need to replace that with the relevant path for your file and computer.
@@ -88,14 +95,15 @@ Dynamic models are complex and there are a lot of ways to fool yourself about th
 ```{r, include=FALSE}
 par(mar=c(4,1,1,1))
 ```
-```{r}
+```{r, fig.width=4}
 histAll(data1)
 ```
 
 A second highly recommended check is to plot the raw time-series data for each dyad, which can be accomplished with the “plotRaw” function. If you have a large number of dyads, you may want to only plot a random subset, or several random subsets. For this vignette we plot a specific sub-set to present some typical-looking examples. Use ?plotRaw for further explanation of the arguments for the function. Running the following syntax we see that one person is completely missing data for dyad 19, which will cause problems if we don't fix it. If you are not plotting all your dyads, you will need to use some other method to identify any dyads with completely missing data for one or both partners. This visualization is also useful for spotting outliers, noise in the data, etc. that should be fixed before proceeding.
-```{r, dpi=180}
+```{r, dpi=150, fig.height=4}
 temp <- subset(data1, couple %in% c(2,3,5,8,10,12,13,17,19))
-plotRaw(basedata=temp, dyad="couple", obs_name="dial", dist_name="female", time_name="time", dist0name="Men", dist1name= "Women", plot_obs_name="Dial")
+plotRaw(basedata=temp, dyad="couple", obs_name="dial", dist_name="female", time_name="time",
+        dist0name="Men", dist1name= "Women", plot_obs_name="Dial")
 ```
 
 At this point, it would be worthwhile to see if the missing data can be accounted for. In our case, we discovered there had been recording problems for the one person and so the only thing we can do about the missing data for dyad 19 is to remove that dyad from the analysis (several steps in the modeling require at least partial data from both partners and will generate error messages if that is violated). The following syntax accomplishes that. First, the dyad to remove is assigned to an object called "dyads" (if more than one dyad is to be removed, this could be a vector, e.g., dyads <- c(3, 5, 19) would remove three dyads). Then the "removeDyads" function takes as arguments the full dataframe, the variable indicating which dyads to remove, and the name of the dataframe column that includes dyad membership.
@@ -106,7 +114,8 @@ data1 <- removeDyads(basedata=data1, dyads=dyads, dyadId="couple")
 
 The “dataPrep” function does much of the work of processing the data into a generic form that is appropriate for any of the _rties_ models (see syntax below). In this example, “data1” is the original data set with any necessary cleaning done and “data2” will be a dataframe holding the processed data. The argument called "time_lag" is optional and specifies the number of steps to lag variables for the Inertia-Coordination model (see comments below). Use ?dataPrep for further explanation of the arguments for the function. 
 ```{r}
-data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag=5) 
+data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial",
+                  dist_name="female", time_name="time", time_lag=5) 
 str(data2)
 ```
 

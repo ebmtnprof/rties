@@ -15,6 +15,6 @@ These vignettes provide an overview of rties functionality and work flow. Many o
 
 overview_data_prep_V04: http://rpubs.com/ebmtnprof/563963
 
-inertia_coordination_V03: http://rpubs.com/ebmtnprof/495166
+inertia_coordination_V04: http://rpubs.com/ebmtnprof/563986
 
 coupled_oscillator_V03: http://rpubs.com/ebmtnprof/495181
