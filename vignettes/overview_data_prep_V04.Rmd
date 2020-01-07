@@ -4,7 +4,7 @@ author: "Emily Butler, eabutler@u.arizona.edu & Ashley Kuelz, akuelz@email.arizo
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{overview_data_prep}
+  %\VignetteIndexEntry{overview_data_prep_V04}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
