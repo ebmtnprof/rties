@@ -306,6 +306,7 @@ indivClo <- function(derivData, whichModel)
 #' @return The function returns a named list including: 1) the adjusted R^2 for the uncoupled model for each dyad (called "R2uncouple"), 2) the adjusted R^2 for the coupled model for each dyad (called "R2couple"), and 3) the difference between the R-squares for each dyad (coupled - uncoupled, called "R2dif").
 
 #' @export
+
 indivCloCompare <- function(derivData)
 {
   basedata <- derivData

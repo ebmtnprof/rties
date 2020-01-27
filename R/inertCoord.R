@@ -462,7 +462,6 @@ print(multiPlots)
 #' @return The function prints the plots and returns them as a list. 
 
 #' @import ggplot2
-#' @import dplyr
 
 #' @export
 

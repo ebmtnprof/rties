@@ -21,7 +21,7 @@
 #' @return The function returns a dataframe called "profileData" that contains the profile classification for each dyad. 
 
 #' @import ggplot2
-#' @import mclust
+
 #' @export
 
 inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL, seed = NULL)
@@ -31,10 +31,10 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
    
    if(whichModel == "clo"){
   	  params <- subset(paramEst, select=c(obs_0:p_d1_1))
-  	  lpa <- Mclust(params, G=n_profiles)
+  	  lpa <- mclust::Mclust(params, G=n_profiles)
     } else if (whichModel == "inertCoord"){
   	    params <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
-  	    lpa <- Mclust(params, G=n_profiles)
+  	    lpa <- mclust::Mclust(params, G=n_profiles)
          } else 
         print("Model must be inertCoord or clo") 
 	  
@@ -50,7 +50,7 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
   print(table(lpa$classification)) 
   
   # plot quality of solution
-  dr <- MclustDR(lpa, lambda=1)
+  dr <- mclust::MclustDR(lpa, lambda=1)
   plot(dr, what ="contour")
   
   # plot content of solution

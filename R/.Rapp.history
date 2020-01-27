@@ -820,4 +820,3 @@ if(lag == 0){#
 lag <- time_lag
 ||
 devtools::install_github("ebmtnprof/rties", force=T)
-devtools::install_github("ebmtnprof/rties", force=T)

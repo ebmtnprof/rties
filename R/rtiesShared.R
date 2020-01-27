@@ -33,6 +33,7 @@
 #'}
 
 #' @export
+
 dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL){
   
   vars <- c(dyadId, personId, obs_name, dist_name, time_name)
@@ -352,6 +353,7 @@ makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){
 #' @param basedata A user-provided dataframe.
 
 #' @export
+
 histAll <- function(basedata)
 {
   nums <- sapply(basedata, is.numeric)
