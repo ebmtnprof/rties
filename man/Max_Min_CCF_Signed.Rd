@@ -6,6 +6,11 @@
 \usage{
 Max_Min_CCF_Signed(a, b)
 }
+\arguments{
+\item{a}{First time-series used in the cross-correlation}
+
+\item{b}{Second time-series used in the cross-correlation}
+}
 \description{
 A helper function for makeCrossCorr
 }

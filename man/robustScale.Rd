@@ -6,6 +6,9 @@
 \usage{
 robustScale(basedata)
 }
+\arguments{
+\item{basedata}{The input data set}
+}
 \description{
 Apply robust scaling from the DescTools package one person at a time to the detrended observed variable (obs_deTrend). Currently not implemented since it wasn't clear it was working, or the optimal thing to do.
 }

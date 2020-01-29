@@ -18,6 +18,8 @@ plotDataByProfile(
 
 \item{fullData}{A dataframe created by the makeFullData function.}
 
+\item{n_profiles}{The number of profiles that were estimated.}
+
 \item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.}

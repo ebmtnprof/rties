@@ -14,6 +14,8 @@ estDerivs(prepData, taus, embeds, delta, idConvention)
 \item{embeds}{A vector containing the values of embeds to use. Embeds indicates the number of columns in the lagged data matrix. The minimum = 3 for 2nd order derivatives and higher values increase smoothing.}
 
 \item{delta}{A value indicating the inter-observation interval. For example, if delta = 2, then every second observation is used in the estimation process.}
+
+\item{idConvention}{The value that was added to the dist1 ID number to get the dist2 ID number}
 }
 \value{
 The function returns a list including: 1) "data" which is a dataframe containing first and second derivative estimates of an observed state variable, and 2) "fitTable" which shows the maximal R^2 achieved for each dyad for a coupled oscillator model, along with the associated tau, embed and estimated period of oscillation.

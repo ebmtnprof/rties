@@ -6,6 +6,13 @@
 \usage{
 cloCoupledOde(t, state, parameters)
 }
+\arguments{
+\item{t}{A parameter used by the ode and passed by functions calling cloCoupleOde}
+
+\item{state}{Another parameter used by the ode and passed by functions calling cloCoupleOde}
+
+\item{parameters}{Another parameter used by the ode and passed by functions calling cloCoupleOde}
+}
 \description{
 Provides the equation for a coupled oscillator model for the differential equation solver (ode) to plot
 }

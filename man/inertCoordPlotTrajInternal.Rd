@@ -27,7 +27,7 @@ inertCoordPlotTrajInternal(
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
 
-\item{set.seed}{An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the number of plots produced is set to one for each profile.}
+\item{seed}{An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the number of plots produced is set to one for each profile.}
 }
 \value{
 The function prints the plots.
