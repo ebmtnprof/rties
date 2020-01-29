@@ -21,6 +21,7 @@
 #' @return The function returns a dataframe called "profileData" that contains the profile classification for each dyad. 
 
 #' @import ggplot2
+#' @import mclust
 
 #' @export
 
@@ -31,10 +32,10 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
    
    if(whichModel == "clo"){
   	  params <- subset(paramEst, select=c(obs_0:p_d1_1))
-  	  lpa <- mclust::Mclust(params, G=n_profiles)
+  	  lpa <- Mclust(params, G=n_profiles)
     } else if (whichModel == "inertCoord"){
   	    params <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
-  	    lpa <- mclust::Mclust(params, G=n_profiles)
+  	    lpa <- Mclust(params, G=n_profiles)
          } else 
         print("Model must be inertCoord or clo") 
 	  
