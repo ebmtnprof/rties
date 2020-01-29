@@ -20,6 +20,8 @@ Imports:
     nnet,
     plyr,
     scales,
+    sjPlot,
+    sjMisc,
     zoo  
 License: GPL-3
 Encoding: UTF-8
