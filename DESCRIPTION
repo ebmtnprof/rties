@@ -9,6 +9,7 @@ Imports:
     DataCombine,
     DescTools,    
     deSolve,
+    devtools,
     dplyr,  
     ggplot2,
     gridExtra,
