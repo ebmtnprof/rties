@@ -21,7 +21,7 @@ Imports:
     plyr,
     scales,
     sjPlot,
-    sjMisc,
+    sjmisc,
     zoo  
 License: GPL-3
 Encoding: UTF-8
