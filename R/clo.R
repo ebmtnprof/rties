@@ -88,6 +88,7 @@ gllaEmbed <- function(x, embed, tau, groupby=NA, label="x", idColumn=F) {
 #' @param taus A vector containing the values of tau to use. Tau indicates the number of time points to lag in the lagged data matrix (see Boker, S.M., Deboeck, P.R., Edler, C., & Keel, P.K. (2010). Generalized local linear approximation of derivatives from time series. In S.M. Chow & E. Ferrer (Eds.), Statistical Methods for Modeling Human Dynamics: An Interdisciplinary Dialogue (pp. 161-178). New York, NY: Taylor & Francis Group). The first derivative is estimated as the mean of the two adjacent slopes across that number of lags, e.g., if tau = 2 then the estimate of the first derivative at time = t is based on the mean of the slopes left and right of time t across 2 observations each. The second derivative is the difference in the two slopes with respect to time. Tau = 1 is sensitive to noise and increasing its value acts as smoothing. 
 #' @param embeds A vector containing the values of embeds to use. Embeds indicates the number of columns in the lagged data matrix. The minimum = 3 for 2nd order derivatives and higher values increase smoothing.
 #' @param delta A value indicating the inter-observation interval. For example, if delta = 2, then every second observation is used in the estimation process.
+#' @param idConvention The value that was added to the dist1 ID number to get the dist2 ID number
 #' 
 #' @return The function returns a list including: 1) "data" which is a dataframe containing first and second derivative estimates of an observed state variable, and 2) "fitTable" which shows the maximal R^2 achieved for each dyad for a coupled oscillator model, along with the associated tau, embed and estimated period of oscillation.
 
@@ -206,6 +207,10 @@ estDerivs <- function(prepData, taus, embeds, delta, idConvention)
 
 #' Provides the equation for a coupled oscillator model for the differential equation solver (ode) to plot
 
+#' @param t A parameter used by the ode and passed by functions calling cloCoupleOde
+#' @param state Another parameter used by the ode and passed by functions calling cloCoupleOde
+#' @param parameters Another parameter used by the ode and passed by functions calling cloCoupleOde
+
 cloCoupledOde <- function(t, state, parameters)
 {
   with(as.list(c(state, parameters)), {
@@ -220,6 +225,10 @@ cloCoupledOde <- function(t, state, parameters)
 ############### cloUncoupledOde
 
 #' Provides the equation for an un-coupled oscillator model for the differential equation solver (ode) to plot
+
+#' @param t A parameter used by the ode and passed by functions calling cloCoupleOde
+#' @param state Another parameter used by the ode and passed by functions calling cloCoupleOde
+#' @param parameters Another parameter used by the ode and passed by functions calling cloCoupleOde
 
 cloUncoupledOde <- function(t, state, parameters)
 {

@@ -140,6 +140,8 @@ lineCenterById <- function(basedata)
 
 #' Apply robust scaling from the DescTools package one person at a time to the detrended observed variable (obs_deTrend). Currently not implemented since it wasn't clear it was working, or the optimal thing to do.
 
+#' @param basedata The input data set
+
 robustScale <- function(basedata){
   newId <- unique(factor(basedata$id))
   dataRobust <- list()
@@ -280,6 +282,9 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData, params)
 
 #' A helper function for makeCrossCorr
 
+#' @param a First time-series used in the cross-correlation
+#' @param b Second time-series used in the cross-correlation
+
 Max_Min_CCF_Signed <- function (a, b) {
 d <- ccf(a, b, plot = FALSE, na.action=na.exclude)
 cor = d$acf[ ,,1] 
@@ -406,6 +411,7 @@ plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=
 #'
 #' @param prepData A dataframe created by the dataPrep function.
 #' @param fullData A dataframe created by the makeFullData function.
+#' @param n_profiles The number of profiles that were estimated.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
 #' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
