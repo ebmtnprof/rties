@@ -1,5 +1,4 @@
 
-
 ######### The "rtiesShared" file includes functions that support all the rties analyses
 
 
@@ -285,6 +284,8 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData, params)
 #' @param a First time-series used in the cross-correlation
 #' @param b Second time-series used in the cross-correlation
 
+#' @importFrom stats ccf na.exclude
+
 Max_Min_CCF_Signed <- function (a, b) {
 d <- ccf(a, b, plot = FALSE, na.action=na.exclude)
 cor = d$acf[ ,,1] 
@@ -296,7 +297,7 @@ res_min = res[which.min(res$cor),]
 res_min_abs = abs(res_min)
 res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))
 if (res.max.abs==1) max=res_max else max=res_min}
-output <<-data.frame(max = max)
+output <-data.frame(max = max)
 output
 }
 
@@ -436,26 +437,3 @@ plotDataByProfile <- function(prepData, fullData, n_profiles, dist0name=NULL, di
     }
 }
 
-######################### Miscellaneous functions
-
-
-biserialCor <- function (x, y, level = 1) 
-{
-    if (!is.numeric(x)) 
-        stop("'x' must be a numeric variable.\n")
-    y <- as.factor(y)
-    if (length(levs <- levels(y)) > 2) 
-        stop("'y' must be a dichotomous variable.\n")
-    if (length(x) != length(y)) 
-        stop("'x' and 'y' do not have the same length")
-    
-        cc.ind <- complete.cases(x, y)
-        x <- x[cc.ind]
-        y <- y[cc.ind]
-    
-    ind <- y == levs[level]
-    diff.mu <- mean(x[ind]) - mean(x[!ind])
-    prob <- mean(ind)
-    sd.pop <- sd(x) * sqrt((length(x) - 1)/length(x))
-    diff.mu * sqrt(prob * (1 - prob))/sd.pop
-}

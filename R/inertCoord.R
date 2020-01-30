@@ -24,7 +24,7 @@ acp <- function(basedata, personId, dyadId, obs_name, time_name)
   names(basedata)[3] <- "obs"
   names(basedata)[4] <- "time"
 
-  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- basedata[stats::complete.cases(basedata), ]
   basedata <- lineCenterById(basedata)
   basedata <- actorPartnerDataTime(basedata, "dyad", "id")
   
@@ -40,11 +40,11 @@ acp <- function(basedata, personId, dyadId, obs_name, time_name)
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
-  par(mfrow=c(2,2))
+  graphics::par(mfrow=c(2,2))
   for(j in 1:length(newDiD)){
-  plot(acf[[j]], main=paste("AutoCorr_Dyad", plotTitle[j], sep="_"))
+  graphics::plot(acf[[j]], main=paste("AutoCorr_Dyad", plotTitle[j], sep="_"))
   }
-  par(mfrow=c(1,1))
+  graphics::par(mfrow=c(1,1))
   return(acf)
 }
 
@@ -70,7 +70,7 @@ ccp <- function(basedata, personId, dyadId, obs_name, time_name)
   names(basedata)[3] <- "obs"
   names(basedata)[4] <- "time"
 
-  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- basedata[stats::complete.cases(basedata), ]
   basedata <- lineCenterById(basedata)
   basedata <- actorPartnerDataTime(basedata, "dyad", "id")
   
@@ -87,12 +87,12 @@ ccp <- function(basedata, personId, dyadId, obs_name, time_name)
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
-  par(mfrow=c(2,2))
+  graphics::par(mfrow=c(2,2))
   for(j in 1:length(newDiD)){
-  plot(ccf[[j]], main=paste("CrossCorr_Dyad", plotTitle[j], sep="_"))
+    graphics::plot(ccf[[j]], main=paste("CrossCorr_Dyad", plotTitle[j], sep="_"))
   }
-  par(mfrow=c(1,1))
-  return(acf)
+  graphics::par(mfrow=c(1,1))
+  return(ccf)
 }
 
 

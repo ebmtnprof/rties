@@ -534,11 +534,11 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
     min <- min(prepData$obs_deTrend, na.rm=T)
     max <- max(prepData$obs_deTrend, na.rm=T)
   } else {
-  	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
-	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
+  	min <- stats::quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
+	  max <- stats::quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
 
-    if(is.null(time_length)){time_length <- as.numeric(quantile(prepData$time, prob=.75))}
+    if(is.null(time_length)){time_length <- as.numeric(stats::quantile(prepData$time, prob=.75))}
     if(is.null(dist0name)){dist0name <- "dist0"}
     if(is.null(dist1name)){dist1name <- "dist1"}
     if(is.null(minMax)){min <- min(prepData$obs_deTrend, na.rm=T)
@@ -552,9 +552,9 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
   
     for(i in 1:n_profiles){
 	  statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
-	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
+	  start0 <- stats::median(statedata0$obs_deTrend, na.rm=T)
   	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
-	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
+	  start1 <- stats::median(statedata1$obs_deTrend, na.rm=T)
   	
 	  plotTimes <- seq(1, time_length, by=1)
 
@@ -568,10 +568,10 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
 	  temp2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
 	  temp3 <- subset(temp2, select=-c(y2, y4))
 	  names(temp3) <- c("time","d0pred","d1pred")
-	  temp4 <- reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
+	  temp4 <- stats::reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
 	   temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
 			
-	  plotData <- temp4[complete.cases(temp3), ]	
+	  plotData <- temp4[stats::complete.cases(temp3), ]	
 	  profileName <- paste("Profile", i , sep="_")
 				
 	  plotsi <- ggplot(plotData, aes(x=time)) +
@@ -610,11 +610,11 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
     min <- min(prepData$obs_deTrend, na.rm=T)
     max <- max(prepData$obs_deTrend, na.rm=T)
   } else {
-  	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
-	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
+  	min <- stats::quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
+	  max <- stats::quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
 
-    time_length <- as.numeric(quantile(prepData$time, prob=.75))
+    time_length <- as.numeric(stats::quantile(prepData$time, prob=.75))
     if(is.null(dist0name)){dist0name <- "dist0"}
     if(is.null(dist1name)){dist1name <- "dist1"}
     if(is.null(minMax)){min <- min(prepData$obs_deTrend, na.rm=T)
@@ -629,9 +629,9 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
   
     for(i in 1:n_profiles){
 	  statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
-	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
+	  start0 <- stats::median(statedata0$obs_deTrend, na.rm=T)
   	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
-	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
+	  start1 <- stats::median(statedata1$obs_deTrend, na.rm=T)
   	
 	  plotTimes <- seq(1, time_length, by=1)
 
@@ -645,10 +645,10 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
 	  temp2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
 	  temp3 <- subset(temp2, select=-c(y2, y4))
 	  names(temp3) <- c("time","d0pred","d1pred")
-	  temp4 <- reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
+	  temp4 <- stats::reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
 	   temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
 			
-	  plotData <- temp4[complete.cases(temp3), ]	
+	  plotData <- temp4[stats::complete.cases(temp3), ]	
 	  profileName <- paste("Profile", i , sep="_")
 				
 	  plotsi <- ggplot(plotData, aes(x=time)) +
