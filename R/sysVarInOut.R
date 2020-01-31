@@ -34,8 +34,8 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
   	min <- min(basedata$sysVar, na.rm=T)
 	max <- max(basedata$sysVar, na.rm=T)
   } else {
-  	min <- quantile(basedata$sysVar, minMax[1], na.rm=T)
-	max <- quantile(basedata$sysVar, minMax[2],  na.rm=T)
+  	min <- stats::quantile(basedata$sysVar, minMax[1], na.rm=T)
+	max <- stats::quantile(basedata$sysVar, minMax[2],  na.rm=T)
     }
  	
   if(sysVarType != "indiv" & sysVarType != "dyadic") {
@@ -49,19 +49,19 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 	basedata <- basedata[!duplicated(basedata$dyad), ]	
 	
 	if (family == "gaussian"){
-	  profile <- lm(sysVar ~ profile, data= basedata, na.action=na.exclude)
-	  profilePred <- fitted(profile)
+	  profile <- stats::lm(sysVar ~ profile, data= basedata, na.action=na.exclude)
+	  profilePred <- stats::fitted(profile)
 	} else {
-	  profile <- glm(sysVar ~ profile, data= basedata, na.action=na.exclude, family=family)
-	  profilePred <- fitted(profile)
+	  profile <- stats::glm(sysVar ~ profile, data= basedata, na.action=na.exclude, family=family)
+	  profilePred <- stats::fitted(profile)
     }
       
     if(printPlots==T & family=="gaussian"){
 	  ylabName <- paste(plot_sysVar_name, "predicted", sep="_")
 	  xlabName <- paste(plot_sysVar_name, "observed", sep="_")
 
-	  hist(residuals(profile))
-	  plot(profilePred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Model")
+	  graphics::hist(stats::residuals(profile))
+	  graphics::plot(profilePred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Model")
 	 }
   }
 
@@ -82,22 +82,22 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 	  profileByDist <- MASS::glmmPQL(sysVar ~ profile * dist, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), family=family)
 	  }
 	
-	profilePred <- fitted(profile)
-	profilePlusDistPred <- fitted(profilePlusDist)
-	profileByDistPred <- fitted(profileByDist)
+	profilePred <- stats::fitted(profile)
+	profilePlusDistPred <- stats::fitted(profilePlusDist)
+	profileByDistPred <- stats::fitted(profileByDist)
   	
     if(family=="gaussian"){
 	  ylabName <- paste(plot_sysVar_name, "predicted", sep="_")
 	  xlabName <- paste(plot_sysVar_name, "observed", sep="_")
 	  
-	  hist(residuals(profile))
-	  plot(profilePred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Model")
+	  graphics::hist(stats::residuals(profile))
+	  graphics::plot(profilePred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Model")
 	
-	  hist(residuals(profilePlusDist))
-	  plot(profilePlusDistPred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Plus Dist Model")
+	  graphics::hist(stats::residuals(profilePlusDist))
+	  graphics::plot(profilePlusDistPred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile Plus Dist Model")
 
-	  hist(residuals(profileByDist))
-	  plot(profileByDistPred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile By Dist Model")
+	  graphics::hist(stats::residuals(profileByDist))
+	  graphics::plot(profileByDistPred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile By Dist Model")
 	  
 	  basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
 	  interact <- ggplot(basedata, aes(x=profile, y=sysVar, fill=dist)) +
@@ -155,13 +155,13 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
     basedata <- basedata[!duplicated(basedata$dyad), ]
     
     if(n_profiles == 2){
-      base <- glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
-      sysVarMain <- glm(profileN ~ sysVar, data=basedata, na.action=na.exclude, family="binomial")    	
+      base <- stats::glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
+      sysVarMain <- stats::glm(profileN ~ sysVar, data=basedata, na.action=na.exclude, family="binomial")    	
      } else {
      	 base <- nnet::multinom(profileN ~ 1, data=basedata, na.action=na.exclude,)
      	 sysVarMain <- nnet::multinom(profileN ~ sysVar, data=basedata, na.action=na.exclude)
      }	
-	  	plot(basedata$sysVar, basedata$profile)
+	  	graphics::plot(basedata$sysVar, basedata$profile)
   }
   
     if(sysVarType == "indiv"){
@@ -177,10 +177,10 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
 	sysVar01name <- paste(sysVar0name, sysVar1name, sep=":")
    
     if(n_profiles == 2){
-      base <- glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
-      sysVarMain <- glm(profileN ~ sysVar0 + sysVar1, data=basedata, na.action=na.exclude, family="binomial") 
+      base <- stats::glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
+      sysVarMain <- stats::glm(profileN ~ sysVar0 + sysVar1, data=basedata, na.action=na.exclude, family="binomial") 
       names(sysVarMain$coefficients) <- c("Intercept", sysVar0name, sysVar1name)
-      sysVarInteract <- glm(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude, family="binomial") 
+      sysVarInteract <- stats::glm(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude, family="binomial") 
       names(sysVarInteract$coefficients) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
       
       if(is.factor(basedata$sysVar0)){
@@ -196,16 +196,16 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
     	sysVarInteract <- nnet::multinom(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude)
     	names(sysVarInteract$coefnames) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
  
-    sysVar0L <- mean(basedata$sysVar0) - sd(basedata$sysVar0)
-    sysVar0H <- mean(basedata$sysVar0) + sd(basedata$sysVar0)
-    sysVar1L <- mean(basedata$sysVar1) - sd(basedata$sysVar1)
-    sysVar1H <- mean(basedata$sysVar1) + sd(basedata$sysVar1)
+    sysVar0L <- mean(basedata$sysVar0) - stats::sd(basedata$sysVar0)
+    sysVar0H <- mean(basedata$sysVar0) + stats::sd(basedata$sysVar0)
+    sysVar1L <- mean(basedata$sysVar1) - stats::sd(basedata$sysVar1)
+    sysVar1H <- mean(basedata$sysVar1) + stats::sd(basedata$sysVar1)
 
     dataTemp<- matrix(c(sysVar0L, sysVar0H, sysVar0L, sysVar0H, sysVar1L, sysVar1L, sysVar1H, sysVar1H), nrow=4, ncol=2)
     dataTemp2 <- data.frame(dataTemp)
     colnames(dataTemp2) <- c("sysVar0", "sysVar1")
 
-    prob <- data.frame(predict(sysVarInteract, newdata=dataTemp2, "probs"))
+    prob <- data.frame(stats::predict(sysVarInteract, newdata=dataTemp2, "probs"))
     prob$sysVar0 <- c(1,2,1,2)
     prob$sysVar1 <- c(1,1,2,2)
     prob$sysVar0 <- factor(prob$sysVar0, levels=c(1,2), labels=c("Low", "High"))

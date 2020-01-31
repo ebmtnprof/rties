@@ -117,15 +117,15 @@ indivInertCoord <- function(prepData, whichModel)
   	stop("the model type must be either inert, coord or inertCoord")
 	
 	} else if (whichModel == "inert"){
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
+	  model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
 	  paramNames <- c("int0","int1","inert0","inert1","dyad") 
       
       } else if (whichModel == "coord"){
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+      	model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
       	paramNames <- c("int0","int1","coord0","coord1","dyad")
         
         } else {
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+          model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
           paramNames <- c("int0","int1","inert0","coord0","inert1","coord1","dyad")
   }
   
@@ -135,7 +135,7 @@ indivInertCoord <- function(prepData, whichModel)
 	
   for (i in 1:length(newDiD)){  
     datai <- basedata[basedata$dyad == newDiD[i], ]
-	m <- lm(model, na.action=na.exclude, data=datai)
+	m <- stats::lm(model, na.action=na.exclude, data=datai)
 	R2[[i]] <- summary(m)$adj.r.squared
 	param[[i]] <- round(as.numeric(m$coefficients), 5)
 	numParam <- length(m$coefficients)
@@ -179,12 +179,12 @@ indivInertCoordCompare <- function(prepData)
 
   for (i in 1:length(newDiD)){
     datai <- basedata[basedata$dyad == newDiD[i], ]
-	m1 <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
-	inert <- lm(m1, na.action=na.exclude, data=datai)
-	m2 <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
-	coord <- lm(m2, na.action=na.exclude, data=datai)
-    m3 <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
-    inertCoord <- lm(m3, na.action=na.exclude, data=datai)
+	m1 <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
+	inert <- stats::lm(m1, na.action=na.exclude, data=datai)
+	m2 <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+	coord <- stats::lm(m2, na.action=na.exclude, data=datai)
+    m3 <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+    inertCoord <- stats::lm(m3, na.action=na.exclude, data=datai)
 			
 	R2inert[[i]] <- summary(inert)$adj.r.squared
 	R2coord[[i]] <- summary(coord)$adj.r.squared	
@@ -228,13 +228,13 @@ indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1na
   if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
   	stop("the model type must be either inert, coord or inertCoord")
 	} else if (whichModel == "inert"){
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
+	  model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
 	  plotFileName <- "inertPlots.pdf"
       } else if (whichModel == "coord"){
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+      	model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
       	plotFileName <- "coordPlots.pdf"
         } else {
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+          model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
           plotFileName <- "inertCoordPlots.pdf"
         }
 
@@ -242,8 +242,8 @@ indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1na
   	min <- min(basedata$obs_deTrend, na.rm=T)
 	max <- max(basedata$obs_deTrend, na.rm=T)
   } else {
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
+  	min <- stats::quantile(basedata$obs_deTrend, minMax[1], na.rm=T)
+	max <- stats::quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
   }
 
   newDiD <- unique(factor(basedata$dyad))
@@ -251,8 +251,8 @@ indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1na
 	
   for (i in 1:length(newDiD)){
 	datai <- basedata[basedata$dyad == newDiD[i], ]
-	m <- lm(model, na.action=na.exclude, data=datai)
-	datai$obsPred <- predict(m)
+	m <- stats::lm(model, na.action=na.exclude, data=datai)
+	datai$obsPred <- stats::predict(m)
 	datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) 
 	plotTitle <- as.character(unique(datai$dyad))
 						
@@ -292,13 +292,13 @@ inertCoordResids <- function(prepData, whichModel)
   if(whichModel != "inert" & whichModel != "coord" & whichModel != "inertCoord") {
   	stop("the model type must be either inert, coord or inertCoord")
 	} else if (whichModel == "inert"){
-	  model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
+	  model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
 	  plotFileName <- "inertResid.pdf"
       } else if (whichModel == "coord"){
-      	model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+      	model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
       	plotFileName <- "coordResid.pdf"
         } else {
-          model <- formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
+          model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
           plotFileName <- "inertCoordResid.pdf"
         }
 
@@ -308,7 +308,7 @@ inertCoordResids <- function(prepData, whichModel)
 	
   for (i in 1:length(newDiD)){
 	datai <- basedata[basedata$dyad == newDiD[i], ]
-	m <- lm(model, na.action=na.exclude, data=datai) 
+	m <- stats::lm(model, na.action=na.exclude, data=datai) 
 	plotTitle <- as.character(unique(datai$dyad))
 	resid[[i]] <- m$residuals
 	plotResid <- data.frame(resid[[i]])
@@ -356,8 +356,8 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
   	min <- min(prepData$obs_deTrend, na.rm=T)
 	max <- max(prepData$obs_deTrend, na.rm=T)
   } else {
-  	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
-	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
+  	min <- stats::quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
+	max <- stats::quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
   
   if(!is.null(seed)) 
@@ -379,9 +379,9 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
   for(i in 1:n_profiles){
   	for (k in 1:numPlots){
       statedata0 <- prepData[prepData$dist0 == 1,] 
-	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
+	  start0 <- stats::median(statedata0$obs_deTrend, na.rm=T)
   	  statedata1 <- prepData[prepData$dist0 == 0,] 
-	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
+	  start1 <- stats::median(statedata1$obs_deTrend, na.rm=T)
   	
       start <- c(start1, start0)  
      
@@ -404,14 +404,14 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
   	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)
   	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)
    	      set.seed(seed)
-  	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
+  	      nextStep[[t]] <- pred + c(stats::rnorm(n=2, mean=0, sd=noise))
         } else {
   	      pred <- A %*% nextStep[[t-1]]
   	      dist <- c(1, 0)
   	      time <- t
   	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)
   	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)
-   	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
+   	      nextStep[[t]] <- pred + c(stats::rnorm(n=2, mean=0, sd=noise))
           }
         }
       
@@ -422,7 +422,7 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
       temp0 <- data.frame(matrix(unlist(final0), ncol=3, byrow=F))
       colnames(temp0) <- c("pred0", "dist0", "time") 
       temp2 <- suppressMessages(plyr::join(temp1, temp0))
-      temp3 <- reshape(temp2, idvar="dist", varying=list(c("pred1", "pred0"), c("dist1", "dist0")), direction="long")
+      temp3 <- stats::reshape(temp2, idvar="dist", varying=list(c("pred1", "pred0"), c("dist1", "dist0")), direction="long")
       temp4 <- temp3[ , - 1]
       colnames(temp4) <- c("pred","dist","time")
       temp4$dist <- factor(temp4$dist, labels=c(dist0name, dist1name))
@@ -467,7 +467,7 @@ print(multiPlots)
 
 inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL, time_length=NULL, numPlots=NULL, seed=NULL)
 { 
-  paramEst <- paramEst[complete.cases(paramEst), ]
+  paramEst <- paramEst[stats::complete.cases(paramEst), ]
   
   if(is.null(time_length)){time_length <- 20}
   if(is.null(dist0name)){dist0name <- "dist0"}
@@ -477,8 +477,8 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
   	min <- min(prepData$obs_deTrend, na.rm=T)
 	max <- max(prepData$obs_deTrend, na.rm=T)
   } else {
-  	min <- quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
-	max <- quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
+  	min <- stats::quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
+	max <- stats::quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
   }
    
   if(!is.null(seed)) {seed = seed}
@@ -500,9 +500,9 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
   for(i in 1:n_profiles){
   	for (k in 1:numPlots){
       statedata0 <- prepData[prepData$dist0 == 1,] 
-	  start0 <- median(statedata0$obs_deTrend, na.rm=T)
+	  start0 <- stats::median(statedata0$obs_deTrend, na.rm=T)
   	  statedata1 <- prepData[prepData$dist0 == 0,] 
-	  start1 <- median(statedata1$obs_deTrend, na.rm=T)
+	  start1 <- stats::median(statedata1$obs_deTrend, na.rm=T)
   	
       start <- c(start1, start0)  
      
@@ -525,14 +525,14 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
   	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)
   	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)
    	      set.seed(seed)
-   	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
+   	      nextStep[[t]] <- pred + c(stats::rnorm(n=2, mean=0, sd=noise))
         } else {
   	      pred <- A %*% nextStep[[t-1]]
   	      dist <- c(1, 0)
   	      time <- t
   	      results1[[t]] <- list(pred=pred[1], dist=dist[1], time=time)
   	      results0[[t]] <- list(pred=pred[2], dist=dist[2], time=time)
-   	      nextStep[[t]] <- pred + c(rnorm(n=2, mean=0, sd=noise))
+   	      nextStep[[t]] <- pred + c(stats::rnorm(n=2, mean=0, sd=noise))
           }
         }
       
@@ -543,7 +543,7 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
       temp0 <- data.frame(matrix(unlist(final0), ncol=3, byrow=F))
       colnames(temp0) <- c("pred0", "dist0", "time") 
       temp2 <- suppressMessages(plyr::join(temp1, temp0))
-      temp3 <- reshape(temp2, idvar="dist", varying=list(c("pred1", "pred0"), c("dist1", "dist0")), direction="long")
+      temp3 <- stats::reshape(temp2, idvar="dist", varying=list(c("pred1", "pred0"), c("dist1", "dist0")), direction="long")
       temp4 <- temp3[ , - 1]
       colnames(temp4) <- c("pred","dist","time")
       temp4$dist <- factor(temp4$dist, labels=c(dist0name, dist1name))

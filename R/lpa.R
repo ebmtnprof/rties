@@ -27,7 +27,7 @@
 inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL, seed = NULL)
 {  
 	profileData <- list() 
-	paramEst <- paramEst[complete.cases(paramEst), ]
+	paramEst <- paramEst[stats::complete.cases(paramEst), ]
    
    if(whichModel == "clo"){
   	  params <- subset(paramEst, select=c(obs_0:p_d1_1))
@@ -51,13 +51,13 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
   
   # plot quality of solution
   dr <- mclust::MclustDR(lpa, lambda=1)
-  plot(dr, what ="contour")
+  graphics::plot(dr, what ="contour")
   
   # plot content of solution
   means <- as.data.frame(lpa$parameters$mean)
   means$varNames <- rownames(means)
   means$var <- c(1:dim(means)[1])
-  meansL <- reshape(means, idvar="varNames", varying=list(1:n_profiles), timevar="profile", sep="", direction="long")
+  meansL <- stats::reshape(means, idvar="varNames", varying=list(1:n_profiles), timevar="profile", sep="", direction="long")
 
   print(ggplot(data=meansL, aes(x=varNames, y=V1, group=profile)) +
 		geom_line(aes(colour=as.factor(profile))))

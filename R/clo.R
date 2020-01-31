@@ -97,7 +97,7 @@ gllaEmbed <- function(x, embed, tau, groupby=NA, label="x", idColumn=F) {
 estDerivs <- function(prepData, taus, embeds, delta, idConvention)
 {   
   basedata <- prepData
-  basedata <- basedata[complete.cases(basedata), ] 
+  basedata <- basedata[stats::complete.cases(basedata), ] 
   params <- expand.grid(taus=taus, embeds=embeds)
   dyadId <- unique(factor(basedata$dyad))
 
@@ -135,7 +135,7 @@ estDerivs <- function(prepData, taus, embeds, delta, idConvention)
 	  derivi <- as.data.frame(derivi)
 
 	  # fit CLO and get R^2 for that combination of parameters
-	  out <- lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1, data=derivi)
+	  out <- stats::lm(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1, data=derivi)
 	  r[i] <- summary(out)$adj.r.squared 
 	  freq0[i] <- out$coefficients[1]
 	  freq1[i] <- out$coefficients[5]
@@ -264,7 +264,7 @@ indivClo <- function(derivData, whichModel)
   	stop("the model type must be either uncoupled or coupled")
 	
 	} else if (whichModel == "uncoupled"){
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
+	  model <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
 	  obs_0 <- param[1]	
 	  d1_0 <- param[2]
 	  obs_1 <- param[3]
@@ -273,7 +273,7 @@ indivClo <- function(derivData, whichModel)
 	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")
 
       } else if (whichModel == "coupled"){
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
+      	model <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
       	obs_0 <- param[1]	
 		d1_0 <- param[2]
 		p_obs_0 <- param[3]
@@ -287,12 +287,12 @@ indivClo <- function(derivData, whichModel)
   }	
 
   newDiD <- unique(factor(basedata$dyad))
-  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- basedata[stats::complete.cases(basedata), ]
   R2 <- vector()
   	
   for (i in 1:length(newDiD)){
     datai <- basedata[basedata$dyad == newDiD[i], ]
-	m <- lm(model, na.action=na.exclude, data=datai)
+	m <- stats::lm(model, na.action=na.exclude, data=datai)
 	R2[[i]] <- summary(m)$adj.r.squared
 	param[[i]] <- round(as.numeric(m$coefficients), 5)
 	numParam <- length(m$coefficients)
@@ -327,10 +327,10 @@ indivCloCompare <- function(derivData)
   
   for (i in 1:length(newDiD)){
 	datai <- basedata[basedata$dyad == newDiD[i], ]
-	m1 <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
-	uncouple <- lm(m1, na.action=na.exclude, data=datai)
-	m2 <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1-1)
-	couple <- lm(m2, na.action=na.exclude, data=datai)	
+	m1 <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
+	uncouple <- stats::lm(m1, na.action=na.exclude, data=datai)
+	m2 <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1-1)
+	couple <- stats::lm(m2, na.action=na.exclude, data=datai)	
 	R2uncouple[[i]] <- summary(uncouple)$adj.r.squared
 	R2couple[[i]] <- summary(couple)$adj.r.squared	
 	R2dif[[i]] <- R2couple[[i]] - R2uncouple[[i]]
@@ -373,7 +373,7 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
   	stop("the model type must be either uncoupled or coupled")
 	
 	} else if (whichModel == "uncoupled"){
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
+	  model <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
 	  obs_0 <- param[1]	
 	  d1_0 <- param[2]
 	  obs_1 <- param[3]
@@ -384,7 +384,7 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
 	  odeFunction <- cloUncoupledOde
 
       } else if (whichModel == "coupled"){
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
+      	model <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
       	obs_0 <- param[1]	
 		d1_0 <- param[2]
 		p_obs_0 <- param[3]
@@ -403,12 +403,12 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
     min <- min(basedata$obs_deTrend, na.rm=T)
     max <- max(basedata$obs_deTrend, na.rm=T)
   } else {
-  	min <- quantile(basedata$obs_deTrend, minMax[1], na.rm=T)
-	max <- quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
+  	min <- stats::quantile(basedata$obs_deTrend, minMax[1], na.rm=T)
+	max <- stats::quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
   }
 
   newDiD <- unique(factor(basedata$dyad))
-  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- basedata[stats::complete.cases(basedata), ]
   plots <- list()
 	
   for (i in 1:length(newDiD)){
@@ -423,7 +423,7 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
  	statei <- c("y1"=y1, "y2"=y2, "y3"=y3, "y4"=y4)
 			
 	datai <- basedata[basedata$dyad == newDiD[i], ]
-	m <- lm(model, na.action=na.exclude, data=datai)
+	m <- stats::lm(model, na.action=na.exclude, data=datai)
 	param[[i]] <- round(as.numeric(m$coefficients), 5)
 	numParam <- length(m$coefficients)
 	param[[i]][numParam + 1] <- unique(datai$dyad)
@@ -433,12 +433,12 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
 	temp2 <- subset(temp, select=-c(y2, y4))
 	names(temp2) <- c("time","d0.pred","d1.pred")
 	temp2$dyad <- statedatai$dyad
-	temp3 <- reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
+	temp3 <- stats::reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
 	temp3$id <- ifelse(temp3$role == "d0", temp3$dyad, temp3$dyad + idConvention)
 	temp4 <- suppressMessages(plyr::join(datai, temp3))
 	temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
 			
-	plotData <- temp4[complete.cases(temp4), ]	
+	plotData <- temp4[stats::complete.cases(temp4), ]	
 	plotTitle <- as.character(unique(datai$dyad))
 						
 	plots[[i]] <- ggplot(plotData, aes(x=time)) +
@@ -478,11 +478,11 @@ cloResids <- function(derivData, whichModel)
   	stop("the model type must be either uncoupled or coupled")
 	
 	} else if (whichModel == "uncoupled"){
-	  model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
+	  model <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
 	  plotFileName <- "uncoupledResid.pdf"
 
       } else if (whichModel == "coupled"){
-      	model <- formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
+      	model <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
    		plotFileName <- "coupledResid.pdf"
   }	   
 
@@ -492,7 +492,7 @@ cloResids <- function(derivData, whichModel)
 	
   for (i in 1:length(newDiD)){
 	datai <- basedata[basedata$dyad == newDiD[i], ]
-	m <- lm(model, na.action=na.exclude, data=datai) 
+	m <- stats::lm(model, na.action=na.exclude, data=datai) 
 	plotTitle <- as.character(unique(datai$dyad))
 	resid[[i]] <- m$residuals
 	plotResid <- data.frame(resid[[i]])

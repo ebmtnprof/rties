@@ -129,7 +129,7 @@ lineCenterById <- function(basedata)
   dataCent <- list()
   for(i in 1:length(newId)){
 	datai <- basedata[basedata$id == newId[i],]
-	datai$obs_deTrend <- resid(lm(obs ~ time, data=datai, na.action=na.exclude))
+	datai$obs_deTrend <- stats::resid(stats::lm(obs ~ time, data=datai, na.action=na.exclude))
 	dataCent[[i]] <- datai
   }		
   basedata <- as.data.frame(do.call(rbind, dataCent)) 	
@@ -365,11 +365,11 @@ histAll <- function(basedata)
   nums <- sapply(basedata, is.numeric)
   numdata <- basedata[ ,nums]
 
-  par(mfrow=c(2,2))
+  graphics::par(mfrow=c(2,2))
   for(i in 1:length(numdata)){
-	hist(numdata[,i], main=NULL, xlab=names(numdata[i]))
+	graphics::hist(numdata[,i], main=NULL, xlab=names(numdata[i]))
   }
-  par(mfrow=c(1,1))
+  graphics::par(mfrow=c(1,1))
 }
 
 ############### plotRaw
