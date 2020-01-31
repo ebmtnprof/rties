@@ -196,10 +196,10 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
     	sysVarInteract <- nnet::multinom(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude)
     	names(sysVarInteract$coefnames) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
  
-    sysVar0L <- mean(basedata$sysVar0) - stats::sd(basedata$sysVar0)
-    sysVar0H <- mean(basedata$sysVar0) + stats::sd(basedata$sysVar0)
-    sysVar1L <- mean(basedata$sysVar1) - stats::sd(basedata$sysVar1)
-    sysVar1H <- mean(basedata$sysVar1) + stats::sd(basedata$sysVar1)
+    sysVar0L <- mean(basedata$sysVar0, na.rm=T) - stats::sd(basedata$sysVar0, na.rm=T)
+    sysVar0H <- mean(basedata$sysVar0, na.rm=T) + stats::sd(basedata$sysVar0, na.rm=T)
+    sysVar1L <- mean(basedata$sysVar1, na.rm=T) - stats::sd(basedata$sysVar1, na.rm=T)
+    sysVar1H <- mean(basedata$sysVar1, na.rm=T) + stats::sd(basedata$sysVar1, na.rm=T)
 
     dataTemp<- matrix(c(sysVar0L, sysVar0H, sysVar0L, sysVar0H, sysVar1L, sysVar1L, sysVar1H, sysVar1H), nrow=4, ncol=2)
     dataTemp2 <- data.frame(dataTemp)
