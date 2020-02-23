@@ -30,10 +30,12 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
 	paramEst <- paramEst[stats::complete.cases(paramEst), ]
    
    if(whichModel == "clo"){
-  	  params <- subset(paramEst, select=c(obs_0:p_d1_1))
+  	  vars1 <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1")
+  	  params <- paramEst[vars1]
   	  lpa <- Mclust(params, G=n_profiles)
     } else if (whichModel == "inertCoord"){
-  	    params <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
+  	    vars2 <- c("inert1", "coord1", "coord0", "inert0")
+  	    params <- paramEst[vars2]
   	    lpa <- Mclust(params, G=n_profiles)
          } else 
         print("Model must be inertCoord or clo") 
@@ -59,7 +61,8 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
   means$var <- c(1:dim(means)[1])
   meansL <- stats::reshape(means, idvar="varNames", varying=list(1:n_profiles), timevar="profile", sep="", direction="long")
 
-  print(ggplot(data=meansL, aes(x=varNames, y=V1, group=profile)) +
+  profile <- NULL
+  print(ggplot(data=meansL, aes_string(x="varNames", y="V1", group="profile")) +
 		geom_line(aes(colour=as.factor(profile))))
 
   if(whichModel=="clo") {

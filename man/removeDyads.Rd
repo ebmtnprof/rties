@@ -7,7 +7,7 @@
 removeDyads(basedata, dyads, dyadId)
 }
 \arguments{
-\item{basedata}{A dataframe.}
+\item{basedata}{A user provided dataframe.}
 
 \item{dyads}{A vector of dyad IDs to remove.}
 

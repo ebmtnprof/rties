@@ -18,7 +18,8 @@ autoCorPlots <- function(basedata, dyadId, personId, obs_name, time_name){invisi
 
 acp <- function(basedata, personId, dyadId, obs_name, time_name)
 {
-  basedata <- subset(basedata, select=c(personId, dyadId, obs_name, time_name))
+  vars <- c(personId, dyadId, obs_name, time_name)
+  basedata <- basedata[vars]
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
   names(basedata)[3] <- "obs"
@@ -64,7 +65,8 @@ crossCorPlots <- function(basedata, personId, dyadId, obs_name, time_name){invis
 
 ccp <- function(basedata, personId, dyadId, obs_name, time_name)
 {
-  basedata <- subset(basedata, select=c(personId, dyadId, obs_name, time_name))  
+  vars <- c(personId, dyadId, obs_name, time_name)
+  basedata <- basedata[vars]  
   names(basedata)[1] <- "id"
   names(basedata)[2] <- "dyad"
   names(basedata)[3] <- "obs"
@@ -144,8 +146,9 @@ indivInertCoord <- function(prepData, whichModel)
   
   param <- as.data.frame(do.call(rbind, param))
   colnames(param) <- paramNames
-  temp <- subset(basedata, select=c("id","dyad","dist0"))
-  temp2 <- unique(temp)
+  vars1 <- c("person","dyad","dist0")
+  temp1 <- basedata[vars1]
+  temp2 <- unique(temp1)
   data <- suppressMessages(plyr::join(param, temp2))
   params <- data[data$dist0 == 1, ]
   
@@ -256,9 +259,9 @@ indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1na
 	datai$role <- factor(datai$dist0, levels=c(0,1), labels=c(dist1name, dist0name)) 
 	plotTitle <- as.character(unique(datai$dyad))
 						
-	plots[[i]] <- ggplot(datai, ggplot2::aes(x=time)) +
-	geom_line(aes(y= obs_deTrend, color=role), linetype="dotted", size= .8, na.rm=T) +
-	geom_line(aes(y=obsPred, color=role), size= .8, na.rm=T) + 
+	plots[[i]] <- ggplot(datai, aes_string(x="time")) +
+	geom_line(aes_string(y= "obs_deTrend", color="role"), linetype="dotted", size= .8, na.rm=T) +
+	geom_line(aes_string(y="obsPred", color="role"), size= .8, na.rm=T) + 
 	scale_color_manual(name="Role", values=c("blue","red")) +
 	ylab(plot_obs_name) +
 	ylim(min, max) +
@@ -314,7 +317,7 @@ inertCoordResids <- function(prepData, whichModel)
 	plotResid <- data.frame(resid[[i]])
 	colnames(plotResid) <- "Residuals"
 						
-	plots[[i]] <- ggplot(plotResid, aes(x=Residuals)) +
+	plots[[i]] <- ggplot(plotResid, aes_string(x="Residuals")) +
 	geom_histogram(color="black", fill="grey") +
 	labs(title= "Dyad ID:", subtitle= plotTitle) +
 	theme(plot.title=element_text(size=11)) +
@@ -347,6 +350,7 @@ inertCoordResids <- function(prepData, whichModel)
 
 inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL, seed=NULL)
 { 
+  paramEst <- paramEst[stats::complete.cases(paramEst), ]
   
   time_length <- 20
   if(is.null(dist0name)){dist0name <- "dist0"}
@@ -364,7 +368,8 @@ inertCoordPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name
   {set.seed = seed
   	numPlots=1} else {numPlots <- 3}
   
-  temp1 <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
+  vars1 <- c("inert1", "coord1", "coord0", "inert0")
+  temp1 <- paramEst[vars1]
   lpa <- mclust::Mclust(temp1, G=n_profiles)
   profileParams <- as.data.frame(lpa$parameters$mean) 
     
@@ -483,7 +488,8 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
    
   if(!is.null(seed)) {seed = seed}
   
-  temp1 <- subset(paramEst, select=c(inert1, coord1, coord0, inert0))
+  vars1 <- c("inert1", "coord1", "coord0", "inert0")
+  temp1 <- paramEst[vars1]
   lpa <- mclust::Mclust(temp1, G=n_profiles)
   profileParams <- as.data.frame(lpa$parameters$mean) 
     

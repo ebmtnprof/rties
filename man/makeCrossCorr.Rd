@@ -18,7 +18,7 @@ makeCrossCorr(basedata, dyadId, personId, obs_name, dist_name)
 \item{dist_name}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
 }
 \value{
-The original dataframe with maximal absolute-value cross-correlations and their lags added.
+A cross-sectional version of the original dataframe with maximal absolute-value cross-correlations and their lags added for each dyad.
 }
 \description{
 Calculates cross-correlations for a given variable and returns a dataframe with the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms).

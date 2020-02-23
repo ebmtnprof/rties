@@ -110,11 +110,17 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 
 makeDist <- function(basedata, dyadId, personId, time_name, dist_name)
 {
-    temp1 <- subset(basedata, select=c(dyadId, personId, time_name, dist_name))
-    temp2 <- rties::actorPartnerDataTime(temp1, dyadId, personId)     
+    vars1 <- c(dyadId, personId, time_name, dist_name)
+    temp1 <- basedata[vars1]
+    temp2 <- actorPartnerDataTime(temp1, dyadId, personId)     
     temp2$dist <- ifelse(temp2[ ,4] == temp2[ ,8], NA, 
 				ifelse(temp2[ ,4] < temp2[ ,8], 0, 1))
-    temp3 <- subset(temp2, select=c(dyadId, personId, time_name, "dist"))
+    vars2 <- c("dyad", "person", "time", "dist")
+    temp3 <- temp2[vars2]
+    colnames(temp3)[colnames(temp3) == "dyad"] <- dyadId
+    colnames(temp3)[colnames(temp3) == "person"] <- personId
+    colnames(temp3)[colnames(temp3) == "time"] <- time_name
+     
     temp4 <- plyr::join(basedata, temp3)
     return(temp4)
  }
@@ -161,7 +167,7 @@ robustScale <- function(basedata){
 #'
 #' Useful for cleaning data if some dyads have extensive missing or otherwise problematic data.
 #'
-#' @param basedata A dataframe.
+#' @param basedata A user provided dataframe.
 #' @param dyads A vector of dyad IDs to remove.
 #' @param dyadId The variable in the dataframe specifying dyad ID.
 #'
@@ -192,20 +198,21 @@ removeDyads <- function (basedata, dyads, dyadId){
 
 actorPartnerDataCross <- function(basedata, dyadId, personId){
 	
-	basedata$d <- basedata[, dyadId]
-	basedata$p <- basedata[, personId]
-	basedata <- basedata[order(basedata$p), ]
+	colnames(basedata)[colnames(basedata) == dyadId] <- "dyad"
+	colnames(basedata)[colnames(basedata) == personId] <- "person"	
+	basedata <- basedata[order(basedata$person), ]
 	dataA <- basedata
+		
+	P1 <- basedata[ which(basedata$dyad == basedata$person), ]
+	P2 <- basedata[ which(basedata$dyad != basedata$person), ]
 	
-	P1 <- subset(basedata, basedata$d == basedata$p)
-	P2 <- subset(basedata, basedata$d != basedata$p)
 	P1_part <- P2
 	P2_part <- P1
 	colnames(P1_part) <- paste("p", colnames(P1_part), sep="_")
 	colnames(P2_part) <- paste("p", colnames(P2_part), sep="_")
 	dataP <- rbind(P1_part, P2_part)
 	dataAP <- cbind(dataA, dataP)
-	dataAP <- subset(dataAP, select=-c(d, p, p_d, p_p))
+	
 	return(dataAP)		
 }
 
@@ -225,28 +232,33 @@ actorPartnerDataCross <- function(basedata, dyadId, personId){
 
 actorPartnerDataTime <- function(basedata, dyadId, personId){
 		
-    basedata$d <- basedata[, dyadId]
-    basedata$p <- basedata[, personId]
-    basedata <- basedata[order(basedata$p), ]
-    dID <- unique(factor(basedata$d))
+    	colnames(basedata)[colnames(basedata) == dyadId] <- "dyad"
+	colnames(basedata)[colnames(basedata) == personId] <- "person"
+	basedata <- basedata[order(basedata$person), ]
+	dataA <- basedata
+
+    dID <- unique(factor(basedata$dyad))
 	dataAP <- list()
 
 	for(i in 1:length(dID))
 		{
-		datai <- basedata[basedata$d == dID[i],]
+		datai <- basedata[basedata$dyad == dID[i],]
 		dataA <- datai
-		P1 <- subset(datai, datai$d == datai$p)
-		P2 <- subset(datai, datai$d != datai$p)
+		
+		P1 <- datai[ which(datai$dyad == datai$person), ]
+	    P2 <- datai[ which(datai$dyad != datai$person), ]
+
 		P1_part <- P2
 		P2_part <- P1
 		colnames(P1_part) <- paste("p", colnames(P1_part), sep="_")
 		colnames(P2_part) <- paste("p", colnames(P2_part), sep="_")
 		dataP <- rbind(P1_part, P2_part)
 		APi <- cbind(dataA, dataP)
-		APi <- subset(APi, select=-c(d, p, p_d, p_p))
 		dataAP[[i]] <- APi		
 		}		
+	
 	dataAP <- as.data.frame(do.call(rbind, dataAP))
+
 } 	
 
 ############# makeFullData
@@ -312,7 +324,7 @@ output
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #'
-#' @return The original dataframe with maximal absolute-value cross-correlations and their lags added.
+#' @return A cross-sectional version of the original dataframe with maximal absolute-value cross-correlations and their lags added for each dyad.
 
 #' @export
 
@@ -329,8 +341,8 @@ makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){
 
   for (i in 1:length(dID)){
   datai <- newdata[newdata$dyad == dID[i], ]
-  dist1 <- subset(datai, dist1==1, select=dv)
-  dist0 <- subset(datai, dist1==0, select=dv)
+  dist1 <- datai[ which(datai$dist1 == 1), "dv"]
+  dist0 <- datai[ which(datai$dist1 == 0), "dv"]
   crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)
   }
 
@@ -339,8 +351,10 @@ makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){
   cc <- as.data.frame(do.call(rbind, crossCorr))
   cc$newID <- dID
   colnames(cc) <- c("maxCor","maxLag", dyadId)
-  
-  temp1 <- basedata[!duplicated(basedata$person), ]
+ 
+  temp1 <- newdata[!duplicated(newdata$person), ]
+  colnames(temp1)[colnames(newdata)== "dyad"] <- dyadId
+  colnames(temp1)[colnames(newdata)== "person"] <- personId
   temp2 <- plyr::join(cc, temp1)
   
   crossCorr <- temp2
@@ -378,7 +392,7 @@ histAll <- function(basedata)
 #'
 #' Produces plots of the observed variable for each dyad over time to check for data errors, etc. 
 #'
-#' @param basedata A dataframe.
+#' @param basedata A user provided dataframe.
 #' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.
@@ -403,6 +417,7 @@ plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=
   if(is.null(dist1name)){dist1name <- "dist1"}
   if(is.null(plot_obs_name)){plot_obs_name <- "obs"}
  
+  dist <- NULL
   lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=plot_obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
 }
 
@@ -425,12 +440,16 @@ plotDataByProfile <- function(prepData, fullData, n_profiles, dist0name=NULL, di
   if(is.null(dist1name)){dist1name <- "dist1"}
   if(is.null(plot_obs_name)){plot_obs_name <- "obs_deTrend"}
     
-    temp1 <- subset(fullData, select=c(dyad, dist0, profile))
-    temp2 <- subset(prepData, select=c(dyad, dist0, obs_deTrend, time))
+    vars1 <- c("dyad", "dist0","profile")
+    temp1 <- fullData[ , vars1]
+    vars2 <- c("dyad", "dist0", "obs_deTrend", "time")
+    temp2 <- prepData[ , vars2]
+    
+    dist0 <- NULL
     temp3 <- plyr::join(temp1, temp2)
 
     for(i in 1:n_profiles){
-      tempi <- subset(temp3, profile==i)
+      tempi <- temp3[ which(temp3$profile == i), ]
       label <- paste("Profile", i, sep="-")   
       print(lattice::xyplot(obs_deTrend ~ time|as.factor(dyad), data = tempi, group=dist0, type=c("l"), ylab=plot_obs_name, main=label, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")), as.table=T, layout = c(3,3)))
 

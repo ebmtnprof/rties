@@ -100,7 +100,7 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 	  graphics::plot(profileByDistPred ~ basedata$sysVar, xlim=c(min, max), ylim=c(min, max), ylab=ylabName, xlab=xlabName, main="Profile By Dist Model")
 	  
 	  basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
-	  interact <- ggplot(basedata, aes(x=profile, y=sysVar, fill=dist)) +
+	  interact <- ggplot(basedata, aes_string(x="profile", y="sysVar", fill="dist")) +
                     geom_boxplot() + 
                     scale_fill_manual(values=c("gray88","gray60")) + 
                     ylab(plot_sysVar_name)
@@ -166,11 +166,12 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
   
     if(sysVarType == "indiv"){
     
-    data1 <- subset(basedata, select=c(dyad, sysVar, dist0, profileN))
+    vars1 <- c("dyad", "sysVar", "dist0", "profileN")
+    data1 <- basedata[vars1]
     data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")   
+    dyad <- sysVar.1 <- profileN.1 <- sysVar.0 <- profileN.0 <- NULL
     data3 <- dplyr::rename(data2, dyad=dyad, sysVar0=sysVar.1, profileN1= profileN.1, sysVar1= sysVar.0, profileN=profileN.0)
-    data4 <- subset(data3, select=-c(profileN1))   
-    basedata <- data4
+    basedata <- data3
     
     sysVar0name <- paste(plot_sysVar_name, dist0name, sep="_")
 	sysVar1name <- paste(plot_sysVar_name, dist1name, sep="_")
@@ -184,8 +185,10 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
       names(sysVarInteract$coefficients) <- c("Intercept", sysVar0name, sysVar1name, sysVar01name)
       
       if(is.factor(basedata$sysVar0)){
+      	sysVar0 <- sysVar1 <- NULL
 	  	print(interactions::cat_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T))
 	   } else {
+	   	sysVar0 <- sysVar1 <- NULL
 	  	print(interactions::interact_plot(sysVarInteract, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T))
 	   }
 
@@ -212,24 +215,27 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
     prob$sysVar1 <- factor(prob$sysVar1, levels=c(1,2), labels=c("Low", "High"))
 
     if(n_profiles==3){
-      prob1 <- subset(prob, select=c(X0, sysVar0, sysVar1))
-      prob2 <- subset(prob, select=c(X1, sysVar0, sysVar1))
-      prob3 <- subset(prob, select=c(X2, sysVar0, sysVar1))
+      vars1 <- c("X0", "sysVar0", "sysVar1")
+      prob1 <- prob[vars1]
+      vars2 <- c("X1", "sysVar0", "sysVar1")
+      prob2 <- prob[vars2]
+      vars3 <- c("X2", "sysVar0", "sysVar1")
+      prob3 <- prob[vars3]
 
-      p1 <- ggplot(prob1, aes(x = sysVar0, y=X0, group=sysVar1)) + 
-        geom_line(aes(linetype=sysVar1)) +
+      p1 <- ggplot(prob1, aes_string(x = "sysVar0", y="X0", group="sysVar1")) + 
+        geom_line(aes_string(linetype="sysVar1")) +
         ylim(0,1) +
         labs(title="Profile-1",y="Probabilty", x=sysVar0name) + 
         scale_linetype_discrete(name=sysVar1name)
   
-      p2 <- ggplot(prob2, aes(x = sysVar0, y=X1, group=sysVar1)) + 
-        geom_line(aes(linetype=sysVar1)) +
+      p2 <- ggplot(prob2, aes_string(x = "sysVar0", y="X1", group="sysVar1")) + 
+        geom_line(aes_string(linetype="sysVar1")) +
         ylim(0,1) +
         labs(title="Profile-2",y="Probabilty", x=sysVar0name) + 
         scale_linetype_discrete(name=sysVar1name)
   
-      p3 <- ggplot(prob3, aes(x = sysVar0, y=X2, group=sysVar1)) + 
-        geom_line(aes(linetype=sysVar1)) +
+      p3 <- ggplot(prob3, aes_string(x = "sysVar0", y="X2", group="sysVar1")) + 
+        geom_line(aes_string(linetype="sysVar1")) +
         ylim(0,1) +
         labs(title="Profile-3",y="Probabilty", x=sysVar0name) + 
         scale_linetype_discrete(name=sysVar1name)
@@ -238,31 +244,35 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles, dist0name=NU
      }
 
      if(n_profiles==4){
-       prob1 <- subset(prob, select=c(X0, sysVar0, sysVar1))
-       prob2 <- subset(prob, select=c(X1, sysVar0, sysVar1))
-       prob3 <- subset(prob, select=c(X2, sysVar0, sysVar1))
-       prob4 <- subset(prob, select=c(X3, sysVar0, sysVar1))
+      vars1 <- c("X0", "sysVar0", "sysVar1")
+      prob1 <- prob[vars1]
+      vars2 <- c("X1", "sysVar0", "sysVar1")
+      prob2 <- prob[vars2]
+      vars3 <- c("X2", "sysVar0", "sysVar1")
+      prob3 <- prob[vars3]
+      vars4 <- c("X3", "sysVar0", "sysVar1")
+      prob4 <- prob[vars4]
 
-       p1 <- ggplot(prob1, aes(x = sysVar0, y=X0, group=sysVar1)) + 
-         geom_line(aes(linetype=sysVar1)) +
+       p1 <- ggplot(prob1, aes_string(x = "sysVar0", y="X0", group="sysVar1")) + 
+         geom_line(aes_string(linetype="sysVar1")) +
          ylim(0,1) +
          labs(title="Profile-1",y="Probabilty", x=sysVar0name) + 
          scale_linetype_discrete(name=sysVar1name)
   
-       p2 <- ggplot(prob2, aes(x = sysVar0, y=X1, group=sysVar1)) + 
-         geom_line(aes(linetype=sysVar1)) +
+       p2 <- ggplot(prob2, aes_string(x = "sysVar0", y="X1", group="sysVar1")) + 
+         geom_line(aes_string(linetype="sysVar1")) +
          ylim(0,1) +
          labs(title="Profile-2",y="Probabilty", x=sysVar0name) + 
          scale_linetype_discrete(name=sysVar1name)
   
-       p3 <- ggplot(prob3, aes(x = sysVar0, y=X2, group=sysVar1)) + 
-         geom_line(aes(linetype=sysVar1)) +
+       p3 <- ggplot(prob3, aes_string(x = "sysVar0", y="X2", group="sysVar1")) + 
+         geom_line(aes_string(linetype="sysVar1")) +
          ylim(0,1) +
          labs(title="Profile-3",y="Probabilty", x=sysVar0name) + 
          scale_linetype_discrete(name=sysVar1name)
   
-       p4 <- ggplot(prob4, aes(x = sysVar0, y=X3, group=sysVar1)) + 
-         geom_line(aes(linetype=sysVar1)) +
+       p4 <- ggplot(prob4, aes_string(x = "sysVar0", y="X3", group="sysVar1")) + 
+         geom_line(aes_string(linetype="sysVar1")) +
          ylim(0,1) +
          labs(title="Profile-4",y="Probabilty", x=sysVar0name) + 
          scale_linetype_discrete(name=sysVar1name)

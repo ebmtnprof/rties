@@ -109,7 +109,7 @@ estDerivs <- function(prepData, taus, embeds, delta, idConvention)
     freq0 <- list()
     freq1 <- list()
 	dataiFull <- basedata[basedata$dyad == dyadId[d],]
-	datai <- subset(dataiFull, dist0 == 1)
+	datai <- dataiFull[ which(dataiFull$dist0 == 1), ]
 
     for(i in 1:nrow(params)){
 	  # Estimate derivatives for each parameter combination
@@ -415,6 +415,7 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
     statedatai <- basedata[basedata$dyad == newDiD[i] & basedata$dist0 == 0,] 
   	maxtime <- max(statedatai$time) 
  	plotTimes <- seq(1, maxtime, by=1)
+ 	time <- obs_deTrend <- p_obs_deTrend <- NULL
  	start <- suppressWarnings(subset(statedatai, time==c(1:5), select=c(obs_deTrend, p_obs_deTrend)))
 	y1 <- mean(start$obs_deTrend, na.rm=T)
  	y2 <- 0
@@ -430,7 +431,8 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
     names(param[[i]]) <- paramNames
 
 	temp <- as.data.frame(deSolve::ode(y=statei, times=plotTimes, func= odeFunction, parms= param[[i]]))
-	temp2 <- subset(temp, select=-c(y2, y4))
+	vars1 <- c("y2", "y4")
+	temp2 <- temp[ ,!(names(temp) %in% vars1)]
 	names(temp2) <- c("time","d0.pred","d1.pred")
 	temp2$dyad <- statedatai$dyad
 	temp3 <- stats::reshape(temp2, direction='long', varying=c("d0.pred","d1.pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
@@ -441,9 +443,9 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
 	plotData <- temp4[stats::complete.cases(temp4), ]	
 	plotTitle <- as.character(unique(datai$dyad))
 						
-	plots[[i]] <- ggplot(plotData, aes(x=time)) +
-	  geom_line(aes(y= obs_deTrend, color=roleNew), linetype="dotted", size= .8, na.rm=T) +
-	  geom_line(aes(y=pred, color=roleNew), size= .8, na.rm=T) + 
+	plots[[i]] <- ggplot(plotData, aes_string(x="time")) +
+	  geom_line(aes_string(y= "obs_deTrend", color="roleNew"), linetype="dotted", size= .8, na.rm=T) +
+	  geom_line(aes_string(y="pred", color="roleNew"), size= .8, na.rm=T) + 
 	  scale_color_manual(name="Role", values=c("red","blue")) +
 	  ylab(plot_obs_name) +
 	  ylim(min, max) +
@@ -498,7 +500,7 @@ cloResids <- function(derivData, whichModel)
 	plotResid <- data.frame(resid[[i]])
 	colnames(plotResid) <- "Residuals"
 						
-	plots[[i]] <- ggplot(plotResid, aes(x=Residuals)) +
+	plots[[i]] <- ggplot(plotResid, aes_string(x="Residuals")) +
 	geom_histogram(color="black", fill="grey") +
 	labs(title= "Dyad ID:", subtitle= plotTitle) +
 	theme(plot.title=element_text(size=11)) +
@@ -543,8 +545,9 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
     if(is.null(dist1name)){dist1name <- "dist1"}
     if(is.null(minMax)){min <- min(prepData$obs_deTrend, na.rm=T)
     				   max <- max(prepData$obs_deTrend, na.rm=T)}
-
-    temp1 <- subset(paramEst, select=c(obs_0:p_d1_1))
+    
+    vars1 <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1")
+  	temp1 <- paramEst[vars1]
     lpa <- mclust::Mclust(temp1, G=n_profiles)
     profileParams <- as.data.frame(lpa$parameters$mean) 
 
@@ -566,7 +569,8 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
       paramsi <- temp1
 		  
 	  temp2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
-	  temp3 <- subset(temp2, select=-c(y2, y4))
+	  vars2 <- c("y2", "y4")
+	  temp3 <- temp2[ ,!(names(temp2) %in% vars2)]
 	  names(temp3) <- c("time","d0pred","d1pred")
 	  temp4 <- stats::reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
 	   temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
@@ -574,8 +578,8 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, time_length=NULL, dist0n
 	  plotData <- temp4[stats::complete.cases(temp3), ]	
 	  profileName <- paste("Profile", i , sep="_")
 				
-	  plotsi <- ggplot(plotData, aes(x=time)) +
-				geom_line(aes(y= pred, color=roleNew), linetype="solid", size=1, na.rm=T) +
+	  plotsi <- ggplot(plotData, aes_string(x="time")) +
+				geom_line(aes_string(y="pred", color="roleNew"), linetype="solid", size=1, na.rm=T) +
 				scale_color_manual(name="Role", values=c("black","gray47")) +
 				ylab("observed") +
 				ylim(min, max) +
@@ -621,9 +625,10 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
     				   max <- max(prepData$obs_deTrend, na.rm=T)}
 
     
-     temp1 <- subset(paramEst, select=c(obs_0:p_d1_1))
-     lpa <- mclust::Mclust(temp1, G=n_profiles)
-     profileParams <- as.data.frame(lpa$parameters$mean) 
+    vars1 <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1")
+  	temp1 <- paramEst[vars1]
+    lpa <- mclust::Mclust(temp1, G=n_profiles)
+    profileParams <- as.data.frame(lpa$parameters$mean) 
 
     plots <- list()
   
@@ -643,7 +648,8 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
       paramsi <- temp1
 		  
 	  temp2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
-	  temp3 <- subset(temp2, select=-c(y2, y4))
+	  vars2 <- c("y2", "y4")
+	  temp3 <- temp2[ ,!(names(temp2) %in% vars2)]
 	  names(temp3) <- c("time","d0pred","d1pred")
 	  temp4 <- stats::reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
 	   temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
@@ -651,8 +657,8 @@ cloPlotTrajInternal <- function(prepData, paramEst, n_profiles, dist0name=NULL, 
 	  plotData <- temp4[stats::complete.cases(temp3), ]	
 	  profileName <- paste("Profile", i , sep="_")
 				
-	  plotsi <- ggplot(plotData, aes(x=time)) +
-				geom_line(aes(y= pred, color=roleNew), linetype="solid", size=1, na.rm=T) +
+	  plotsi <- ggplot(plotData, aes_string(x="time")) +
+				geom_line(aes_string(y= "pred", color="roleNew"), linetype="solid", size=1, na.rm=T) +
 				scale_color_manual(name="Role", values=c("black","gray47")) +
 				ylab("observed") +
 				ylim(min, max) +

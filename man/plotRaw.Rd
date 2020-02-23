@@ -16,7 +16,7 @@ plotRaw(
 )
 }
 \arguments{
-\item{basedata}{A dataframe.}
+\item{basedata}{A user provided dataframe.}
 
 \item{dyadId}{The name of the column in the dataframe that has the dyad-level identifier.}
 
