@@ -141,7 +141,7 @@ Finally, if the number of profiles you have chosen provides a good representatio
 plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 2, dist0name="men", 
                   dist1name="women", plot_obs_name="Dial")
 ```
-![](P1rawCLO.png) ![](P2rawCLO.png)
+![](p1rawCLO.png) ![](p2rawCLO.png)
 
 ### Predicting the System Variable From the Profiles 
 
