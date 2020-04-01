@@ -11,7 +11,10 @@ inspectProfiles(
   n_profiles,
   dist0name = NULL,
   dist1name = NULL,
+  plot_obs_name = NULL,
   minMax = NULL,
+  time_length = NULL,
+  numPlots = NULL,
   seed = NULL
 )
 }
@@ -28,9 +31,15 @@ inspectProfiles(
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
 
+\item{plot_obs_name}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
+
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
 
-\item{seed}{An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the number of plots produced is set to one for each profile.}
+\item{time_length}{An optional value specifying how many time points to plot across. Default is the 75th percentile for the time variable.}
+
+\item{numPlots}{Only relevant for the inertCoord model. An optional value controlling how many random examples of each profile are produced. Default is 3.}
+
+\item{seed}{Only relevant for the inertCoord model. An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the "numPlots" can be set to one - otherwise each plot is replicated 3 times.}
 }
 \value{
 The function returns a dataframe called "profileData" that contains the profile classification for each dyad.

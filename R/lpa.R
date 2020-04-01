@@ -14,8 +14,11 @@
 #' @param n_profiles The number of latent profiles.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
+#' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
-#' @param seed An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the number of plots produced is set to one for each profile.
+#' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the time variable.
+#' @param numPlots Only relevant for the inertCoord model. An optional value controlling how many random examples of each profile are produced. Default is 3.
+#' @param seed Only relevant for the inertCoord model. An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the "numPlots" can be set to one - otherwise each plot is replicated 3 times.
 #' 
 #' @return The function returns a dataframe called "profileData" that contains the profile classification for each dyad. 
 
@@ -24,9 +27,25 @@
 
 #' @export
 
-inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, minMax=NULL, seed = NULL)
+inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, plot_obs_name = NULL, minMax=NULL, time_length=NULL, numPlots=NULL, seed = NULL)
 {  
-	profileData <- list() 
+  if(is.null(dist0name)){dist0name <- "dist0"}
+  if(is.null(dist1name)){dist1name <- "dist1"}
+  if(is.null(plot_obs_name)){plot_obs_name <- "observed"}
+  
+  if(is.null(minMax)){
+    min <- min(prepData$obs_deTrend, na.rm=T)
+    max <- max(prepData$obs_deTrend, na.rm=T)
+  } else {
+    min <- stats::quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
+    max <- stats::quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
+  }
+  
+  if(is.null(time_length)){time_length <- as.numeric(stats::quantile(prepData$time, prob=.75))}
+  if(is.null(numPlots)) {numPlots <- 3}
+  if(!is.null(seed)) {seed = seed}
+  
+  profileData <- list() 
 	paramEst <- paramEst[stats::complete.cases(paramEst), ]
    
    if(whichModel == "clo"){
@@ -39,8 +58,6 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
   	    lpa <- Mclust(params, G=n_profiles)
          } else 
         print("Model must be inertCoord or clo") 
-	  
-	  if(! is.null(seed)) {set.seed = seed}
    
    # profileData
    profileData$profile <- factor(lpa$classification)
@@ -66,12 +83,11 @@ inspectProfiles <- function(whichModel, prepData, paramEst, n_profiles, dist0nam
 		geom_line(aes(colour=as.factor(profile))))
 
   if(whichModel=="clo") {
-  cloPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax)
+  cloPlotTraj(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, plot_obs_name=plot_obs_name, minMax=minMax, time_length=time_length)
   } else if (whichModel=="inertCoord"){
-  	  inertCoordPlotTrajInternal(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, minMax=minMax, seed=seed)
+  	  inertCoordPlotTraj(prepData=prepData, paramEst=paramEst, n_profiles=n_profiles, dist0name=dist0name, dist1name=dist1name, plot_obs_name=plot_obs_name, minMax=minMax, time_length=time_length, numPlots=numPlots, seed=seed)
   } else
   print("Model must be inertCoord or clo")
   
   return(profileData)
 }
-
