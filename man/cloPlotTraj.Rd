@@ -26,6 +26,8 @@ cloPlotTraj(
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
 
+\item{plot_obs_name}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
+
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
 
 \item{time_length}{An optional value specifying how many time points to plot across. Default is the 75th percentile for the observed time variable.}

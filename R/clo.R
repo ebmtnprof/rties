@@ -520,17 +520,16 @@ cloResids <- function(derivData, whichModel)
 #' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' @param paramEst A dataframe created by indivClo containing the clo parameter estimates for each dyad.
 #' @param n_profiles The number of latent profiles.
-#' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the observed time variable.
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
+#' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
+#' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the observed time variable.
 #' 
 #' @return The function returns the plots as a list. 
 
 #' @import ggplot2
 #' @export
-
-
 
 cloPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, plot_obs_name = NULL, minMax=NULL, time_length=NULL)
 {    

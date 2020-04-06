@@ -4,7 +4,9 @@
 \name{rties_ExampleData_ExtraVars}
 \alias{rties_ExampleData_ExtraVars}
 \title{Data for demonstrating rties models.}
-\format{An object of class \code{data.frame} with 200 rows and 6 columns.}
+\format{
+An object of class \code{data.frame} with 200 rows and 6 columns.
+}
 \usage{
 rties_ExampleData_ExtraVars
 }

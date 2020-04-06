@@ -1,16 +1,14 @@
 Package: rties
-Title: Tools for Modeling Interpersonal Dynamics
-Version: 4.0.0
-Authors@R: person("Emily", "Butler", email = "emily.a.butler@gmail.com", role = c("aut", "cre"))
+Title: Modeling Interpersonal Dynamics
+Version: 4.1.0
+Authors@R: c(person("Emily", "Butler", email = "emily.a.butler@gmail.com", role = c("aut", "cre")), person("Steven Boker", role="ctb"))
 Maintainer: Emily Butler <emily.a.butler@gmail.com>
 Description: The name of this package grew out of our research on temporal interpersonal emotion systems (TIES), hence "rties". It provides tools for using a set of models to investigate temporal processes in bivariate (e.g., dyadic) systems. The general approach is to model, one dyad at a time, the dynamics of a variable that is assessed repeatedly from both partners, extract the parameter estimates for each dyad, and then use those parameter estimates to either predict, or be predicted by, another variable of interest. Currently, 2 models are supported: 1) inertia-coordination, and 2) a coupled-oscillator. The models are currently restricted to distinguishable dyads. Documentation is provided as pdfs in the "documentation" folder (relevant publications) and as vignettes (published as RPubs).
 Depends: R (>= 2.10)
 Imports:
-    car,
     DataCombine,
     DescTools,    
     deSolve,
-    devtools,
     dplyr,  
     ggplot2,
     gridExtra,
@@ -21,13 +19,10 @@ Imports:
     nlme,
     nnet,
     plyr,
-    scales,
-    sjPlot,
-    sjmisc,
     zoo  
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
