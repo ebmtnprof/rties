@@ -3,7 +3,14 @@ Title: Modeling Interpersonal Dynamics
 Version: 4.1.0
 Authors@R: c(person("Emily", "Butler", email = "emily.a.butler@gmail.com", role = c("aut", "cre")), person("Steven Boker", role="ctb"))
 Maintainer: Emily Butler <emily.a.butler@gmail.com>
-Description: The name of this package grew out of our research on temporal interpersonal emotion systems (TIES), hence 'rties'. It provides tools for using a set of models to investigate temporal processes in bivariate (e.g., dyadic) systems. The general approach is to model, one dyad at a time, the dynamics of a variable that is assessed repeatedly from both partners, extract the parameter estimates for each dyad, and then use those parameter estimates as input to a latent profile analysis to extract groups of dyads with qualitatively distinct dynamics. Finally, the profile memberships can be used to either predict, or be predicted by, another variable of interest. Currently, 2 models are supported: 1) inertia-coordination, and 2) a coupled-oscillator. Extended documentation is provided in vignettes. Butler (2011)<DOI: 10.1177/1088868311411164>
+Description: The name of this package grew out of our research on temporal interpersonal emotion systems (TIES), hence 'rties'. 
+    It provides tools for using a set of models to investigate temporal processes in bivariate (e.g., dyadic) systems. 
+    The general approach is to model, one dyad at a time, the dynamics of a variable that is assessed repeatedly from both partners, 
+    extract the parameter estimates for each dyad, and then use those parameter estimates as input to a latent profile analysis 
+    to extract groups of dyads with qualitatively distinct dynamics. Finally, the profile memberships can be used to either predict, 
+    or be predicted by, another variable of interest. Currently, 2 models are supported: 1) inertia-coordination, and 2) a coupled-oscillator. 
+    Extended documentation is provided in vignettes. Theoretical background can be found in Butler (2011) <doi: 10.1177/1088868311411164> 
+    and Butler & Barnard (2019) <doi: 10.1097/PSY.0000000000000703>
 Depends: R (>= 2.10)
 Imports:
     DataCombine,
