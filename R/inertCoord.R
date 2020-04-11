@@ -41,11 +41,13 @@ acp <- function(basedata, personId, dyadId, obs_name, time_name)
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
-  graphics::par(mfrow=c(2,2))
+  opar <- par(no.readonly =TRUE) 
+  on.exit(par(opar))
+  
+   graphics::par(mfrow=c(2,2))
   for(j in 1:length(newDiD)){
   graphics::plot(acf[[j]], main=paste("AutoCorr_Dyad", plotTitle[j], sep="_"))
   }
-  graphics::par(mfrow=c(1,1))
   return(acf)
 }
 
@@ -89,11 +91,13 @@ ccp <- function(basedata, personId, dyadId, obs_name, time_name)
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
+  opar <- par(no.readonly =TRUE) 
+  on.exit(par(opar))
+  
   graphics::par(mfrow=c(2,2))
   for(j in 1:length(newDiD)){
     graphics::plot(ccf[[j]], main=paste("CrossCorr_Dyad", plotTitle[j], sep="_"))
   }
-  graphics::par(mfrow=c(1,1))
   return(ccf)
 }
 

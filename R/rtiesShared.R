@@ -58,7 +58,7 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 	if (length(notEqual) > 0){
 	  print(notEqual)
 	  stop("the partners in these dyads have unequal number of observations")
-      rm(notEqual, envir = .GlobalEnv)
+      notEqual <- NULL
 	}
 	    
   # center each person's data around their own regression line
@@ -378,12 +378,14 @@ histAll <- function(basedata)
 {
   nums <- sapply(basedata, is.numeric)
   numdata <- basedata[ ,nums]
+  
+  opar <- par(no.readonly =TRUE) 
+  on.exit(par(opar))
 
   graphics::par(mfrow=c(2,2))
   for(i in 1:length(numdata)){
 	graphics::hist(numdata[,i], main=NULL, xlab=names(numdata[i]))
   }
-  graphics::par(mfrow=c(1,1))
 }
 
 ############### plotRaw
@@ -416,7 +418,7 @@ plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
   if(is.null(plot_obs_name)){plot_obs_name <- "obs"}
- 
+  
   dist <- NULL
   lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=plot_obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
 }

@@ -12,8 +12,7 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-knitr::opts_knit$set(global.par=TRUE)
+  comment = "#>"
 )
 ```
 
@@ -43,10 +42,7 @@ The situation is more complicated when the system variable is assessed at the in
 
 One complexity in using the Inertia-Coordination model is that the results are highly dependent upon the chosen lag length (for discussion of a similar issue when choosing the measurement interval see Boker & Nesselroade, 2002). This dependence on the lag makes interpretation problematic unless one has a strong theory about the temporal processes at work. At a minimum, it is a good idea to inspect the auto-correlation (relevant to inertia) and cross-correlation (relevant to coordination) plots for the observed state variables. If the state variables are oscillating at all, the auto- and cross- correlations will also oscillate depending on lag. For example, the correlations can vary from negative, to zero, to positive depending on the lag. To facilitate making an informed decision about lag length, _rties_ provides functions to produce auto- and cross- correlation plots. Here we plot a chosen subset of dyads to show the strong impact that is sometimes found due to lag, especially for cross-correlation. 
 
-```{r, include=FALSE}
-par(mar=c(1,1,1,1))
-```
-```{r}
+```{r, fig.height=5, fig.width=5}
 temp <- subset(data1, couple %in% c(2,5,27,31,47,60,103,110))
 autoCorPlots(basedata=temp, dyadId="couple", personId="person", obs_name="dial", time_name="time")
 crossCorPlots(basedata=temp, dyadId="couple", personId="person", obs_name="dial", time_name= "time")
