@@ -10,7 +10,8 @@ plotDataByProfile(
   n_profiles,
   dist0name = NULL,
   dist1name = NULL,
-  plot_obs_name = NULL
+  plot_obs_name = NULL,
+  printPlots = T
 )
 }
 \arguments{
@@ -25,6 +26,11 @@ plotDataByProfile(
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.}
 
 \item{plot_obs_name}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
+
+\item{printPlots}{If true (the default) plots are displayed on the screen.}
+}
+\value{
+A list of plots.
 }
 \description{
 Plots of de-trended observed variable over time, with dyads separated into groups based on LPA profile membership.

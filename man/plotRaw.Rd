@@ -12,7 +12,8 @@ plotRaw(
   time_name,
   dist0name = NULL,
   dist1name = NULL,
-  plot_obs_name = NULL
+  plot_obs_name = NULL,
+  printPlots = T
 )
 }
 \arguments{
@@ -31,6 +32,11 @@ plotRaw(
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").}
 
 \item{plot_obs_name}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
+
+\item{printPlots}{If true (the default) plots are displayed on the screen.}
+}
+\value{
+A list of plots.
 }
 \description{
 Produces plots of the observed variable for each dyad over time to check for data errors, etc.

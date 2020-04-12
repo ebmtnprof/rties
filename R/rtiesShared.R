@@ -402,10 +402,13 @@ histAll <- function(basedata)
 #' @param dist0name An optional name for the level-0 of the distinguishing variable to appear on plots (e.g., "Women").
 #' @param dist1name An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").
 #' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
+#' @param printPlots If true (the default) plots are displayed on the screen.
+
+#' @return A list of plots.
 
 #' @export
 
-plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=NULL, dist1name=NULL, plot_obs_name=NULL) 
+plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=NULL, dist1name=NULL, plot_obs_name=NULL, printPlots=T) 
 {
   basedata <- basedata[ ,c(dyadId, obs_name, dist_name, time_name) ]
   names(basedata) <- c("dyad", "obs", "dist", "time")
@@ -420,7 +423,11 @@ plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=
   if(is.null(plot_obs_name)){plot_obs_name <- "obs"}
   
   dist <- NULL
-  lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=plot_obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
+  plots <- lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=plot_obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
+  
+  if(printPlots==T){print(plots)}
+  
+  return(plots)
 }
 
 ################ plotDataByProfile
@@ -433,10 +440,13 @@ plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
 #' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
+#' @param printPlots If true (the default) plots are displayed on the screen.
+
+#' @return A list of plots.
 
 #' @export
 
-plotDataByProfile <- function(prepData, fullData, n_profiles, dist0name=NULL, dist1name=NULL, plot_obs_name=NULL){
+plotDataByProfile <- function(prepData, fullData, n_profiles, dist0name=NULL, dist1name=NULL, plot_obs_name=NULL, printPlots=T){
 
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
@@ -450,11 +460,15 @@ plotDataByProfile <- function(prepData, fullData, n_profiles, dist0name=NULL, di
     dist0 <- NULL
     temp3 <- plyr::join(temp1, temp2)
 
+    plots <- list()
     for(i in 1:n_profiles){
       tempi <- temp3[ which(temp3$profile == i), ]
       label <- paste("Profile", i, sep="-")   
-      print(lattice::xyplot(obs_deTrend ~ time|as.factor(dyad), data = tempi, group=dist0, type=c("l"), ylab=plot_obs_name, main=label, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")), as.table=T, layout = c(3,3)))
-
-    }
+      plots[[i]] <- lattice::xyplot(obs_deTrend ~ time|as.factor(dyad), data = tempi, group=dist0, type=c("l"), ylab=plot_obs_name, main=label, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")), as.table=T, layout = c(3,3))
+      }
+      
+    if(printPlots==T){print(plots)}
+    
+    return(plots)
 }
 
