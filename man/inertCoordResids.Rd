@@ -4,15 +4,17 @@
 \alias{inertCoordResids}
 \title{Produces histograms of the residuals from the inertia-coordination model for each dyad.}
 \usage{
-inertCoordResids(prepData, whichModel)
+inertCoordResids(prepData, whichModel, printPlots = T)
 }
 \arguments{
 \item{prepData}{A dataframe that was produced with the "dataPrep" function.}
 
 \item{whichModel}{Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").}
+
+\item{printPlots}{If true (the default) plots are displayed on the screen.}
 }
 \value{
-The function returns histograms of the residuals from the model for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertResid.pdf", or "coordResid.pdf" or "inertCoordResid.pdf"
+A list with the histograms of the residuals for each dyad.
 }
 \description{
 Produces histograms of the residuals from the inertia-coordination model for each dyad.

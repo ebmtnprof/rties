@@ -20,7 +20,7 @@
 #' @param numPlots Only relevant for the inertCoord model. An optional value controlling how many random examples of each profile are produced. Default is 3.
 #' @param seed Only relevant for the inertCoord model. An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the "numPlots" can be set to one - otherwise each plot is replicated 3 times.
 #' 
-#' @return The function returns a dataframe called "profileData" that contains the profile classification for each dyad. 
+#' @return A dataframe called "profileData" that contains the profile classification for each dyad. 
 
 #' @import ggplot2
 #' @import mclust

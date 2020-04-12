@@ -218,13 +218,14 @@ indivInertCoordCompare <- function(prepData)
 #' @param dist1name An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").
 #' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
+#' @param printPlots If true (the default) plots are displayed on the screen.
 #' 
-#' @return The function returns plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf", or "coordPlots.pdf" or "inertCoordPlots.pdf"
+#' @return A list with the plots of the predicted values against the observed values for each dyad. 
 
 #' @import ggplot2
 #' @export
 
-indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1name = NULL, plot_obs_name = NULL, minMax=NULL)
+indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1name = NULL, plot_obs_name = NULL, minMax=NULL, printPlots=T)
 {
   basedata <- prepData
   
@@ -236,21 +237,18 @@ indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1na
   	stop("the model type must be either inert, coord or inertCoord")
 	} else if (whichModel == "inert"){
 	  model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
-	  plotFileName <- "inertPlots.pdf"
       } else if (whichModel == "coord"){
       	model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
-      	plotFileName <- "coordPlots.pdf"
         } else {
           model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
-          plotFileName <- "inertCoordPlots.pdf"
         }
 
   if(is.null(minMax)){
   	min <- min(basedata$obs_deTrend, na.rm=T)
-	max <- max(basedata$obs_deTrend, na.rm=T)
+	  max <- max(basedata$obs_deTrend, na.rm=T)
   } else {
   	min <- stats::quantile(basedata$obs_deTrend, minMax[1], na.rm=T)
-	max <- stats::quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
+	  max <- stats::quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
   }
 
   newDiD <- unique(factor(basedata$dyad))
@@ -275,9 +273,9 @@ indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1na
 	theme(plot.subtitle=element_text(size=10))			
   }
 	
-  modelPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
-  ggsave(plotFileName, modelPlots)
-  results <- list(plots=plots)
+  if(printPlots==T){print(plots)}
+  
+  return(plots)
 }
 
 #################### inertCoordResids
@@ -286,13 +284,14 @@ indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1na
 #' 
 #' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
+#' @param printPlots If true (the default) plots are displayed on the screen.
 #' 
-#' @return The function returns histograms of the residuals from the model for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertResid.pdf", or "coordResid.pdf" or "inertCoordResid.pdf"
+#' @return A list with the histograms of the residuals for each dyad. 
 
 #' @import ggplot2
 #' @export
 
-inertCoordResids <- function(prepData, whichModel)
+inertCoordResids <- function(prepData, whichModel, printPlots=T)
 {
   basedata <- prepData
   
@@ -300,13 +299,10 @@ inertCoordResids <- function(prepData, whichModel)
   	stop("the model type must be either inert, coord or inertCoord")
 	} else if (whichModel == "inert"){
 	  model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist1:obs_deTrend_Lag)
-	  plotFileName <- "inertResid.pdf"
       } else if (whichModel == "coord"){
       	model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
-      	plotFileName <- "coordResid.pdf"
         } else {
           model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:obs_deTrend_Lag + dist0:p_obs_deTrend_Lag + dist1:obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)
-          plotFileName <- "inertCoordResid.pdf"
         }
 
   newDiD <- unique(factor(basedata$dyad))
@@ -328,11 +324,10 @@ inertCoordResids <- function(prepData, whichModel)
 	theme(plot.subtitle=element_text(size=10))		
   }
 	
-  modelPlots <- suppressMessages(gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3))
-  ggsave(plotFileName, modelPlots)
-  results <- list(plots=plots)
-}
+  if(printPlots==T){print(plots)}
 
+  return(plots)
+}
 
 
 ######################## inertCoordPlotTraj 
@@ -351,14 +346,15 @@ inertCoordResids <- function(prepData, whichModel)
 #' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the time variable.
 #' @param numPlots An optional value controlling how many random examples of each profile are produced. Default is 3.
 #' @param seed An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the "numPlots" can be set to one - otherwise each plot is replicated 3 times.
+#' @param printPlots If true (the default) plots are displayed on the screen.
 #' 
-#' @return The function prints the plots and returns them as a list. 
+#' @return A list with the plots of predicted trajectories for each dyad. 
 
 #' @import ggplot2
 
 #' @export
 
-inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, plot_obs_name = NULL, minMax=NULL, time_length=NULL, numPlots=NULL, seed=NULL)
+inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, plot_obs_name = NULL, minMax=NULL, time_length=NULL, numPlots=NULL, seed=NULL, printPlots=T)
 { 
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
@@ -366,7 +362,7 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
   
   if(is.null(minMax)){
   	min <- min(prepData$obs_deTrend, na.rm=T)
-	max <- max(prepData$obs_deTrend, na.rm=T)
+	  max <- max(prepData$obs_deTrend, na.rm=T)
   } else {
   	min <- stats::quantile(prepData$obs_deTrend, minMax[1], na.rm=T)
 	  max <- stats::quantile(prepData$obs_deTrend, minMax[2],  na.rm=T)
@@ -453,7 +449,9 @@ inertCoordPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, d
     }
     multiPlots[[i]] <- plots
   }
-print(multiPlots)
+ 
+  if(printPlots==T){print(multiPlots)}
+  return(multiPlots)
 }
 
 

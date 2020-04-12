@@ -14,7 +14,8 @@ inertCoordPlotTraj(
   minMax = NULL,
   time_length = NULL,
   numPlots = NULL,
-  seed = NULL
+  seed = NULL,
+  printPlots = T
 )
 }
 \arguments{
@@ -37,9 +38,11 @@ inertCoordPlotTraj(
 \item{numPlots}{An optional value controlling how many random examples of each profile are produced. Default is 3.}
 
 \item{seed}{An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the "numPlots" can be set to one - otherwise each plot is replicated 3 times.}
+
+\item{printPlots}{If true (the default) plots are displayed on the screen.}
 }
 \value{
-The function prints the plots and returns them as a list.
+A list with the plots of predicted trajectories for each dyad.
 }
 \description{
 Produces sets of prototypical example plots of the state variables' predicted temporal trajectories for each latent profile obtained based on the inertia-coordination parameters. The plots are produced by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step.

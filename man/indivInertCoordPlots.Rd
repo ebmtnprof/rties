@@ -10,7 +10,8 @@ indivInertCoordPlots(
   dist0name = NULL,
   dist1name = NULL,
   plot_obs_name = NULL,
-  minMax = NULL
+  minMax = NULL,
+  printPlots = T
 )
 }
 \arguments{
@@ -25,9 +26,11 @@ indivInertCoordPlots(
 \item{plot_obs_name}{An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.}
+
+\item{printPlots}{If true (the default) plots are displayed on the screen.}
 }
 \value{
-The function returns plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf", or "coordPlots.pdf" or "inertCoordPlots.pdf"
+A list with the plots of the predicted values against the observed values for each dyad.
 }
 \description{
 The observed state variables (with linear trends removed) are predicted from one of the 3 versions of the inertia-coordination model (inertia only, "inert"; coordination only, "coord"; full inertia-coordination, "inertCoord") for each dyad individually. The predicted trajectories are plotted overlaid on the observed trajectories.

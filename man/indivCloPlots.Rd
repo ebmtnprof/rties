@@ -11,7 +11,8 @@ indivCloPlots(
   dist0name = NULL,
   dist1name = NULL,
   plot_obs_name = NULL,
-  minMax = NULL
+  minMax = NULL,
+  printPlots = T
 )
 }
 \arguments{
@@ -28,9 +29,11 @@ indivCloPlots(
 \item{plot_obs_name}{An optional name for the observed state variables being plotted (e.g., "Emotional Experience"). Default is observed.}
 
 \item{minMax}{An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. Default is to use the minimum and maximum observed values of the state variables.}
+
+\item{printPlots}{If true (the default) plots are displayed on the screen.}
 }
 \value{
-The function returns plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf", or "coordPlots.pdf" or "inertCoordPlots.pdf"
+A list plots of the predicted values against the observed values for each dyad.
 }
 \description{
 The observed and CLO-model predicted state variables (with linear trends removed) are plotted for each dyad individually.

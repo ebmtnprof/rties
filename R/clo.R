@@ -353,13 +353,14 @@ indivCloCompare <- function(derivData)
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
 #' @param plot_obs_name An optional name for the observed state variables being plotted (e.g., "Emotional Experience"). Default is observed.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. Default is to use the minimum and maximum observed values of the state variables.
+#' @param printPlots If true (the default) plots are displayed on the screen.
 #' 
-#' @return The function returns plots of the predicted values against the observed values for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "inertPlots.pdf", or "coordPlots.pdf" or "inertCoordPlots.pdf"
+#' @return A list plots of the predicted values against the observed values for each dyad.
 
 #' @import ggplot2
 #' @export
 
-indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, dist1name=NULL, plot_obs_name=NULL, minMax=NULL)
+indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, dist1name=NULL, plot_obs_name=NULL, minMax=NULL, printPlots=T)
 {
   basedata <- derivData
   
@@ -368,6 +369,14 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
   if(is.null(plot_obs_name)){plot_obs_name <- "observed"}
+  
+  if(is.null(minMax)){
+    min <- min(basedata$obs_deTrend, na.rm=T)
+    max <- max(basedata$obs_deTrend, na.rm=T)
+  } else {
+    min <- stats::quantile(basedata$obs_deTrend, minMax[1], na.rm=T)
+    max <- stats::quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
+  }
   
   if(whichModel != "uncoupled" & whichModel != "coupled") {
   	stop("the model type must be either uncoupled or coupled")
@@ -380,7 +389,6 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
 	  d1_1 <- param[4]
 	  paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "obs_1"=obs_1, "d1_1"=d1_1)
 	  paramNames <- c("obs_0","d1_0","obs_1","d1_1","dyad")
-	  plotFileName <- "uncoupledCloPlots.pdf"
 	  odeFunction <- cloUncoupledOde
 
       } else if (whichModel == "coupled"){
@@ -395,18 +403,9 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
 		p_d1_1 <- param[8]
 		paramClo <- c("obs_0"= obs_0, "d1_0"= d1_0, "p_obs_0"= p_obs_0, "p_d1_0"=p_d1_0, "obs_1"=obs_1, "d1_1"=d1_1, "p_obs_1"= p_obs_1, "p_d1_1"= p_d1_1)
 		paramNames <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1","dyad")
-		plotFileName <- "coupledCloPlots.pdf"
 		odeFunction <- cloCoupledOde
   }	
    
-  if(is.null(minMax)){
-    min <- min(basedata$obs_deTrend, na.rm=T)
-    max <- max(basedata$obs_deTrend, na.rm=T)
-  } else {
-  	min <- stats::quantile(basedata$obs_deTrend, minMax[1], na.rm=T)
-	max <- stats::quantile(basedata$obs_deTrend, minMax[2],  na.rm=T)
-  }
-
   newDiD <- unique(factor(basedata$dyad))
   basedata <- basedata[stats::complete.cases(basedata), ]
   plots <- list()
@@ -454,10 +453,9 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
 	  theme(plot.title=element_text(size=11)) +
 	  theme(plot.subtitle=element_text(size=10))			
   }
-  		
-  cloPlots <- gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3)
-  ggsave(plotFileName, cloPlots)
-  results <- list(plots=plots)
+  
+  if(printPlots==T){print(plots)}	
+  return(plots)
 }
 
 ###################### cloResids
@@ -466,13 +464,14 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
 #' 
 #' @param derivData A dataframe that was produced with the "estDerivs" function.
 #' @param whichModel Whether the model to be estimated is the uncoupled-oscillator ("uncoupled") or the coupled-oscillator ("coupled").
+#' @param printPlots If true (the default) plots are displayed on the screen.
 #' 
-#' @return The function returns histograms of the residuals from the model for each dyad (called "plots"). The plots are also written to the working directory as a pdf file called "uncoupledResid.pdf", or "coupledResid.pdf" or "inertCoordResid.pdf"
+#' @return A list with the histograms of the residuals for each dyad.
 
 #' @import ggplot2
 #' @export
 
-cloResids <- function(derivData, whichModel)
+cloResids <- function(derivData, whichModel, printPlots=T)
 {
   basedata <- derivData
   
@@ -481,11 +480,9 @@ cloResids <- function(derivData, whichModel)
 	
 	} else if (whichModel == "uncoupled"){
 	  model <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist1:obs_deTrend + dist1:d1 -1)
-	  plotFileName <- "uncoupledResid.pdf"
 
       } else if (whichModel == "coupled"){
       	model <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)
-   		plotFileName <- "coupledResid.pdf"
   }	   
 
   newDiD <- unique(factor(basedata$dyad))
@@ -507,9 +504,8 @@ cloResids <- function(derivData, whichModel)
 	theme(plot.subtitle=element_text(size=10))		
   }
 	
-  modelPlots <- suppressMessages(gridExtra::marrangeGrob(grobs= plots, ncol=2, nrow=3))
-  ggsave(plotFileName, modelPlots)
-  results <- list(plots=plots)
+  if(printPlots==T){print(plots)}
+  return(plots)
 }
 
 
@@ -525,13 +521,14 @@ cloResids <- function(derivData, whichModel)
 #' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the observed time variable.
+#' @param printPlots If true (the default) plots are displayed on the screen.
 #' 
 #' @return The function returns the plots as a list. 
 
 #' @import ggplot2
 #' @export
 
-cloPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, plot_obs_name = NULL, minMax=NULL, time_length=NULL)
+cloPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1name=NULL, plot_obs_name = NULL, minMax=NULL, time_length=NULL, printPlots=T)
 {    
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
@@ -589,7 +586,7 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1nam
 	
 	  plots[[i]] <- plotsi
     }
-  print(plots)
+  if(printPlots==T){print(plots)}
   return(plots) 
 } 
 
