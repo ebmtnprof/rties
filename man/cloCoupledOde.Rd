@@ -13,6 +13,9 @@ cloCoupledOde(t, state, parameters)
 
 \item{parameters}{Another parameter used by the ode and passed by functions calling cloCoupleOde}
 }
+\value{
+A list with the rates of change for each state variable.
+}
 \description{
 Provides the equation for a coupled oscillator model for the differential equation solver (ode) to plot
 }

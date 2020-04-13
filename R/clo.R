@@ -210,6 +210,8 @@ estDerivs <- function(prepData, taus, embeds, delta, idConvention)
 #' @param t A parameter used by the ode and passed by functions calling cloCoupleOde
 #' @param state Another parameter used by the ode and passed by functions calling cloCoupleOde
 #' @param parameters Another parameter used by the ode and passed by functions calling cloCoupleOde
+#' 
+#' @return A list with the rates of change for each state variable.
 
 cloCoupledOde <- function(t, state, parameters)
 {
@@ -229,6 +231,8 @@ cloCoupledOde <- function(t, state, parameters)
 #' @param t A parameter used by the ode and passed by functions calling cloCoupleOde
 #' @param state Another parameter used by the ode and passed by functions calling cloCoupleOde
 #' @param parameters Another parameter used by the ode and passed by functions calling cloCoupleOde
+#' #' 
+#' @return A list with the rates of change for each state variable.
 
 cloUncoupledOde <- function(t, state, parameters)
 {

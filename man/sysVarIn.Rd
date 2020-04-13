@@ -10,8 +10,7 @@ sysVarIn(
   sysVarType,
   n_profiles,
   dist0name = NULL,
-  dist1name = NULL,
-  plot_sysVar_name = NULL
+  dist1name = NULL
 )
 }
 \arguments{
@@ -26,12 +25,10 @@ sysVarIn(
 \item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
 
 \item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
-
-\item{plot_sysVar_name}{An optional name for the system variable being predicted (e.g., "Satisfaction"). Default is sysVar.}
 }
 \value{
-A list of model results and, by default, plots of profile membership against the system variable(s), but these can be turned off by setting printPlots=F.
+A list including the glm or multinom objects containing the full results for each model (called "models").
 }
 \description{
-If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, a couple's shared score is the only predictor of their profile membership (called "sysVar"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base"). The function returns a list of the full model results and produces plots of the probability of profile membership against the system variable(s).
+If there are 2 profiles, then glm binomial regression models are used. If there are more than 2 profiles then multinomial regression is used (from the nnet package). The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, a couple's shared score is the only predictor of their profile membership (called "sysVar"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base"). The function returns a list of the full model results.
 }

@@ -11,7 +11,11 @@ cloUncoupledOde(t, state, parameters)
 
 \item{state}{Another parameter used by the ode and passed by functions calling cloCoupleOde}
 
-\item{parameters}{Another parameter used by the ode and passed by functions calling cloCoupleOde}
+\item{parameters}{Another parameter used by the ode and passed by functions calling cloCoupleOde
+#'}
+}
+\value{
+A list with the rates of change for each state variable.
 }
 \description{
 Provides the equation for an un-coupled oscillator model for the differential equation solver (ode) to plot
