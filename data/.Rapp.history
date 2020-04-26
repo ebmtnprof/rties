@@ -7,3 +7,4 @@ data2$negInfCat <- factor(data2$negInf, labels=c("no","yes"))
 data2$supDAve <- ifelse(data2$supDAve < -1.5, 0, 1)
 setwd("/Users/emily/Documents/Projects/R-TIES/rties/Data")#
 write.csv(data2, "forTesting.csv", row.names=F)
+load("/Users/emily/rties/data/rties_ExampleData_1.rda")

@@ -4,14 +4,7 @@
 \alias{sysVarIn}
 \title{Provides results for predicting couples' latent profile membership from the system variable.}
 \usage{
-sysVarIn(
-  fullData,
-  sysVar_name,
-  sysVarType,
-  n_profiles,
-  dist0name = NULL,
-  dist1name = NULL
-)
+sysVarIn(fullData, sysVar_name, sysVarType, n_profiles)
 }
 \arguments{
 \item{fullData}{A dataframe created by the makeFullData function.}
@@ -21,10 +14,6 @@ sysVarIn(
 \item{sysVarType}{Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores}
 
 \item{n_profiles}{The number of latent profiles.}
-
-\item{dist0name}{An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.}
-
-\item{dist1name}{An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1}
 }
 \value{
 A list including the glm or multinom objects containing the full results for each model (called "models").

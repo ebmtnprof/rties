@@ -1,6 +1,6 @@
 Package: rties
 Title: Modeling Interpersonal Dynamics
-Version: 4.1.0
+Version: 5.0.0
 Authors@R: c(person("Emily", "Butler", email = "emily.a.butler@gmail.com", role = c("aut", "cre")), person("Steven Boker", role="ctb"))
 Maintainer: Emily Butler <emily.a.butler@gmail.com>
 Description: The name of this package grew out of our research on temporal interpersonal 
