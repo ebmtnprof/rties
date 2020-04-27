@@ -7,7 +7,7 @@
 #' @param sysVar_name The name of the variable in the dataframe that contains the system variable.
 #' @param sysVarType Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores
 #' @param n_profiles The number of latent profiles.
-#' @param model The name of the model that is being interpreted (e.g., sysIn$models$sysVarInteract). Only needed when the system variable is "indiv" (e.g., individual scores for each partner)
+#' @param testModel The name of the model that is being interpreted (e.g., sysIn$models$sysVarInteract). Only needed when the system variable is "indiv" (e.g., individual scores for each partner)
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
 #' @param printPlots If true (the default) plots are displayed on the screen.
@@ -17,7 +17,7 @@
 #' @import ggplot2
 #' @export
 
-sysVarInPlots <- function(fullData, sysVar_name, sysVarType, n_profiles, model=NULL, dist0name=NULL, dist1name=NULL, printPlots=T){
+sysVarInPlots <- function(fullData, sysVar_name, sysVarType, n_profiles, testModel=NULL, dist0name=NULL, dist1name=NULL, printPlots=T){
   basedata <- fullData
   basedata <- basedata[complete.cases(basedata), ]
   colnames(basedata)[colnames(basedata)== sysVar_name] <- "sysVar" 	
@@ -42,20 +42,20 @@ sysVarInPlots <- function(fullData, sysVar_name, sysVarType, n_profiles, model=N
     
     if(is.factor(basedata$sysVar0)){
       if(n_profiles == 2){
-        pAll <- indiv2profilesCat(model, sysVar0name, sysVar1name)
+        pAll <- indiv2profilesCat(testModel, sysVar0name, sysVar1name)
        } 
       if(n_profiles == 3){
-        pAll <- indiv3profilesCat(basedata, model, sysVar0name, sysVar1name)
+        pAll <- indiv3profilesCat(basedata, testModel, sysVar0name, sysVar1name)
         }
       if(n_profiles == 4){
-        pAll <- indiv4profilesCat(basedata, model, sysVar0name, sysVar1name)
+        pAll <- indiv4profilesCat(basedata, testModel, sysVar0name, sysVar1name)
       }
     }
       
     if(is.numeric(basedata$sysVar0)){
       
       if(n_profiles == 2){
-        pAll <- indiv2profilesCont(model, sysVar0name, sysVar1name)  
+        pAll <- indiv2profilesCont(testModel, sysVar0name, sysVar1name)  
       }
       
       if(n_profiles > 2){
@@ -66,7 +66,7 @@ sysVarInPlots <- function(fullData, sysVar_name, sysVarType, n_profiles, model=N
       dataTemp<- matrix(c(sysVar0L, sysVar0H, sysVar0L, sysVar0H, sysVar1L, sysVar1L, sysVar1H, sysVar1H), nrow=4, ncol=2)
       dataTemp2 <- data.frame(dataTemp)
       colnames(dataTemp2) <- c("sysVar0", "sysVar1")
-      prob <- data.frame(stats::predict(model, newdata=dataTemp2, type="probs"))
+      prob <- data.frame(stats::predict(testModel, newdata=dataTemp2, type="probs"))
       prob$sysVar0 <- c(1,2,1,2)
       prob$sysVar1 <- c(1,1,2,2)
       prob$sysVar0 <- factor(prob$sysVar0, levels=c(1,2), labels=c("Low", "High"))
@@ -118,15 +118,15 @@ dyadic <- function(basedata, sysVar_name){
 
 #' Produces plots for sysVarIn when sysVar is categorical and there are 2 profiles
 #'
-#' @param model The model object created by sysVarIn for the interaction model (e.g., sysVarInteract)
+#' @param testModel The model object created by sysVarIn for the interaction model (e.g., sysVarInteract)
 #' @param sysVar0name The name created by sysVarInPlots referring to the system variable for partner-0.
 #' @param sysVar1name The name created by sysVarInPlots referring to the system variable for partner-1.
 #' 
 #' @return A plot produced by the interactions package.
 
-indiv2profilesCat <- function(model, sysVar0name, sysVar1name){
+indiv2profilesCat <- function(testModel, sysVar0name, sysVar1name){
   sysVar0 <- sysVar1 <- NULL
-  pAll <- interactions::cat_plot(model, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T)
+  pAll <- interactions::cat_plot(testModel, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T)
   return(pAll)
 } 
 
@@ -134,15 +134,15 @@ indiv2profilesCat <- function(model, sysVar0name, sysVar1name){
 
 #' Produces plots for sysVarIn when sysVar is continuous and there are 2 profiles
 #'
-#' @param model The model object created by sysVarIn for the interaction model (e.g., sysVarInteract)
+#' @param testModel The model object created by sysVarIn for the interaction model (e.g., sysVarInteract)
 #' @param sysVar0name The name created by sysVarInPlots referring to the system variable for partner-0.
 #' @param sysVar1name The name created by sysVarInPlots referring to the system variable for partner-1.
 #' 
 #' @return A plot produced by the interactions package.
 
-indiv2profilesCont <- function(model,sysVar0name, sysVar1name) {
+indiv2profilesCont <- function(testModel,sysVar0name, sysVar1name) {
   sysVar0 <- sysVar1 <- NULL
-  pAll <- interactions::interact_plot(model, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T)
+  pAll <- interactions::interact_plot(testModel, pred=sysVar0, modx=sysVar1, y.label="Prob Profile = 2", x.label=sysVar0name, legend.main=sysVar1name, colors="Greys", interval=T)
   return(pAll)
 }
 
@@ -151,20 +151,20 @@ indiv2profilesCont <- function(model,sysVar0name, sysVar1name) {
 #' Produces plots for sysVarIn when sysVar is categorical and there are 3 profiles
 
 #' @param basedata A dataframe created internally by the "sysVarInPlots" function.
-#' @param model The model object created by sysVarIn for the interaction model (e.g., sysVarInteract)
+#' @param testModel The model object created by sysVarIn for the interaction model (e.g., sysVarInteract)
 #' @param sysVar0name The name created by sysVarInPlots referring to the system variable for partner-0.
 #' @param sysVar1name The name created by sysVarInPlots referring to the system variable for partner-1.
 #' 
 #' @return A list of 3 plots showing the simple slopes for each of the profiles.
 
-indiv3profilesCat <- function(basedata, model, sysVar0name, sysVar1name){
+indiv3profilesCat <- function(basedata, testModel, sysVar0name, sysVar1name){
   sysVar0 <- levels(basedata$sysVar0)
   sysVar1 <- levels(basedata$sysVar1)
   
   temp <- expand.grid(sysVar0, sysVar1)
   colnames(temp) <- c("sysVar0", "sysVar1")
   
-  prob <- stats::predict(model, newdata=temp, "probs")
+  prob <- stats::predict(testModel, newdata=temp, "probs")
   colnames(prob) <- c("P1","P2","P3")
   temp2 <- cbind(prob, temp)
   
@@ -207,20 +207,20 @@ indiv3profilesCat <- function(basedata, model, sysVar0name, sysVar1name){
 #' Produces plots for sysVarIn when sysVar is categorical and there are 4 profiles
 
 #' @param basedata A dataframe created internally by the "sysVarInPlots" function.
-#' @param model The model object created by sysVarIn for the interaction model (e.g., sysVarInteract)
+#' @param testModel The model object created by sysVarIn for the interaction model (e.g., sysVarInteract)
 #' @param sysVar0name The name created by sysVarInPlots referring to the system variable for partner-0.
 #' @param sysVar1name The name created by sysVarInPlots referring to the system variable for partner-1.
 #' 
 #' @return A list of 4 plots showing the simple slopes for each of the profiles.
 
-indiv4profilesCat <- function(basedata, model, sysVar0name, sysVar1name){
+indiv4profilesCat <- function(basedata, testModel, sysVar0name, sysVar1name){
   sysVar0 <- levels(basedata$sysVar0)
   sysVar1 <- levels(basedata$sysVar1)
   
   temp <- expand.grid(sysVar0, sysVar1)
   colnames(temp) <- c("sysVar0", "sysVar1")
   
-  prob <- stats::predict(model, newdata=temp, "probs")
+  prob <- stats::predict(testModel, newdata=temp, "probs")
   colnames(prob) <- c("P1","P2","P3","P4")
   temp2 <- cbind(prob, temp)
   
@@ -356,6 +356,81 @@ indiv4profilesCont <- function(prob, sysVar0name, sysVar1name){
   return(pAll)
 } 
 
+#######################################
+
+############### sysVarOutPlots
+
+#' Produces plots for interpreting the results from sysVarIn.
+#'
+#' @param fullData A dataframe created by the "makeFullData" function.
+#' @param sysVar_name The name of the variable in the dataframe that contains the system variable.
+#' @param sysVarType Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores
+#' @param testModel The name of the model that is being interpreted (e.g., sysIn$models$sysVarInteract). 
+#' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
+#' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
+#' @param binomial Whether the system variable is binomial. Default is false.
+#' 
+#' @return Single plots or a list of plots (depending on the model that is being interpreted).
+
+#' @import ggplot2
+#' @export
+
+sysVarOutPlots <- function(fullData, sysVar_name, sysVarType, testModel, dist0name=NULL, dist1name=NULL, binomial=F){
+  
+  basedata <- fullData
+  basedata <- basedata[complete.cases(basedata), ]
+  if(is.null(dist0name)){dist0name <- "dist0"}
+  if(is.null(dist1name)){dist1name <- "dist1"}
+  colnames(basedata)[colnames(basedata)== sysVar_name] <- "sysVar" 	
+  basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
+  
+  if(binomial==F){
+    if(sysVarType == "dyadic")
+    {
+      resid <- data.frame(resid(testModel))
+      colnames(resid) <- "resid"
+      pAll <- list()
+      
+      pAll[[1]] <- ggplot(resid, aes(x=resid)) +
+        geom_histogram(color="black", fill="grey")
+      
+      pAll[[2]] <- ggplot(basedata, aes(x=profile, y=sysVar)) +
+        geom_boxplot() + 
+        ylab(sysVar_name)
+    }
+    
+    if(sysVarType == "indiv")
+    {
+      resid <- data.frame(resid(testModel))
+      colnames(resid) <- "resid"
+      pAll <- list()
+      
+      pAll[[1]] <- ggplot(resid, aes(x=resid)) +
+        geom_histogram(color="black", fill="grey")
+      
+      temp <- sjPlot::plot_model(testModel, type="pred", terms=c("profile", "dist"), colors="gs", y.label=sysVar_name)
+      pAll[[2]] <- temp + ylab(sysVar_name) 
+    }
+  }
+  
+  if(binomial==T){
+    if(sysVarType == "dyadic")
+    {
+      label <- paste("Proportions", sysVar_name, "= 0 or 1 in each profile", sep=" ")
+      pAll <- ggplot(basedata) +
+        geom_bar(aes(x = profile, y = ..prop.., group = sysVar)) +
+        facet_wrap(~ sysVar) +
+        ylab(label)
+    }
+    
+    if(sysVarType == "indiv")
+    {
+      temp <- sjPlot::plot_model(testModel, type="pred", terms=c("profile", "dist"), colors="gs", y.label=sysVar_name)
+      pAll <- temp + ylab(sysVar_name) 
+    }
+  }
+  return(pAll)
+}
 
 
 
