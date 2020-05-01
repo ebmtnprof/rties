@@ -18,10 +18,10 @@ knitr::opts_chunk$set(
 
 Once you have gone through the steps for estimating dynamic trajectory profiles for one of the models (see "inertia_coordination" and "coupled_oscillator" vignettes), you are ready to use the profiles as either predictors or outcomes of system variables, e.g., any variables of interest that you think are related to your dyadic system, but change slower than the state variables used to represent the dynamics. We show only the basic steps for getting the profile memberships from the inertia-coordination model here (see other vignettes for full procedure).
 
-```{r, results= "hide"}
+```{r}
 library(rties)
-
 data1 <- rties_ExampleData_4
+```
 
 data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag="absMaxCC") 
 
