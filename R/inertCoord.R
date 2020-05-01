@@ -11,6 +11,8 @@
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
+#' 
+#' @return Prints the plots to the screen.
 
 #' @export
 
@@ -60,6 +62,8 @@ acp <- function(basedata, personId, dyadId, obs_name, time_name)
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
+#' #' 
+#' @return Prints the plots to the screen.
 
 #' @export
 

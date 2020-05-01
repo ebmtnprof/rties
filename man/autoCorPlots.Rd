@@ -17,6 +17,9 @@ autoCorPlots(basedata, dyadId, personId, obs_name, time_name)
 
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 }
+\value{
+Prints the plots to the screen.
+}
 \description{
 Produces auto-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
 }
