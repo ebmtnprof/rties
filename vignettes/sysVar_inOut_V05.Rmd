@@ -20,7 +20,7 @@ Once you have gone through the steps for estimating dynamic trajectory profiles 
 
 ```{r}
 library(rties)
-data1 <- rties_ExampleData_4
+data1 <- rties_ExampleData_3
 ```
 
 data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag="absMaxCC") 

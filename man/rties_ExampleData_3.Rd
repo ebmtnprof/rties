@@ -5,7 +5,7 @@
 \alias{rties_ExampleData_3}
 \title{Data for demonstrating rties models.}
 \format{
-An object of class \code{data.frame} with 10046 rows and 9 columns.
+An object of class \code{data.frame} with 78858 rows and 19 columns.
 }
 \usage{
 rties_ExampleData_3
