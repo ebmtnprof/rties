@@ -247,7 +247,7 @@ actorPartnerDataCross <- function(basedata, dyadId, personId){
 #' @param personId The name of the variable indicating peron ID.
 #' @examples
 #' data <- rties_ExampleDataShort
-#' newData <- actorPartnerDataTime(basedata=newData1, dyadId="couple", personId="couple")
+#' newData <- actorPartnerDataTime(basedata=newData, dyadId="couple", personId="couple")
 #' head(newData)
 #'
 #' @return A dataframe in actor-partner format.
