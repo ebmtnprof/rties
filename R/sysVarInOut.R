@@ -32,7 +32,7 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 	
   basedata$dist1 <- ifelse(basedata$dist0 == 1, 0, 1)
   basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
-  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- basedata[stats::complete.cases(basedata), ]
 	
   if (sysVarType == "dyadic"){	
 	  basedata <- basedata[!duplicated(basedata$dyad), ]
@@ -96,7 +96,7 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles){
   if(sysVarType != "indiv" & sysVarType != "dyadic") {stop("the sysVarType must be either indiv or dyadic")}
 
   colnames(basedata)[colnames(basedata)== sysVar_name] <- "sysVar" 	
-  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- basedata[stats::complete.cases(basedata), ]
 
   if(sysVarType == "dyadic"){
     
@@ -159,19 +159,19 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles){
 sysVarInResults <- function(baseModel, testModel, n_profiles){
   
   if(n_profiles == 2){
-    modelCompare <- anova(baseModel, testModel, test="LRT")
+    modelCompare <- stats::anova(baseModel, testModel, test="LRT")
     paramEst <- summary(testModel)
-    oddsRatio <- exp(coef(testModel))
+    oddsRatio <- exp(stats::coef(testModel))
     results <- list(modelCompare=modelCompare, paramEst=paramEst, oddsRatio=oddsRatio)
   }
   
   if(n_profiles > 2){
-    modelCompare <- anova(baseModel, testModel, test="Chisq")
+    modelCompare <- stats::anova(baseModel, testModel, test="Chisq")
     paramEst <- summary(testModel)
     z <- summary(testModel)$coefficients/summary(testModel)$standard.errors
-    p <- (1 - pnorm(abs(z), 0, 1)) * 2
+    p <- (1 - stats::pnorm(abs(z), 0, 1)) * 2
     p <- round(p, 3)
-    oddsRatio <- exp(coef(testModel))
+    oddsRatio <- exp(stats::coef(testModel))
     results <- list(modelCompare=modelCompare, paramEst=paramEst, p=p, oddsRatio=oddsRatio)
   }
   return(results)
@@ -191,12 +191,12 @@ sysVarInResults <- function(baseModel, testModel, n_profiles){
 sysVarOutResults <- function(baseModel, testModel, Gaussian=TRUE){
   
   if(Gaussian == T){
-    modelCompare <- anova(baseModel, testModel)
-    omnibus <- anova(testModel)
+    modelCompare <- stats::anova(baseModel, testModel)
+    omnibus <- stats::anova(testModel)
     paramEst <- summary(testModel)
     results <- list(modelCompare=modelCompare, omnibus=omnibus, paramEst=paramEst)
   } else {
-    modelCompare <- anova(baseModel, testModel, test="LRT")
+    modelCompare <- stats::anova(baseModel, testModel, test="LRT")
     paramEst <- summary(testModel)
     oddsRatio <- exp(summary(testModel)$coefficients[ ,1])
     results <- list(modelCompare=modelCompare, paramEst=paramEst, oddsRatio=oddsRatio)

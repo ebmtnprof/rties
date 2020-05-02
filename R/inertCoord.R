@@ -43,8 +43,8 @@ acp <- function(basedata, personId, dyadId, obs_name, time_name)
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
-  opar <- par(no.readonly =TRUE) 
-  on.exit(par(opar))
+  opar <- graphics::par(no.readonly =TRUE) 
+  on.exit(graphics::par(opar))
   
    graphics::par(mfrow=c(2,2))
   for(j in 1:length(newDiD)){
@@ -95,8 +95,8 @@ ccp <- function(basedata, personId, dyadId, obs_name, time_name)
     plotTitle[[i]] <- as.character(unique(datai$dyad))
   }  
   
-  opar <- par(no.readonly =TRUE) 
-  on.exit(par(opar))
+  opar <- graphics::par(no.readonly =TRUE) 
+  on.exit(graphics::par(opar))
   
   graphics::par(mfrow=c(2,2))
   for(j in 1:length(newDiD)){

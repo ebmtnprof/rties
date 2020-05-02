@@ -379,8 +379,8 @@ histAll <- function(basedata)
   nums <- sapply(basedata, is.numeric)
   numdata <- basedata[ ,nums]
   
-  opar <- par(no.readonly =TRUE) 
-  on.exit(par(opar))
+  opar <- graphics::par(no.readonly =TRUE) 
+  on.exit(graphics::par(opar))
 
   graphics::par(mfrow=c(2,2))
   for(i in 1:length(numdata)){

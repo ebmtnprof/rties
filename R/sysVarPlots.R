@@ -19,7 +19,7 @@
 
 sysVarInPlots <- function(fullData, sysVar_name, sysVarType, n_profiles, testModel=NULL, dist0name=NULL, dist1name=NULL, printPlots=T){
   basedata <- fullData
-  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- basedata[stats::complete.cases(basedata), ]
   colnames(basedata)[colnames(basedata)== sysVar_name] <- "sysVar" 	
   if(n_profiles > 4) {message("plots are not provided if there are more than 4 profiles") }
   
@@ -98,6 +98,8 @@ sysVarInPlots <- function(fullData, sysVar_name, sysVarType, n_profiles, testMod
 
 dyadic <- function(basedata, sysVar_name){
   basedata <- basedata[!duplicated(basedata$dyad), ]	
+  
+  sysVar <- ..prop.. <- profile <- profileN <- NULL
   
   if(is.factor(basedata$sysVar)){
     pAll <- ggplot(basedata) +
@@ -378,11 +380,13 @@ indiv4profilesCont <- function(prob, sysVar0name, sysVar1name){
 sysVarOutPlots <- function(fullData, sysVar_name, sysVarType, testModel, dist0name=NULL, dist1name=NULL, binomial=F){
   
   basedata <- fullData
-  basedata <- basedata[complete.cases(basedata), ]
+  basedata <- basedata[stats::complete.cases(basedata), ]
   if(is.null(dist0name)){dist0name <- "dist0"}
   if(is.null(dist1name)){dist1name <- "dist1"}
   colnames(basedata)[colnames(basedata)== sysVar_name] <- "sysVar" 	
   basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
+  
+  profile <- sysVar <- ..prop.. <- NULL
   
   if(binomial==F){
     if(sysVarType == "dyadic")
