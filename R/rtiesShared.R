@@ -109,6 +109,11 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param dist_name The name of the column in the dataframe that holds the variable to use for distinguishing the partners. For example, if "influence" was the variable, for each dyad the partner scoring lower on "influence" would be given a score of 0 on "dist" and the partner scoring higher on "influence" would be given a score of 1 on "dist"
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- makeDist(basedata=data, dyadId="couple", personId="person", time_name="time", dist_name="relstress")
+#' summary(newData$dist)
+
 
 #' @return The function returns the original dataframe with an additional variable, called "dist" that distinguishes between partners based on the user-specified variable indicated by "dist_name"
 
@@ -176,6 +181,10 @@ robustScale <- function(basedata){
 #' @param basedata A user provided dataframe.
 #' @param dyads A vector of dyad IDs to remove.
 #' @param dyadId The variable in the dataframe specifying dyad ID.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' dyads <- c(3, 12)
+#' newData <- removeDyads(basedata=data, dyads=dyads, dyadId="couple")
 #'
 #' @return A dataframe with the data for the specified dyads removed.
 
@@ -197,6 +206,11 @@ removeDyads <- function (basedata, dyads, dyadId){
 #' @param basedata A dataframe with cross-sectional dyadic data.
 #' @param dyadId The name of variable indicating dyad ID.
 #' @param personId The name of the variable indicating peron ID.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData1 <- data[data$time==1, ] # make a cross-sectional dataframe
+#' newData2 <- actorPartnerDataCross(basedata=newData1, dyadId="couple", personId="couple")
+#' head(newData2)
 #'
 #' @return A dataframe in actor-partner format.
 

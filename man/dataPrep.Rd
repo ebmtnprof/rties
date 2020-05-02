@@ -47,7 +47,8 @@ The dataframe must be in a specific format and include several specific variable
 }
 \examples{
 data <- rties_ExampleDataShort
-newData <- dataPrep(basedata=data, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", obs_name="dial", 
+dist_name="female", time_name="time", time_lag=2)
 head(newData) 
  
 }
