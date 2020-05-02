@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 Once you have gone through the steps for estimating dynamic trajectory profiles for one of the models (see "inertia_coordination" and "coupled_oscillator" vignettes), you are ready to use the profiles as either predictors or outcomes of system variables, e.g., any variables of interest that you think are related to your dyadic system, but change slower than the state variables used to represent the dynamics. We show only the basic steps for getting the profile memberships from the inertia-coordination model here (see other vignettes for full procedure).
 
-```{r}
+```{r, fig.show="hide", results="hide"}
 library(rties)
 data1 <- rties_ExampleData_4
 
@@ -37,66 +37,54 @@ The "sysVarOut" function uses the profile memberships to predict system variable
 
 For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). Similarly, for non-normal system variables, the function returns a list of the glm or glmer objects containing the full results for the models.
 
-We start with an example of a normally distributed dyadic system variable, "dyadSup", which was the average self-report for each couple of their emotion suppression during a conversation.
+We start with an example of a normally (or at least close enough to normally) distributed dyadic system variable, "dyadInfluence", which was the average self-report for each couple of their attempts to influence each other during a conversation. We first run the "sysVarOut" function and then use the "sysVarOutResults" function to produce a set of results from the model. Since this is a dyadic system variable, the only model is the main effect of profile and we compare it to the base model. The results include a Likelihood Ratio test (LRT) of the overall model fit compared to the null (base) model, an omnibus anova table (which is identical to the LRT for a dyadic system variable), and the parameter estimates. In this example, we see there is no effect of profile on influence attempts.
 
 ```{r}
-sysOut <- sysVarOut(fullData=fullData, sysVar_name="dyadSup", sysVarType="dyadic", dist0name="Men", dist1name="Women")
+sysOut <- sysVarOut(fullData=fullData, sysVar_name="dyadInfluence", sysVarType="dyadic", dist0name="Men", dist1name="Women")
+sysVarOutResults(sysOut$models$base, sysOut$models$profile)
+```
+
+We can also use the "sysVarOutPlots" function to produce a histogram of the residuals from the model and a boxplot of the system variable for each profile.
+```{r, fig.width=5}
+sysVarOutPlots(fullData=fullData, sysVar_name="dyadSup", sysVarType="dyadic", testModel=sysOut$models$profile, dist0name=NULL, dist1name=NULL)
+```
+
+As a second example, we consider a binomial individual level system variable, "ambivB" which was a self-report of ambivalence about the relationship, answered yes vs. no. Since this is an individual system variable, three models are now estimated: 1) main effect of profile, 2) main effects of profile and the distinguishing variable, and 2) the interaction of profile by the distinguishing variable. We call "sysVarOutResults" three times, once for each model, again comparing each to the base model. The results contain the same information as described for the previous example, but since this a logistic model (due to the binomial system variable) the odds ratios obtained by exponentiating the parameter estimates are also provided. As in the previous example, we find no evidence of any effect of profiles or the distinguishing variable on ambivalence.
+
+```{r}
+sysOut <- sysVarOut(fullData=fullData, sysVar_name="ambivB", sysVarType="indiv", dist0name="Men", dist1name="Women", family="binomial")
+sysVarOutResults(sysOut$models$base, sysOut$models$profile, Gaussian=F)
+sysVarOutResults(sysOut$models$base, sysOut$models$profilePlusDist, Gaussian=F)
+sysVarOutResults(sysOut$models$base, sysOut$models$profileByDist, Gaussian=F)
+```
+
+We can again use the "sysVarOutPlots" function, this time with "binomial=TRUE", to produce a plot of the predicted probabilities of the system variable for each profile.
+```{r, fig.width=5}
+sysVarOutPlots(fullData=fullData, sysVar_name="ambivB", sysVarType="indiv", testModel=sysOut$models$profileByDist, dist0name=NULL, dist1name=NULL, binomial=T)
 ```
 
 ### Predicting Profile Membership From the System Variable
 
-Finally, you can turn the direction of prediction around and use the system variable to predict couples' profile membership. The function "sysVarIn" accomplishes this. It takes as arguments the name of the dataframe containing the profile membership scores combined with your original dataframe (created by the "makeFullData" function), the name of the column in the dataframe containing the variable you would like to use as the system variable, whether the system variable is "dyadic" or "individual", the number of profiles, and optional names to use in the plots for the levels of the distinguisher and the system variable. If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. For dyadic system variables, a couple's shared score is the only predictor of their profile membership (the model is called "sysVarMain"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base").
+The "sysVarIn" function turns the direction of prediction around and uses the system variable to predict couples' profile memberships. It takes as arguments the name of the dataframe containing the profile membership scores combined with your original dataframe (created by the "makeFullData" function), the name of the column in the dataframe containing the variable you would like to use as the system variable, whether the system variable is "dyadic" or "individual", and the number of profiles. If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. For dyadic system variables, a couple's shared score is the only predictor of their profile membership (the model is called "sysVarMain"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base"). The function returns a list of the model objects and result summaries can be obtained with the "sysVarInResults" function. The results include a Chisquare Deviance test (ChiSq) of the overall model fit compared to the null (base) model, the parameter estimates and odds ratios obtained by exponentiating the parameter estimates.  
 
-The function returns a list of the full model results and produces plots of profile membership against the system variable(s). Due to these being either logistic or multinomial models, interpretation is somewhat more complicated than for the sysVarOut results. In this example, it is a multinomial model since we used 3 profiles. To aid intrepretation, we exponentiate the coefficients from the sysVarInteract model to get odds ratios and then calculate p-values for them. The results show evidence of an interaction effect, such that male and female self-satisfaction with physique predict membership in Profile 3 differently than they do for Profile 1. The accompanying plots show that Profile 1 is most likely when both partners are low on selfsatPhys, while Profile 3 is most likely for couples where the woman is high on selfsatPhys ane the male is low.
-```{r, fig.width=5, fig.height=5}
-sysIn <- sysVarIn(fullData=fullData, sysVar_name="selfsatPhys", sysVarType="indiv", n_profiles=3,
-                  dist0name="men", dist1name="women")
-summary(sysIn$models$sysVarInteract)
-exp(coef(sysIn$models$sysVarInteract))
-z <- summary(sysIn$models$sysVarInteract)$coefficients/summary(sysIn$models$sysVarInteract)$standard.errors
-p <- (1 - pnorm(abs(z), 0, 1)) * 2
-round(p, 3)
+We first consider a dyadic system variable and again find no evidence for it predicting the profiles.
+```{r}
+sysIn <- sysVarIn(fullData=fullData, sysVar_name="dyadInfluence", n_profiles=2, sysVarType="dyadic")
+sysVarInResults(sysIn$models$base, sysIn$models$sysVarMain, n_profiles=2)
+```
+We can also use the "sysVarInPlots" function to produce a plot of profile membership at observed values of the system variable.
+```{r, fig.width=5}
+inPlots <- sysVarInPlots(fullData=fullData, sysVar_name="dyadInfluence", sysVarType="dyadic", n_profiles=2)
 ```
 
-### Predicting the System Variable From the Profiles 
-
-The next step in the analysis is to use each dyad's profile membership to predict the system variable using the "sysVarOut" function. The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). It takes as arguments the name of the dataframe containing the profile membership scores combined with your original dataframe (created by the "makeFullData" function), the name of the column in the dataframe containing the variable you would like to use as the system variable, and whether the system variable is "dyadic" or "individual". For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership ("profile"), 2) main effects of profile membership and the distinguishing variable ("profilePlusDist"), and 3) the interaction of profile membership and the distinguishing variable ("profileByDist"). If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution (use ?sysVarOut for more information).
-
-For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). These results can be inspected using the usual "summary" function and the models can be compared using the "anova" function. Similarly, for non-normal system variables, the function returns a list of the glm or glmmPQL objects containing the full results for the models. For normally distributed variables, the function also displays a boxplot of the system variable for each profile, histograms of the residuals and plots of the predicted values against observed values for each model. In this example, we predict a binary variable that indicates whether a person scored high or low on a self-reported relationship ambivalence scale. The results show a main effect of profile, such that couples in Profile 2 are more likely to report high ambivalence. To aid in interpretation, since this is a logistic regression, we can use the sjPlot and sjmisc packages to produce a plot of the predicted probabilities of high ambivalence for men and women in each profile.
-```{r, fig.width=4}
-sysOut <- sysVarOut(fullData=fullData, sysVar_name="ambivB", sysVarType="indiv", dist0name="Men",
-                    dist1name="Women", family="binomial")
-summary(sysOut$models$profileByDist)
-summary(sysOut$models$profilePlusDist)
-summary(sysOut$models$profile)
-
-library(sjPlot)
-library(sjmisc)
-plot_model(sysOut$models$profileByDist, type="pred", terms=c("profile", "dist"))
+Next we consider a categorical individual level system variable. Because it is at the individual level, there are two models estimated, one for the main effects of each partner's system variable and one for their interaction, so we use the "sysVarInResults" function twice, once for each model. We still see no evidence of any effects.
+```{r}
+sysIn <- sysVarIn(fullData=fullData, sysVar_name="conflictCat", n_profiles=2, sysVarType="indiv")
+sysVarInResults(sysIn$models$base, sysIn$models$sysVarMain, n_profiles=2)
+sysVarInResults(sysIn$models$base, sysIn$models$sysVarInteract, n_profiles=2)
 ```
 
-### Predicting Profile Membership From the System Variable
-
-Finally, you can turn the direction of prediction around and use the system variable to predict couples' profile membership. The function "sysVarIn" accomplishes this. It takes as arguments the name of the dataframe containing the profile membership scores combined with your original dataframe (created by the "makeFullData" function), the name of the column in the dataframe containing the variable you would like to use as the system variable, whether the system variable is "dyadic" or "individual", the number of profiles, and optional names to use in the plots for the levels of the distinguisher and the system variable. If there are 2 profiles, then binomial regression models are used. If there are more than 2 profiles then multinomial regression is used. For dyadic system variables, a couple's shared score is the only predictor of their profile membership (the model is called "sysVarMain"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base").
-
-The function returns a list of the full model results and produces plots of profile membership against the system variable(s). Due to these being either logistic or multinomial models, interpretation is somewhat more complicated than for the sysVarOut results. In this example, it is a logistic model since we used 2 profiles and there is no evidence of any effects, although the effect of women's ambivalence on the probability of being in Profile 2 is marginal (p < .07). The plot shows the results, or we can exponentiate the coefficients to obtain odds ratios, which shows that ambivalent women are 2.4 times more likely to be in Profile 2 than Profile 1, compared to non-ambivalent women.
-```{r, fig.width=4}
-sysIn <- sysVarIn(fullData=fullData, sysVar_name="ambiv", sysVarType="indiv", n_profiles=2, 
-                  dist0name="Men", dist1name="Women")
-summary(sysIn$models$sysVarInteract)
-summary(sysIn$models$sysVarMain)
-exp(coef(sysIn$models$sysVarMain))
+Finally, we can produce a plot of the model predicted probabilities of being in each profile for the different combinations of the partner's system variables.
+```{r, fig.width=5}
+inPlots <- sysVarInPlots(fullData=fullData, sysVar_name="conflictCat", sysVarType="indiv", n_profiles=2, testModel= sysIn$models$sysVarInteract, dist0name="men", dist1name="women")
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-

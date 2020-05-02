@@ -18,3 +18,5 @@ overview_data_prep_V05: https://rpubs.com/ebmtnprof/605883
 inertia_coordination_V05: https://rpubs.com/ebmtnprof/605907
 
 coupled_oscillator_V05: https://rpubs.com/ebmtnprof/605924
+
+sysVar_inOut_V05: https://rpubs.com/ebmtnprof/608082
