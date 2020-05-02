@@ -547,51 +547,52 @@ cloPlotTraj <- function(prepData, paramEst, n_profiles, dist0name=NULL, dist1nam
   }
   
   if(is.null(time_length)){time_length <- as.numeric(stats::quantile(prepData$time, prob=.75))}
-    
-    vars1 <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1")
-  	temp1 <- paramEst[vars1]
-    lpa <- mclust::Mclust(temp1, G=n_profiles)
-    profileParams <- as.data.frame(lpa$parameters$mean) 
-
-    plots <- list()
   
-    for(i in 1:n_profiles){
-	  statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
-	  start0 <- stats::median(statedata0$obs_deTrend, na.rm=T)
-  	  statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
-	  start1 <- stats::median(statedata1$obs_deTrend, na.rm=T)
-  	
-	  plotTimes <- seq(1, time_length, by=1)
-
-	  state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
-	  
-	  temp1 <- profileParams[ ,i]
-      names <- rownames(profileParams)
-      names(temp1) <- names
-      paramsi <- temp1
-		  
-	  temp2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
-	  vars2 <- c("y2", "y4")
-	  temp3 <- temp2[ ,!(names(temp2) %in% vars2)]
-	  names(temp3) <- c("time","d0pred","d1pred")
-	  temp4 <- stats::reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
-	   temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
-			
-	  plotData <- temp4[stats::complete.cases(temp3), ]	
-	  profileName <- paste("Profile", i , sep="_")
-				
-	  plotsi <- ggplot(plotData, aes_string(x="time")) +
-				geom_line(aes_string(y="pred", color="roleNew"), linetype="solid", size=1, na.rm=T) +
-				scale_color_manual(name="Role", values=c("black","gray47")) +
-				ylab(plot_obs_name) +
-				ylim(min, max) +
-				labs(title=profileName, subtitle= "Predicted Trajectory") +
-				theme(plot.title=element_text(size=11))
-	
-	  plots[[i]] <- plotsi
-    }
+  prepData <- prepData[stats::complete.cases(prepData), ]	
+  paramEst <- paramEst[stats::complete.cases(paramEst), ]	
+  
+  vars1 <- c("obs_0","d1_0","p_obs_0","p_d1_0","obs_1","d1_1","p_obs_1","p_d1_1")
+  temp1 <- paramEst[vars1]
+  lpa <- mclust::Mclust(temp1, G=n_profiles)
+  profileParams <- as.data.frame(lpa$parameters$mean) 
+  
+  plots <- list()
+  
+  for(i in 1:n_profiles){
+    statedata0 <- prepData[prepData$dist0 == 1 & prepData$time ==1,] 
+    start0 <- stats::median(statedata0$obs_deTrend, na.rm=T)
+    statedata1 <- prepData[prepData$dist0 == 0 & prepData$time ==1,] 
+    start1 <- stats::median(statedata1$obs_deTrend, na.rm=T)
+    
+    plotTimes <- seq(1, time_length, by=1)
+    
+    state <- c("y1"=start0, "y2"=0, "y3"=start1, "y4"=0)
+    
+    temp1 <- profileParams[ ,i]
+    names <- rownames(profileParams)
+    names(temp1) <- names
+    paramsi <- temp1
+    
+    temp2 <- as.data.frame(deSolve::ode(y=state, times=plotTimes, func=cloCoupledOde, parms= paramsi))
+    vars2 <- c("y2", "y4")
+    temp3 <- temp2[ ,!(names(temp2) %in% vars2)]
+    names(temp3) <- c("time","d0pred","d1pred")
+    temp4 <- stats::reshape(temp3, direction='long', varying=c("d0pred","d1pred"), timevar="role", times=c("d0","d1"), v.names=c("pred"), idvar="time")
+    temp4$roleNew <- factor(temp4$role, levels=c("d0","d1"), labels=c(dist0name, dist1name)) 
+    
+    plotData <- temp4[stats::complete.cases(temp4), ]	
+    profileName <- paste("Profile", i , sep="_")
+    
+    plotsi <- ggplot(plotData, aes_string(x="time")) +
+      geom_line(aes_string(y="pred", color="roleNew"), linetype="solid", size=1, na.rm=T) +
+      scale_color_manual(name="Role", values=c("black","gray47")) +
+      ylab(plot_obs_name) +
+      ylim(min, max) +
+      labs(title=profileName, subtitle= "Predicted Trajectory") +
+      theme(plot.title=element_text(size=11))
+    
+    plots[[i]] <- plotsi
+  }
   if(printPlots==T){print(plots)}
   return(plots) 
 } 
-
-
