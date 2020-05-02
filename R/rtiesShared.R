@@ -245,6 +245,10 @@ actorPartnerDataCross <- function(basedata, dyadId, personId){
 #' @param basedata A dataframe with repeated measures dyadic data
 #' @param dyadId The name of variable indicating dyad ID.
 #' @param personId The name of the variable indicating peron ID.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- actorPartnerDataTime(basedata=newData1, dyadId="couple", personId="couple")
+#' head(newData)
 #'
 #' @return A dataframe in actor-partner format.
 
@@ -291,6 +295,8 @@ actorPartnerDataTime <- function(basedata, dyadId, personId){
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #' @param lpaData The object returned by the "inspectProfiles" function
 #' @param params The list called "params" returned by one of the "indiv" functions (e.g., indivInertCoord or indivClo) 
+#' @examples
+#' # See vignettes for examples.
 #'
 #' @return A dataframe that contains all variables needed for using the profiles to predict, or be predicted by, the system variable.
 
@@ -343,6 +349,10 @@ output
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- makeCrossCorr(basedata=data, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+#' head(newData)
 #'
 #' @return A cross-sectional version of the original dataframe with maximal absolute-value cross-correlations and their lags added for each dyad.
 
@@ -391,6 +401,11 @@ makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){
 #' Useful for checking distributions to assess normality
 #'
 #' @param basedata A user-provided dataframe.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' vars <- c("reltime","ambiv","love","conflict")
+#' newData <- data[vars ]
+#' histAll(newData)
 
 #' @export
 
