@@ -24,6 +24,7 @@ Imports:
     gridExtra,
     interactions,  
     lattice,
+    lme4,
     MASS,
     mclust,
     nlme,

@@ -36,7 +36,7 @@ sysVarInPlots <- function(fullData, sysVar_name, sysVarType, n_profiles, testMod
     data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")   
     dyad <- sysVar.1 <- profileN.1 <- sysVar.0 <- profileN.0 <- NULL
     data3 <- dplyr::rename(data2, dyad=dyad, sysVar0=sysVar.1, profileN1= profileN.1, sysVar1= sysVar.0, profileN=profileN.0)
-    basedata <- data3[complete.cases(data3), ]
+    basedata <- data3[stats::complete.cases(data3), ]
     sysVar0name <- paste(sysVar_name, dist0name, sep="_")
     sysVar1name <- paste(sysVar_name, dist1name, sep="_")
     

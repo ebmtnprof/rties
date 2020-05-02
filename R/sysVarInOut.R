@@ -36,7 +36,7 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 	
   if (sysVarType == "dyadic"){	
 	  basedata <- basedata[!duplicated(basedata$dyad), ]
-	  basedata <- basedata[complete.cases(basedata), ]
+	  basedata <- basedata[stats::complete.cases(basedata), ]
 	
 	  if (family == "gaussian"){
 	    base <- stats::lm(sysVar ~ 1, data= basedata, na.action=na.exclude)
@@ -117,7 +117,7 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles){
       data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")   
       dyad <- sysVar.1 <- profileN.1 <- sysVar.0 <- profileN.0 <- NULL
       data3 <- dplyr::rename(data2, dyad=dyad, sysVar0=sysVar.1, profileN1= profileN.1, sysVar1= sysVar.0, profileN=profileN.0)
-      basedata <- data3[complete.cases(data3), ]
+      basedata <- data3[stats::complete.cases(data3), ]
     
         if(n_profiles == 2){
           base <- stats::glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
