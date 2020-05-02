@@ -21,7 +21,8 @@
 #'
 #' @examples 
 #' data <- rties_ExampleDataShort
-#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", obs_name="dial", 
+#' dist_name="female", time_name="time", time_lag=2)
 #' head(newData) 
 #'  
 #' @return The function returns a dataframe that has all the variables needed for modeling system dynamics, each renamed to a generic variable name, which are:
