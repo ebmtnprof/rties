@@ -25,7 +25,8 @@ Calculates cross-correlations for a given variable and returns a dataframe with 
 }
 \examples{
 data <- rties_ExampleDataShort
-newData <- makeCrossCorr(basedata=data, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+newData <- makeCrossCorr(basedata=data, dyadId="couple", personId="person", 
+obs_name="dial", dist_name="female")
 head(newData)
 
 }

@@ -111,7 +111,8 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 #' @param dist_name The name of the column in the dataframe that holds the variable to use for distinguishing the partners. For example, if "influence" was the variable, for each dyad the partner scoring lower on "influence" would be given a score of 0 on "dist" and the partner scoring higher on "influence" would be given a score of 1 on "dist"
 #' @examples
 #' data <- rties_ExampleDataShort
-#' newData <- makeDist(basedata=data, dyadId="couple", personId="person", time_name="time", dist_name="relstress")
+#' newData <- makeDist(basedata=data, dyadId="couple", personId="person", 
+#' time_name="time", dist_name="relstress")
 #' summary(newData$dist)
 
 
@@ -351,7 +352,8 @@ output
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #' @examples
 #' data <- rties_ExampleDataShort
-#' newData <- makeCrossCorr(basedata=data, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+#' newData <- makeCrossCorr(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female")
 #' head(newData)
 #'
 #' @return A cross-sectional version of the original dataframe with maximal absolute-value cross-correlations and their lags added for each dyad.
@@ -460,7 +462,8 @@ plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=
   dist <- NULL
   plots <- lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=plot_obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
   
-  if(printPlots==T){print(plots)}
+  if(printPlots==T)
+    {lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=plot_obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))}
   
   return(plots)
 }

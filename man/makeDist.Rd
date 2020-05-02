@@ -25,6 +25,7 @@ Create a distinguishing variable (called "dist") for non-distinguishable dyads b
 }
 \examples{
 data <- rties_ExampleDataShort
-newData <- makeDist(basedata=data, dyadId="couple", personId="person", time_name="time", dist_name="relstress")
+newData <- makeDist(basedata=data, dyadId="couple", personId="person", 
+time_name="time", dist_name="relstress")
 summary(newData$dist)
 }
