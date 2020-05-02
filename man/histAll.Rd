@@ -12,3 +12,9 @@ histAll(basedata)
 \description{
 Useful for checking distributions to assess normality
 }
+\examples{
+data <- rties_ExampleDataShort
+vars <- c("reltime","ambiv","love","conflict")
+newData <- data[vars ]
+histAll(newData)
+}

@@ -19,3 +19,10 @@ A dataframe in actor-partner format.
 \description{
 Need to use a person ID that has first person in dyad numbered 1-n and second person in dyad = ID + some number larger than the number of dyads. Need dyad ID numbered same as for person ID for the first person in the dyad. Both members in each dyad need to have the same number of rows (rows of missing data are ok)
 }
+\examples{
+data <- rties_ExampleDataShort
+newData1 <- data[data$time==1, ] # make a cross-sectional dataframe
+newData2 <- actorPartnerDataCross(basedata=newData1, dyadId="couple", personId="couple")
+head(newData2)
+
+}

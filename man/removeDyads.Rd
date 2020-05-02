@@ -19,3 +19,9 @@ A dataframe with the data for the specified dyads removed.
 \description{
 Useful for cleaning data if some dyads have extensive missing or otherwise problematic data.
 }
+\examples{
+data <- rties_ExampleDataShort
+dyads <- c(3, 12)
+newData <- removeDyads(basedata=data, dyads=dyads, dyadId="couple")
+
+}

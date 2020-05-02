@@ -25,3 +25,7 @@ A dataframe that contains all variables needed for using the profiles to predict
 \description{
 Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.
 }
+\examples{
+# See vignettes for examples.
+
+}

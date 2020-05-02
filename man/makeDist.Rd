@@ -23,3 +23,8 @@ The function returns the original dataframe with an additional variable, called 
 \description{
 Create a distinguishing variable (called "dist") for non-distinguishable dyads by assigning the partner who is lower on a chosen variable a 0 and the partner who is higher on the variable a 1.
 }
+\examples{
+data <- rties_ExampleDataShort
+newData <- makeDist(basedata=data, dyadId="couple", personId="person", time_name="time", dist_name="relstress")
+summary(newData$dist)
+}

@@ -23,3 +23,9 @@ A cross-sectional version of the original dataframe with maximal absolute-value 
 \description{
 Calculates cross-correlations for a given variable and returns a dataframe with the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms).
 }
+\examples{
+data <- rties_ExampleDataShort
+newData <- makeCrossCorr(basedata=data, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+head(newData)
+
+}
