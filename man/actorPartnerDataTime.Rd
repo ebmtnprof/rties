@@ -21,7 +21,7 @@ Need to use a person ID that has first person in dyad numbered 1-n and second pe
 }
 \examples{
 data <- rties_ExampleDataShort
-newData <- actorPartnerDataTime(basedata=newData1, dyadId="couple", personId="couple")
+newData <- actorPartnerDataTime(basedata=newData, dyadId="couple", personId="couple")
 head(newData)
 
 }
