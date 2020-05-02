@@ -20,8 +20,7 @@ Once you have gone through the steps for estimating dynamic trajectory profiles 
 
 ```{r}
 library(rties)
-data1 <- rties_ExampleData_3
-```
+data1 <- rties_ExampleData_4
 
 data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag="absMaxCC") 
 
@@ -32,15 +31,16 @@ lpaData <- inspectProfiles(whichModel="inertCoord", prepData=data2, paramEst=ic$
 fullData <- makeFullData(basedata=data1, dyadId="couple", personId="person", dist_name="female", lpaData=lpaData, params=ic$params)
 ```
 
-
 ### Predicting the System Variable From the Profiles 
 
-The "sysVarOut" function uses the profile memberships to predict system variables, which can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). It takes as arguments the name of the dataframe containing the profile membership scores combined with your original dataframe (created by the "makeFullData" function), the name of the column in the dataframe containing the variable you would like to use as the system variable, and whether the system variable is "dyadic" or "individual". For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership ("profile"), 2) main effects of profile membership and the distinguishing variable ("profilePlusDist"), and 3) the interaction of profile membership and the distinguishing variable ("profileByDist"). If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmmPQL (for individual system variables) are available by specifying the "family" distribution (use ?sysVarOut for more information).
+The "sysVarOut" function uses the profile memberships to predict system variables, which can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). It takes as arguments the name of the dataframe containing the profile membership scores combined with your original dataframe (created by the "makeFullData" function), the name of the column in the dataframe containing the variable you would like to use as the system variable, and whether the system variable is "dyadic" or "individual". For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership ("profile"), 2) main effects of profile membership and the distinguishing variable ("profilePlusDist"), and 3) the interaction of profile membership and the distinguishing variable ("profileByDist"). If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmer (for individual system variables) are available by specifying the "family" distribution (use ?sysVarOut for more information).
 
-For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). These results can be inspected using the usual "summary" function and the models can be compared using the "anova" function. Similarly, for non-normal system variables, the function returns a list of the glm or glmmPQL objects containing the full results for the models. The function also displays a boxplot of the system variable for each profile, histograms of the residuals and plots of the predicted values against observed values for each model. In this example, we find a main effect of sex, but no effect of profile (see summary and anova output), nor an interaction. The boxplot helps to interpret this result and shows that the system variable (selfsatPhys, which is self-reported satisfaction with one's own physical shape) is predicted to be higher for men than women, especially in Profiles 1 & 2.
+For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). Similarly, for non-normal system variables, the function returns a list of the glm or glmer objects containing the full results for the models.
+
+We start with an example of a normally distributed dyadic system variable, "dyadSup", which was the average self-report for each couple of their emotion suppression during a conversation.
 
 ```{r}
-sysOut <- sysVarOut(fullData=fullData, sysVar_name="conflict", sysVarType="indiv", dist0name="men", dist1name="women")
+sysOut <- sysVarOut(fullData=fullData, sysVar_name="dyadSup", sysVarType="dyadic", dist0name="Men", dist1name="Women")
 ```
 
 ### Predicting Profile Membership From the System Variable

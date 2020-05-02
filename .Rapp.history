@@ -1,6 +1,5 @@
-setwd("/Users/emily/rties")#
-usethis::use_data(rties_ExampleData_4, overwrite=TRUE)
-library(rties)
+library(rties)#
+#
 data1 <- rties_ExampleData_2#
 #
 data1$dyadSupB <- ifelse(data1$dyadSup < -2, 0, 1)#
@@ -13,6 +12,6 @@ data1$conflictCat <- factor(data1$conflictCat)#
 data1$ambivB <- ifelse(data1$ambiv < .5, 0, 1)#
 data1$conflictG <- data1$conflict + 1#
 #
-rties_ExampleData_4 <- data1
+rties_ExampleData_3 <- data1#
 setwd("/Users/emily/rties")#
-usethis::use_data(rties_ExampleData_4, overwrite=TRUE)
+usethis::use_data(rties_ExampleData_3, overwrite=TRUE)
