@@ -1,3 +1,710 @@
+lagi <- lag[i]
+lagi
+i <- 2
+lagi <- lag[i]
+lagi
+datai <- basedata[basedata$couple == dID[i], ]
+head(datai)
+test <- list()
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -lagi))
+lag
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= 4))
+test
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", NewVar="dial_Lag", slideBy= 4))
+test[i]
+fix(datai)
+test[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -4))
+names(datai)
+datai[i] <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -1))
+head(datai)
+datai <- basedata[basedata$couple == dID[i], ]
+head(datai)
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -1))
+head(datai)
+lagi <- lag[i]
+lagi
+datai <- basedata[basedata$couple == dID[i], ]
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= -1))
+datai <- basedata[basedata$couple == dID[i], ]
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))
+head(datai)
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= "lagi"))
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= 4))
+head(datai)
+fix(datai)
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}#
+#
+basedata <- data1
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
+  }#
+#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+crossCorr <- makeCrossCorr(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))#
+lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+dID <- unique(factor(basedata$couple))#
+#
+lagData <- list()
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))#
+lagData[i] <- datai#
+}
+warnings()
+head(datai)
+lag
+head(lagData)
+lagData <- list()
+dID
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))#
+lagData[i] <- datai#
+}
+head(datai)
+fix(datai)
+lagi
+lag
+fix(lag)
+crossCorr <- makeCrossCorr(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))#
+lag <- ifelse(lagTemp == 0, 1, lagTemp)
+length(crossCorr)
+dim(crossCorr)
+length(lag)
+dID <- unique(factor(basedata$couple))
+length(dID)
+i <- 3
+lagData <- list()
+lagi <- lag[i]
+lagi
+datai <- basedata[basedata$couple == dID[i], ]
+head(datai)
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))
+head(datai)
+fix(datai)
+lagData[i] <- datai
+lagData[[i]] <- datai
+lagData
+fix(lagData)
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}#
+#
+basedata <- data1
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
+  }#
+#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+crossCorr <- makeCrossCorr(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female")
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))#
+lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+dID <- unique(factor(basedata$couple))
+lagData <- list()
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))#
+lagData[[i]] <- datai#
+}
+lagData <- as.data.frame(do.call(rbind, lagData))
+fix(lagData)
+lag
+fix(lagData)
+dID
+fix(lagData)
+i <- 4
+lagi <- lag[i]
+lagi
+lag <- ifelse(lagTemp == 0, 1, lagTemp)
+lag
+pID  <- unique(factor(basedata$person))
+lagTemp <- as.numeric(unlist(crossCorr$maxLag))
+head(lagTemp)
+head(crossCorr)
+cc <- crossCorr[unique(crossCorr$couple), ]
+head(cc)
+cc <- crossCorr[!duplicated(crossCorr$couple), ]
+head(cc)
+lagTemp <- as.numeric(unlist(cc$maxLag))
+lag <- ifelse(lagTemp == 0, 1, lagTemp)
+dID <- unique(factor(basedata$couple))
+lagData <- list()
+for (i in 1:length(dID)){#
+lagi <- lag[i]#
+datai <- basedata[basedata$couple == dID[i], ]#
+datai <- suppressMessages(DataCombine::slide(datai, Var="dial", GroupVar="person", NewVar="dial_Lag", slideBy= lagi))#
+lagData[[i]] <- datai#
+}
+head(lagData)
+lagData <- as.data.frame(do.call(rbind, lagData))
+fix(lagData)
+lag
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
+  }#
+#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL){#
+  vars <- c(dyadId, personId, obs_name, dist_name, time_name)#
+  basedata <- basedata[vars]#
+  names(basedata) <- c("dyad","id","obs","dist1","time")#
+      # check distinguishing variable is numeric #
+  if (!is.numeric(basedata$dist1)){#
+	stop("the distinguishing variable must be a 0/1 numeric variable")#
+  }#
+#
+  # create the dist0 variable#
+  basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)#
+  # check partners have same number of observations #
+  notEqual <- vector()#
+  t <- table(basedata$dist1, basedata$dyad)#
+  for(i in 1:ncol(t)){		#
+    if (t[1,i] != t[2,i]){#
+	notEqual <- append(notEqual, as.numeric(dimnames(t)[[2]][i]))#
+	}#
+  }				#
+	if (length(notEqual) > 0){#
+	  print(notEqual)#
+	  stop("the partners in these dyads have unequal number of observations")#
+      rm(notEqual, envir = .GlobalEnv)#
+	}#
+  # center each person's data around their own regression line#
+  basedata <- lineCenterById(basedata)#
+  # create lagged variables#
+  if(!is.null(time_lag)){#
+	lag <- time_lag#
+	  if(lag == 0){#
+	   crossCorr <- makeCrossCorr(basedata=data1, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")#
+	   cc <- crossCorr[!duplicated(crossCorr$dyad), ]#
+       lagTemp <- as.numeric(unlist(cc$maxLag))#
+       lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+       dID <- unique(factor(basedata$dyad))#
+       lagData <- list()#
+#
+       for (i in 1:length(dID)){#
+         lagi <- lag[i]#
+         datai <- basedata[basedata$dyad == dID[i], ]#
+         datai <- suppressMessages(DataCombine::slide(datai, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= lagi))#
+         lagData[[i]] <- datai#
+       }#
+         basedata <- as.data.frame(do.call(rbind, lagData))#
+#
+       } else {#
+	       basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))#
+  }#
+  # put data in actor-partner format#
+  basedata <- actorPartnerDataTime(basedata, "dyad", "id")  #
+  return(basedata)#
+}#
+lineCenterById <- function(basedata)#
+{#
+  newId <- unique(factor(basedata$id))#
+  dataCent <- list()#
+  for(i in 1:length(newId)){#
+	datai <- basedata[basedata$id == newId[i],]#
+	datai$obs_deTrend <- resid(lm(obs ~ time, data=datai, na.action=na.exclude))#
+	dataCent[[i]] <- datai#
+  }		#
+  basedata <- as.data.frame(do.call(rbind, dataCent)) 	#
+}		#
+#
+actorPartnerDataTime <- function(basedata, dyadId, personId){#
+    basedata$d <- basedata[, dyadId]#
+    basedata$p <- basedata[, personId]#
+    basedata <- basedata[order(basedata$p), ]#
+    dID <- unique(factor(basedata$d))#
+	dataAP <- list()#
+#
+	for(i in 1:length(dID))#
+		{#
+		datai <- basedata[basedata$d == dID[i],]#
+		dataA <- datai#
+		P1 <- subset(datai, datai$d == datai$p)#
+		P2 <- subset(datai, datai$d != datai$p)#
+		P1_part <- P2#
+		P2_part <- P1#
+		colnames(P1_part) <- paste("p", colnames(P1_part), sep="_")#
+		colnames(P2_part) <- paste("p", colnames(P2_part), sep="_")#
+		dataP <- rbind(P1_part, P2_part)#
+		APi <- cbind(dataA, dataP)#
+		APi <- subset(APi, select=-c(d, p, p_d, p_p))#
+		dataAP[[i]] <- APi		#
+		}		#
+	dataAP <- as.data.frame(do.call(rbind, dataAP))#
+}
+}}
+data1 <- rties_ExampleData_2
+Max_Min_CCF_Signed <- function (a, b) {#
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude)#
+cor = d$acf[ ,,1] #
+lag = d$lag[ ,,1] #
+res = data.frame(cor,lag) #
+for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {#
+res_max = res[which.max(res$cor),] #
+res_min = res[which.min(res$cor),]#
+res_min_abs = abs(res_min)#
+res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))#
+if (res.max.abs==1) max=res_max else max=res_min}#
+output <<-data.frame(max = max)#
+output#
+}
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){#
+  newdata <- basedata#
+  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
+  colnames(newdata)[colnames(newdata)== personId] <- "person"#
+  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
+  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
+#
+  crossCorr <- list()#
+  dID <- unique(factor(newdata$dyad))#
+#
+  for (i in 1:length(dID)){#
+  datai <- newdata[newdata$dyad == dID[i], ]#
+  dist1 <- subset(datai, dist1==1, select=dv)#
+  dist0 <- subset(datai, dist1==0, select=dv)#
+  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
+  }#
+#
+  cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))#
+  cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))#
+  cc <- as.data.frame(do.call(rbind, crossCorr))#
+  cc$newID <- dID#
+  colnames(cc) <- c("maxCor","maxLag", dyadId)#
+  temp1 <- basedata[!duplicated(basedata$person), ]#
+  temp2 <- plyr::join(cc, temp1)#
+  crossCorr <- temp2#
+  return(crossCorr)#
+ }
+lineCenterById <- function(basedata)#
+{#
+  newId <- unique(factor(basedata$id))#
+  dataCent <- list()#
+  for(i in 1:length(newId)){#
+	datai <- basedata[basedata$id == newId[i],]#
+	datai$obs_deTrend <- resid(lm(obs ~ time, data=datai, na.action=na.exclude))#
+	dataCent[[i]] <- datai#
+  }		#
+  basedata <- as.data.frame(do.call(rbind, dataCent)) 	#
+}
+actorPartnerDataTime <- function(basedata, dyadId, personId){#
+    basedata$d <- basedata[, dyadId]#
+    basedata$p <- basedata[, personId]#
+    basedata <- basedata[order(basedata$p), ]#
+    dID <- unique(factor(basedata$d))#
+	dataAP <- list()#
+#
+	for(i in 1:length(dID))#
+		{#
+		datai <- basedata[basedata$d == dID[i],]#
+		dataA <- datai#
+		P1 <- subset(datai, datai$d == datai$p)#
+		P2 <- subset(datai, datai$d != datai$p)#
+		P1_part <- P2#
+		P2_part <- P1#
+		colnames(P1_part) <- paste("p", colnames(P1_part), sep="_")#
+		colnames(P2_part) <- paste("p", colnames(P2_part), sep="_")#
+		dataP <- rbind(P1_part, P2_part)#
+		APi <- cbind(dataA, dataP)#
+		APi <- subset(APi, select=-c(d, p, p_d, p_p))#
+		dataAP[[i]] <- APi		#
+		}		#
+	dataAP <- as.data.frame(do.call(rbind, dataAP))#
+}
+dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL){#
+  vars <- c(dyadId, personId, obs_name, dist_name, time_name)#
+  basedata <- basedata[vars]#
+  names(basedata) <- c("dyad","id","obs","dist1","time")#
+      # check distinguishing variable is numeric #
+  if (!is.numeric(basedata$dist1)){#
+	stop("the distinguishing variable must be a 0/1 numeric variable")#
+  }#
+#
+  # create the dist0 variable#
+  basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)#
+  # check partners have same number of observations #
+  notEqual <- vector()#
+  t <- table(basedata$dist1, basedata$dyad)#
+  for(i in 1:ncol(t)){		#
+    if (t[1,i] != t[2,i]){#
+	notEqual <- append(notEqual, as.numeric(dimnames(t)[[2]][i]))#
+	}#
+  }				#
+	if (length(notEqual) > 0){#
+	  print(notEqual)#
+	  stop("the partners in these dyads have unequal number of observations")#
+      rm(notEqual, envir = .GlobalEnv)#
+	}#
+  # center each person's data around their own regression line#
+  basedata <- lineCenterById(basedata)#
+  # create lagged variables#
+  if(!is.null(time_lag)){#
+	lag <- time_lag#
+	  if(lag == 0){#
+	   crossCorr <- makeCrossCorr(basedata=data1, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")#
+	   cc <- crossCorr[!duplicated(crossCorr$dyad), ]#
+       lagTemp <- as.numeric(unlist(cc$maxLag))#
+       lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+       dID <- unique(factor(basedata$dyad))#
+       lagData <- list()#
+#
+       for (i in 1:length(dID)){#
+         lagi <- lag[i]#
+         datai <- basedata[basedata$dyad == dID[i], ]#
+         datai <- suppressMessages(DataCombine::slide(datai, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= lagi))#
+         lagData[[i]] <- datai#
+       }#
+         basedata <- as.data.frame(do.call(rbind, lagData))#
+#
+       } else {#
+	       basedata <- suppressMessages(DataCombine::slide(basedata, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= -lag))#
+	  }#
+   }#
+  # put data in actor-partner format#
+  basedata <- actorPartnerDataTime(basedata, "dyad", "id")  #
+  return(basedata)#
+}
+test <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag=0)
+names(data1)
+basedata <- data1#
+dyadId <- "couple"#
+personId <- "person"#
+obs_name <- "dial"#
+dist_name <- "female"#
+time_name <- "time"#
+time_lag <- 0
+vars <- c(dyadId, personId, obs_name, dist_name, time_name)
+basedata <- basedata[vars]
+head(basedata)
+names(basedata) <- c("dyad","id","obs","dist1","time")
+basedata$dist0 <- ifelse(basedata$dist1 == 1, 0, 1)
+head(basedata)
+basedata <- lineCenterById(basedata)
+head(basedata)
+lag <- time_lag
+lag
+if(lag == 0){#
+	   crossCorr <- makeCrossCorr(basedata=data1, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")#
+	   cc <- crossCorr[!duplicated(crossCorr$dyad), ]#
+       lagTemp <- as.numeric(unlist(cc$maxLag))#
+       lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+       dID <- unique(factor(basedata$dyad))#
+       lagData <- list()#
+#
+       for (i in 1:length(dID)){#
+         lagi <- lag[i]#
+         datai <- basedata[basedata$dyad == dID[i], ]#
+         datai <- suppressMessages(DataCombine::slide(datai, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= lagi))#
+         lagData[[i]] <- datai#
+       }
+if(lag == 0){#
+	   crossCorr <- makeCrossCorr(basedata=data1, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")#
+	   cc <- crossCorr[!duplicated(crossCorr$dyad), ]#
+       lagTemp <- as.numeric(unlist(cc$maxLag))#
+       lag <- ifelse(lagTemp == 0, 1, lagTemp)#
+#
+       dID <- unique(factor(basedata$dyad))#
+       lagData <- list()#
+#
+       for (i in 1:length(dID)){#
+         lagi <- lag[i]#
+         datai <- basedata[basedata$dyad == dID[i], ]#
+         datai <- suppressMessages(DataCombine::slide(datai, Var="obs_deTrend", GroupVar="id", NewVar="obs_deTrend_Lag", slideBy= lagi))#
+         lagData[[i]] <- datai#
+       }#
+         basedata <- as.data.frame(do.call(rbind, lagData))#
+#
+       }
+lag <- time_lag
+||
+devtools::install_github("ebmtnprof/rties", force=T)
+setwd("/Users/emily")#
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+data1 <- rties_ExampleData_3
+data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time")
+taus <- c(4,5)#
+embeds <- c(3,4,5)#
+delta <- 1#
+#
+derivs <- estDerivs(prepData=data2, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+clo <- indivClo(derivData=derivs$data, whichModel="coupled")
+lpaData <- inspectProfiles(whichModel="clo", prepData=data2, paramEst=clo$params, n_profiles=2)
+setwd("/Users/emily")#
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+plots <- cloPlotTraj(prepData=data2, paramEst=clo$params, n_profiles=2, time_length=100, minMax=c(.1, .9))
+setwd("/Users/emily")#
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 2, dist0name="men", dist1name="women", plot_obs_name="Dial")
+fullData <- makeFullData(basedata=data1, personId="person", dyadId="couple", dist_name="female", lpaData=lpaData, params=clo$params)
+plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 2, dist0name="men", dist1name="women", plot_obs_name="Dial")
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 2, dist0name="men", dist1name="women", plot_obs_name="Dial")
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 2, dist0name="men", dist1name="women", plot_obs_name="Dial")
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 2, dist0name="men", dist1name="women", plot_obs_name="Dial")
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+plotRaw(basedata=data1, dyad="couple", obs_name="dial", dist_name="female", time_name="time", dist0name="Men", dist1name= "Women", plot_obs_name="Dial")
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+data1 <- rties_ExampleData_3
+plotRaw(basedata=data1, dyad="couple", obs_name="dial", dist_name="female", time_name="time", dist0name="Men", dist1name= "Women", plot_obs_name="Dial")
+temp <- subset(data1, couple %in% c(2,5,27,31,47,60,103,110))#
+autoCorPlots(basedata=temp, dyadId="couple", personId="person", obs_name="dial", time_name="time")#
+crossCorPlots(basedata=temp, dyadId="couple", personId="person", obs_name="dial", time_name= "time")
+data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag="absMaxCC")
+compare <- indivInertCoordCompare(data2)
+figures <- indivInertCoordPlots(data2, "inertCoord", dist0name="Men", dist1name="Women")
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+figures <- indivInertCoordPlots(data2, "inertCoord", dist0name="Men", dist1name="Women")
+residPlots <- inertCoordResids(prepData=data2, whichModel="inertCoord")
+ic <- indivInertCoord(prepData=data2, whichModel="inertCoord")
+lpaData <- inspectProfiles(whichModel="inertCoord", prepData=data2, paramEst=ic$params, n_profiles=3, seed=21)
+plots <- inertCoordPlotTraj(prepData=data2, paramEst=ic$params, n_profiles=3, time_length=75, seed=6, numPlots=1)
+plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 3, dist0name="men", dist1name="women", plot_obs_name="Dial")
+fullData <- makeFullData(basedata=data1, dyadId="couple", personId="person", dist_name="female", lpaData=lpaData, params=ic$params)
+plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 3, dist0name="men", dist1name="women", plot_obs_name="Dial")
+sysOut <- sysVarOut(fullData=fullData, sysVar_name="selfsatPhys", sysVarType="indiv", dist0name="men", dist1name="women", plot_sysVar_name="selfsatPhys")
+sysIn <- sysVarIn(fullData=fullData, sysVar_name="selfsatPhys", n_profiles=3, sysVarType="indiv", dist0name="men", dist1name="women", plot_sysVar_name="selfsatPhys")
+data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time")
+taus <- c(4,5)#
+embeds <- c(3,4,5)#
+delta <- 1#
+#
+derivs <- estDerivs(prepData=data2, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+compare <- indivCloCompare(derivData = derivs$data)
+pplots <- indivCloPlots(derivData=derivs$data, whichModel="coupled", idConvention=500, plot_obs_name="dial")
+cloResids(derivData=derivs$data, whichModel="coupled")
+clo <- indivClo(derivData=derivs$data, whichModel="coupled")
+lpaData <- inspectProfiles(whichModel="clo", prepData=data2, paramEst=clo$params, n_profiles=2)
+plots <- cloPlotTraj(prepData=data2, paramEst=clo$params, n_profiles=2, time_length=100, minMax=c(.1, .9))
+fullData <- makeFullData(basedata=data1, personId="person", dyadId="couple", dist_name="female", lpaData=lpaData, params=clo$params)
+plotDataByProfile(prepData=data2, fullData=fullData, n_profiles= 2, dist0name="men", dist1name="women", plot_obs_name="Dial")
+sysOut <- sysVarOut(fullData=fullData, sysVar_name="ambivB", sysVarType="indiv", dist0name="Men", dist1name="Women", family="binomial")
+sysIn <- sysVarIn(fullData=fullData, sysVar_name="ambiv", sysVarType="indiv", n_profiles=2, dist0name="Men", dist1name="Women")
+setwd("/Users/emily")#
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+data1 <- rties_ExampleData_3
+data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time")
+taus <- c(4,5)#
+embeds <- c(3,4,5)#
+delta <- 1#
+#
+derivs <- estDerivs(prepData=data2, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+pplots <- indivCloPlots(derivData=derivs$data, whichModel="coupled", idConvention=500, plot_obs_name="dial")
+setwd("/Users/emily")#
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+clo <- indivClo(derivData=derivs$data, whichModel="coupled")
+lpaData <- inspectProfiles(whichModel="clo", prepData=data2, paramEst=clo$params, n_profiles=2)
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+lpaData <- inspectProfiles(whichModel="clo", prepData=data2, paramEst=clo$params, n_profiles=2)
+sysIn <- sysVarIn(fullData=fullData, sysVar_name="ambiv", sysVarType="indiv", n_profiles=2, dist0name="Men", dist1name="Women")
+sysOut <- sysVarOut(fullData=fullData, sysVar_name="ambivB", sysVarType="indiv", dist0name="Men", dist1name="Women", family="binomial")
+summary(sysOut$models$profile)
+setwd("/Users/emily")#
+devtools::document("rties")
+library(rties, lib.loc="/Users/emily")
+lpaData <- inspectProfiles(whichModel="clo", prepData=data2, paramEst=clo$params, n_profiles=2)
+library(dynr)
+require(mvtnorm)#
+require(Matrix)#
+#
+xdim <- 2#
+udim <- 1#
+ydim <- 1#
+tdim <- 1000#
+set.seed(315)#
+tA <- matrix(c(0, -.3, 1, -.7), xdim, xdim)#
+tB <- matrix(c(0), xdim, udim)#
+tC <- matrix(c(1, 0), ydim, xdim)#
+tD <- matrix(c(0), ydim, udim)#
+tQ <- matrix(c(0), xdim, xdim); diag(tQ) <- c(0, 2.2)#
+tR <- matrix(c(0), ydim, ydim); diag(tR) <- c(1.5)#
+#
+x0 <- matrix(c(0, 1), xdim, 1)#
+P0 <- diag(c(1), xdim)#
+tdx <- matrix(0, xdim, tdim+1)#
+tx <- matrix(0, xdim, tdim+1)#
+tu <- matrix(0, udim, tdim)#
+ty <- matrix(0, ydim, tdim)#
+#
+tT <- matrix(0:tdim, nrow=1, ncol=tdim+1)#
+#
+tI <- diag(1, nrow=xdim)#
+#
+tx[,1] <- x0#
+for(i in 2:(tdim+1)){#
+    q <- t(rmvnorm(1, rep(0, xdim), tQ))#
+    tdx[,i] <- tA %*% tx[,i-1] + tB %*% tu[,i-1] + q#
+    expA <- as.matrix(expm(tA * (tT[,i]-tT[,i-1])))#
+    intA <- solve(tA) %*% (expA - tI)#
+    tx[,i] <- expA %*% tx[, i-1] + intA %*% tB %*% tu[,i-1] + intA %*% q#
+    ty[,i-1] <- tC %*% tx[,i] + tD %*% tu[,i-1] + t(rmvnorm(1, rep(0, ydim), tR))#
+}#
+rownames(ty) <- paste('y', 1:ydim, sep='')#
+rownames(tx) <- paste('x', 1:xdim, sep='')#
+simdata <- cbind(id=rep(1,100), t(ty), times=tT[,-1])
+head(simdata)
+data <- dynr.data(simdata, id="id", time="times", observed="y1")
+head(data)
+typeof(data)
+str(data)
+meas <- prep.measurement(#
+    values.load=matrix(c(1, 0), 1, 2), #
+    params.load=matrix(c('fixed', 'fixed'), 1, 2),#
+    state.names=c("Position","Velocity"),#
+    obs.names=c("y1"))
+head(meas)
+typeof(meas)
+str(meas)
+exp(5.5)
+log(5.5)
+exp(0)
+exp(5.5)/(exp(5.5) + 1)
+79000+110000
+109000+135000
+190+135
+9*4
+34*5
+12.6*10
+126/60
+113-86
+109-87
+113-86
+109-87
+113.1-86.3
+108.9-86.7
+6*.2
+60*.2
+10+30+31+31+31
 library(rties)#
 #
 data1 <- rties_ExampleData_2#
@@ -10,8 +717,7 @@ data1$conflictCat <- ifelse(data1$conflict < 1.5, 1, #
                             ifelse(data1$conflict > 3, 3, 2 ))#
 data1$conflictCat <- factor(data1$conflictCat)#
 data1$ambivB <- ifelse(data1$ambiv < .5, 0, 1)#
-data1$conflictG <- data1$conflict + 1#
-#
-rties_ExampleData_3 <- data1#
-setwd("/Users/emily/rties")#
-usethis::use_data(rties_ExampleData_3, overwrite=TRUE)
+data1$conflictG <- data1$conflict + 1
+rties_ExampleData_4 <- data1
+setwd("/Users/emily/rties")
+usethis::use_data(rties_ExampleData_4, overwrite=TRUE)
