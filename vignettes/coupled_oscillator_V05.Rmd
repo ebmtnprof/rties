@@ -20,7 +20,7 @@ As for all _rties_ analyses, the first step for a Coupled-Oscillator analysis is
 
 ```{r}
 library(rties)
-data1 <- rties_ExampleData_3
+data1 <- rties_ExampleDataFull
 data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", 
                   dist_name="female", time_name="time") 
 ```

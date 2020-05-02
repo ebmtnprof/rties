@@ -82,7 +82,7 @@ demo <- read.csv("/Users/emily/Documents/Projects/R-TIES/Data/demo.csv")
 
 For this vignette, we will work with an example data set provided with _rties_, so we start by assigning the example data to a dataframe and listing its contents. The central variables are the same as described above for the demo dataframe, but we now have real data from a sample of couples and a set of 9 possible system variables (reltime through dyadInfluence).
 ```{r}
-data1 <- rties_ExampleData_2
+data1 <- rties_ExampleDataFull
 str(data1)
 ```
 

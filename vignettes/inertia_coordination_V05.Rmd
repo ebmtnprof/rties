@@ -20,7 +20,7 @@ As for all _rties_ analyses, the first step for an Inertia-Coordination analysis
 
 ```{r}
 library(rties)
-data1 <- rties_ExampleData_3
+data1 <- rties_ExampleDataFull
 ```
 
 The Inertia-Coordination model represents the within-person pattern of inertia, which is defined as the extent to which a person’s state can be predicted from his or her own state at a prior time point (a.k.a. auto-regression), and the between-person pattern of coordination, which is defined as the extent to which one partner’s state can be predicted from their partner’s state either concurrently or time-lagged (Reed, Randall, Post, & Butler, 2013). Specifically, the time-series state variable is predicted by: 1) separate intercepts for each partner, 2) a person’s own state variable at a prior time point, which gives two “inertia” estimates, one for each partner, and 3) the person’s partner’s state variable at the same prior time point, which gives two “coordination” estimates, again one for each partner. This model is identical to the "Stability-Influence" model (Thorson, West & Mendes, 2017), but we prefer the terms "inertia" and "coordination" rather than "stability" and "influence" because they have fewer connotations that may or may not be appropriate for a given research design. The lm model used by the _rties_ functions is:    
