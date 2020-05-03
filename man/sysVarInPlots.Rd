@@ -47,6 +47,7 @@ profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData,
 paramEst=ic$params, n_profiles=2)
 fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
 dist_name="female", lpaData=profiles, params=ic$params)
+sysIn <- sysVarIn(fullData=fullData, sysVar_name="conflict", sysVarType="indiv", n_profiles=2)
 sysVarInPlots(fullData=fullData, sysVar_name="conflict", sysVarType="indiv", 
 n_profiles=2, testModel=sysIn$models$sysVarInteract)
 
