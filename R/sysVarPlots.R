@@ -11,6 +11,17 @@
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
 #' @param printPlots If true (the default) plots are displayed on the screen.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+#' profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+#' paramEst=ic$params, n_profiles=2)
+#' fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+#' dist_name="female", lpaData=profiles, params=ic$params)
+#' sysVarInPlots(fullData=fullData, sysVar_name="conflict", sysVarType="indiv", 
+#' n_profiles=2, testModel=sysIn$models$sysVarInteract)
 #' 
 #' @return Single plots or a list of plots (depending on the model that is being interpreted).
 
@@ -371,6 +382,18 @@ indiv4profilesCont <- function(prob, sysVar0name, sysVar1name){
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
 #' @param binomial Whether the system variable is binomial. Default is false.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+#' profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+#' paramEst=ic$params, n_profiles=2)
+#' fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+#' dist_name="female", lpaData=profiles, params=ic$params)
+#' sysOut <- sysVarOut(fullData=fullData, sysVar_name="conflict", sysVarType="indiv")
+#' sysVarOutPlots(fullData=fullData, sysVar_name="conflict", sysVarType="indiv", 
+#' testModel=sysOut$models$profilePlusDist)
 #' 
 #' @return Single plots or a list of plots (depending on the model that is being interpreted).
 

@@ -11,7 +11,18 @@ sysVarInResults(baseModel, testModel, n_profiles)
 
 \item{testModel}{The name of the model that was produced by sysVarIn that you want results for (e.g., sysIn$models$sysVarMain or sysIn$models$sysVarInteract).}
 
-\item{n_profiles}{The number of latent profiles.}
+\item{n_profiles}{The number of latent profiles.
+#' @examples
+data <- rties_ExampleDataShort
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+paramEst=ic$params, n_profiles=2)
+fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+dist_name="female", lpaData=profiles, params=ic$params)
+sysIn <- sysVarIn(fullData=fullData, sysVar_name="conflict", sysVarType="indiv", n_profiles=2)
+sysVarInResults(baseModel=sysIn$models$base, testModel=sysIn$models$sysVarMain, n_profiles=2)}
 }
 \value{
 A list of results including a comparison of the test model to the null (either a LRT or Chisquare test depending on the model), a summary of the parameter estimates, exponentiated parameter estimates (e.g., odds ratios), and p values for the parameter estimates.

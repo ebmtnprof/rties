@@ -11,6 +11,17 @@
 #' @param dist0name An optional name for the level-0 of the distinguishing variable (e.g., "Women"). Default is dist0.
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1
 #' @param family An optional argument specifying the error distribution and link function to be used in the model. Any of the "family" options supported by glm (for dyadic system variables) or glmer (for individual system variables) are available. Default is gaussian.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+#' profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+#' paramEst=ic$params, n_profiles=2)
+#' fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+#' dist_name="female", lpaData=profiles, params=ic$params)
+#' sysOut <- sysVarOut(fullData=fullData, sysVar_name="conflict", sysVarType="indiv")
+#' summary(sysOut$models$profilePlusDist)
 #' 
 #' @return For normally distributed system variables, the function returns a list including the lm or lme objects containing the full results for each model (called "models"). Similarly, for non-normal system variables, the function returns a list of the glm or glmer objects containing the full results for the models.  
 
@@ -84,6 +95,17 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 #' @param sysVar_name The name of the variable in the dataframe that contains the system variable to be predicted by profile membership.
 #' @param sysVarType Whether the system variable is "dyadic", which means both partners have the same score, or "indiv" which means the partners can have different scores
 #' @param n_profiles The number of latent profiles.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+#' profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+#' paramEst=ic$params, n_profiles=2)
+#' fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+#' dist_name="female", lpaData=profiles, params=ic$params)
+#' sysIn <- sysVarIn(fullData=fullData, sysVar_name="conflict", sysVarType="indiv", n_profiles=2)
+#' summary(sysIn$models$sysVarMain)
 #' 
 #' @return A list including the glm or multinom objects containing the full results for each model (called "models"). 
 
@@ -151,6 +173,17 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles){
 #' @param baseModel The name of the model that was produced by sysVarIn to be used as the null model for comparison (e.g., sysIn$models$base).
 #' @param testModel The name of the model that was produced by sysVarIn that you want results for (e.g., sysIn$models$sysVarMain or sysIn$models$sysVarInteract).
 #' @param n_profiles The number of latent profiles.
+#' #' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+#' profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+#' paramEst=ic$params, n_profiles=2)
+#' fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+#' dist_name="female", lpaData=profiles, params=ic$params)
+#' sysIn <- sysVarIn(fullData=fullData, sysVar_name="conflict", sysVarType="indiv", n_profiles=2)
+#' sysVarInResults(baseModel=sysIn$models$base, testModel=sysIn$models$sysVarMain, n_profiles=2)
 #' 
 #' @return A list of results including a comparison of the test model to the null (either a LRT or Chisquare test depending on the model), a summary of the parameter estimates, exponentiated parameter estimates (e.g., odds ratios), and p values for the parameter estimates.
 
@@ -184,6 +217,17 @@ sysVarInResults <- function(baseModel, testModel, n_profiles){
 #' @param baseModel The name of the model that was produced by sysVarOut to be used as the null model for comparison (e.g., sysOut$models$base).
 #' @param testModel The name of the model that was produced by sysVarOut that you want results for (e.g., sysOut$models$profile, sysOut$models$profilePlusDist, sysOut$models$profileByDist).
 #' @param Gaussian Whether the system variable is Gaussian. Default is true.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+#' profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+#' paramEst=ic$params, n_profiles=2)
+#' fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+#' dist_name="female", lpaData=profiles, params=ic$params)
+#' sysOut <- sysVarOut(fullData=fullData, sysVar_name="conflict", sysVarType="indiv")
+#' sysVarOutResults(baseModel=sysOut$models$base, testModel=sysOut$models$profileByDist)
 #' 
 #' @return A list of results including an LRT comparison of the test model to the null, an omnibus anova test for the parameters in the model (this is identical to the LRT test for Gaussian dyadic system variables), a summary of the parameter estimates, and exponentiated parameter estimates (e.g., odds ratios) if Gaussian = FALSE.
 

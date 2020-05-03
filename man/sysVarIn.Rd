@@ -21,3 +21,16 @@ A list including the glm or multinom objects containing the full results for eac
 \description{
 If there are 2 profiles, then glm binomial regression models are used. If there are more than 2 profiles then multinomial regression is used (from the nnet package). The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, a couple's shared score is the only predictor of their profile membership (called "sysVar"). For individual system variables, two models are tested, one with the main effects of both partner's system variable ("sysVarMain") and one with the main effects and their interaction ("sysVarInteract"). In both cases an intercept-only model is included as a comparison point (called "base"). The function returns a list of the full model results.
 }
+\examples{
+data <- rties_ExampleDataShort
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+paramEst=ic$params, n_profiles=2)
+fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+dist_name="female", lpaData=profiles, params=ic$params)
+sysIn <- sysVarIn(fullData=fullData, sysVar_name="conflict", sysVarType="indiv", n_profiles=2)
+summary(sysIn$models$sysVarMain)
+
+}

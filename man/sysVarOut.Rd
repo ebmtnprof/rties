@@ -32,3 +32,16 @@ For normally distributed system variables, the function returns a list including
 \description{
 The system variable can be either dyadic (sysVarType = "dyadic"), where both partners have the same score (e.g., relationship length) or individual (sysVarType = "indiv"), where the partners can have different scores (e.g., age). For dyadic system variables, the only predictor is profile membership and the model is a regular regression model since all variables are at the level of the dyad. If the system variable is individual then the model is a random-intercept dyadic model and 3 models are estimated: 1) the main effect of profile membership, 2) main effects of profile membership and the distinguishing variable, and 3) the interaction of profile membership and the distinguishing variable. If the system variable is not normally distributed, any of the generalized linear models supported by glm (for dyadic system variables) or glmer (for individual system variables) are available by specifying the "family" distribution.
 }
+\examples{
+data <- rties_ExampleDataShort
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+paramEst=ic$params, n_profiles=2)
+fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+dist_name="female", lpaData=profiles, params=ic$params)
+sysOut <- sysVarOut(fullData=fullData, sysVar_name="conflict", sysVarType="indiv")
+summary(sysOut$models$profilePlusDist)
+
+}
