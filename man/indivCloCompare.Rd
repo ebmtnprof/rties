@@ -7,7 +7,17 @@
 indivCloCompare(derivData)
 }
 \arguments{
-\item{derivData}{A dataframe that was produced with the "estDerivs" function.}
+\item{derivData}{A dataframe that was produced with the "estDerivs" function.
+#' @examples
+data <- rties_ExampleDataShort
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+obs_name="dial", dist_name="female", time_name="time")
+taus <-c(2,3)
+embeds <- c(3,4)
+delta <- 1
+derivs <- estDerivs(prepData=newData, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+compare <- indivCloCompare(derivData=derivs$data)
+summary(compare$R2couple)}
 }
 \value{
 The function returns a named list including: 1) the adjusted R^2 for the uncoupled model for each dyad (called "R2uncouple"), 2) the adjusted R^2 for the coupled model for each dyad (called "R2couple"), and 3) the difference between the R-squares for each dyad (coupled - uncoupled, called "R2dif").

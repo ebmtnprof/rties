@@ -23,3 +23,16 @@ The function returns a list including: 1) "data" which is a dataframe containing
 \description{
 This function makes use of 2 functions written by Steven Boker, "gllaWMatrix" and "gllaEmbed" which are available on his website, http://people.virginia.edu/~smb3u/. It fits a coupled oscillator model for each dyad at different combinations of the input parameters (tau, embeds) and returns the input values and period of oscillation that maximize the R^2 for each dyad. It also estimates first and second derivatives of the observed state variable for each person at the input values that maximize the R^2 for that dyad and returns a dataframe that contains them.
 }
+\examples{
+data <- rties_ExampleDataShort
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+obs_name="dial", dist_name="female", time_name="time")
+taus <-c(2,3)
+embeds <- c(3,4)
+delta <- 1
+derivs <- estDerivs(prepData=newData, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+head(derivs$fitTable)
+summary(derivs$fitTable[ ,4]) # summary of R-square
+summary(derivs$fitTable[ ,5]) # summary of period of oscillation
+
+}

@@ -47,3 +47,16 @@ A dataframe called "profileData" that contains the profile classification for ea
 \description{
 The function prints out the number of dyads in each profile for a specified number of profiles. It also prints out: 1) a figure showing the best clustering solution as indicated by BIC (e.g., the observed data separated into clusters, produced by mclust), 2) a line plot showing the content of the best solution (e.g., the mean parameter estimates for each profile) and 3) prototypical model-predicted trajectories for each profile. For the inertia-coordination model, it produces sets of prototypical examples by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step. This process is required because the inertia-coordination model only represents local dynamics and predictions bear no resemblance to observed variables without the addition of noise. An optional argument, "seed" sets the seed for the random number generator, so you can get the same plots each time. If the "seed" argument is used, then only one plot per profile is produced. For the coupled-oscillator, this step is not necessary and one prototypical trajectory is plotted for each profile.
 }
+\examples{
+data <- rties_ExampleDataShort
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+ obs_name="dial", dist_name="female", time_name="time")
+taus <-c(2,3)
+embeds <- c(3,4)
+delta <- 1
+derivs <- estDerivs(prepData=newData, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+clo <- indivClo(derivData=derivs$data, whichModel="coupled")
+profiles <- inspectProfiles(whichModel="clo", prepData=newData, paramEst=clo$params, n_profiles=2)
+head(profiles)
+
+}

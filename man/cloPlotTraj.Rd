@@ -41,3 +41,7 @@ The function returns the plots as a list.
 \description{
 Plots the bivariate state variable's clo model-predicted temporal trajectories for each latent profile of clo parameters.
 }
+\examples{
+# See vignettes for examples.
+
+}

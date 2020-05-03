@@ -19,6 +19,17 @@
 #' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the time variable.
 #' @param numPlots Only relevant for the inertCoord model. An optional value controlling how many random examples of each profile are produced. Default is 3.
 #' @param seed Only relevant for the inertCoord model. An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the "numPlots" can be set to one - otherwise each plot is replicated 3 times.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#'  obs_name="dial", dist_name="female", time_name="time")
+#' taus <-c(2,3)
+#' embeds <- c(3,4)
+#' delta <- 1
+#' derivs <- estDerivs(prepData=newData, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+#' clo <- indivClo(derivData=derivs$data, whichModel="coupled")
+#' profiles <- inspectProfiles(whichModel="clo", prepData=newData, paramEst=clo$params, n_profiles=2)
+#' head(profiles)
 #' 
 #' @return A dataframe called "profileData" that contains the profile classification for each dyad. 
 

@@ -89,6 +89,17 @@ gllaEmbed <- function(x, embed, tau, groupby=NA, label="x", idColumn=F) {
 #' @param embeds A vector containing the values of embeds to use. Embeds indicates the number of columns in the lagged data matrix. The minimum = 3 for 2nd order derivatives and higher values increase smoothing.
 #' @param delta A value indicating the inter-observation interval. For example, if delta = 2, then every second observation is used in the estimation process.
 #' @param idConvention The value that was added to the dist1 ID number to get the dist2 ID number
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time")
+#' taus <-c(2,3)
+#' embeds <- c(3,4)
+#' delta <- 1
+#' derivs <- estDerivs(prepData=newData, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+#' head(derivs$fitTable)
+#' summary(derivs$fitTable[ ,4]) # summary of R-square
+#' summary(derivs$fitTable[ ,5]) # summary of period of oscillation
 #' 
 #' @return The function returns a list including: 1) "data" which is a dataframe containing first and second derivative estimates of an observed state variable, and 2) "fitTable" which shows the maximal R^2 achieved for each dyad for a coupled oscillator model, along with the associated tau, embed and estimated period of oscillation.
 
@@ -253,7 +264,18 @@ cloUncoupledOde <- function(t, state, parameters)
 #'
 #' @param derivData A dataframe that was produced with the "estDerivs" function.
 #' @param whichModel Whether the model to be estimated is the "uncoupled" or "coupled" oscillator.
-#' 
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time")
+#' taus <-c(2,3)
+#' embeds <- c(3,4)
+#' delta <- 1
+#' derivs <- estDerivs(prepData=newData, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+#' clo <- indivClo(derivData=derivs$data, whichModel="coupled")
+#' summary(clo$R2)
+#' head(clo$params)
+
 #' @return The function returns a list including: 1) the adjusted R^2 for the model for each dyad (called "R2"), and 2) the parameter estimates for the model for each dyad (called "params", for use in either predicting, or being predicted by, the system variable).
 
 #' @export
@@ -315,6 +337,16 @@ indivClo <- function(derivData, whichModel)
 #' Fits an uncoupled and coupled oscillator model to each dyad's observed state variables and returns the adjusted R-squares, along with the difference between them (coupled - uncoupled, so positive values indicate better fit for the more complex model).
 #'
 #' @param derivData A dataframe that was produced with the "estDerivs" function.
+#' #' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time")
+#' taus <-c(2,3)
+#' embeds <- c(3,4)
+#' delta <- 1
+#' derivs <- estDerivs(prepData=newData, taus=taus, embeds=embeds, delta=delta, idConvention=500)
+#' compare <- indivCloCompare(derivData=derivs$data)
+#' summary(compare$R2couple)
 #' 
 #' @return The function returns a named list including: 1) the adjusted R^2 for the uncoupled model for each dyad (called "R2uncouple"), 2) the adjusted R^2 for the coupled model for each dyad (called "R2couple"), and 3) the difference between the R-squares for each dyad (coupled - uncoupled, called "R2dif").
 
@@ -358,6 +390,8 @@ indivCloCompare <- function(derivData)
 #' @param plot_obs_name An optional name for the observed state variables being plotted (e.g., "Emotional Experience"). Default is observed.
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. Default is to use the minimum and maximum observed values of the state variables.
 #' @param printPlots If true (the default) plots are displayed on the screen.
+#' @examples
+#' # See vignettes for examples.
 #' 
 #' @return A list plots of the predicted values against the observed values for each dyad.
 
@@ -469,6 +503,8 @@ indivCloPlots <- function(derivData, whichModel, idConvention, dist0name=NULL, d
 #' @param derivData A dataframe that was produced with the "estDerivs" function.
 #' @param whichModel Whether the model to be estimated is the uncoupled-oscillator ("uncoupled") or the coupled-oscillator ("coupled").
 #' @param printPlots If true (the default) plots are displayed on the screen.
+#' @examples
+#' # See vignettes for examples.
 #' 
 #' @return A list with the histograms of the residuals for each dyad.
 
@@ -526,6 +562,8 @@ cloResids <- function(derivData, whichModel, printPlots=T)
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' @param time_length An optional value specifying how many time points to plot across. Default is the 75th percentile for the observed time variable.
 #' @param printPlots If true (the default) plots are displayed on the screen.
+#' @examples
+#' # See vignettes for examples.
 #' 
 #' @return The function returns the plots as a list. 
 

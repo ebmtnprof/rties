@@ -19,3 +19,7 @@ A list with the histograms of the residuals for each dyad.
 \description{
 Produces histograms of the residuals from the oscillator model for each dyad.
 }
+\examples{
+# See vignettes for examples.
+
+}

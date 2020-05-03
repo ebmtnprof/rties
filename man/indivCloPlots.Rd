@@ -38,3 +38,7 @@ A list plots of the predicted values against the observed values for each dyad.
 \description{
 The observed and CLO-model predicted state variables (with linear trends removed) are plotted for each dyad individually.
 }
+\examples{
+# See vignettes for examples.
+
+}
