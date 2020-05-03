@@ -35,3 +35,11 @@ A list with the plots of the predicted values against the observed values for ea
 \description{
 The observed state variables (with linear trends removed) are predicted from one of the 3 versions of the inertia-coordination model (inertia only, "inert"; coordination only, "coord"; full inertia-coordination, "inertCoord") for each dyad individually. The predicted trajectories are plotted overlaid on the observed trajectories.
 }
+\examples{
+data <- rties_ExampleDataShort
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+temp <- newData[newData$dyad < 5, ]
+plots <- indivInertCoordPlots(prepData=temp, whichModel="inertCoord")
+
+}

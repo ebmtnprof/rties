@@ -19,3 +19,11 @@ A list with the histograms of the residuals for each dyad.
 \description{
 Produces histograms of the residuals from the inertia-coordination model for each dyad.
 }
+\examples{
+data <- rties_ExampleDataShort
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+temp <- newData[newData$dyad < 5, ]
+residPlots <- inertCoordResids(prepData=temp, whichModel="inertCoord")
+
+}

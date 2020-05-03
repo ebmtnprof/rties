@@ -47,3 +47,7 @@ A list with the plots of predicted trajectories for each dyad.
 \description{
 Produces sets of prototypical example plots of the state variables' predicted temporal trajectories for each latent profile obtained based on the inertia-coordination parameters. The plots are produced by using the inertia-coordination parameters to predict temporal trajectories, with random noise added at each temporal step.
 }
+\examples{
+# See vignettes for examples.
+
+}

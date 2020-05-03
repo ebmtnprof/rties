@@ -11,6 +11,9 @@
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' autoCorPlots(basedata=data, dyadId="couple", personId="person", obs_name="dial", time_name="time")
 #' 
 #' @return Prints the plots to the screen.
 
@@ -62,7 +65,10 @@ acp <- function(basedata, personId, dyadId, obs_name, time_name)
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
-#' #' 
+#' @examples
+#' data <- rties_ExampleDataShort
+#' crossCorPlots(basedata=data, dyadId="couple", personId="person", obs_name="dial", time_name="time")
+#' 
 #' @return Prints the plots to the screen.
 
 #' @export
@@ -114,7 +120,13 @@ ccp <- function(basedata, personId, dyadId, obs_name, time_name)
 #'
 #' @param prepData A dataframe that was produced with the "dataPrep" function.
 #' @param whichModel Whether the model to be estimated is the inertia only model ("inert"), the coordination only model ("coord"), or the full inertia-coordination model ("inertCoord").
-#' 
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
+#' head(ic$params)
+
 #' @return The function returns a dataframe containing the parameter estimates, called "params", for use in the latent profile analysis.
 
 #' @export
@@ -171,6 +183,15 @@ indivInertCoord <- function(prepData, whichModel)
 #' Fits inertia-only, coordination-only and full inertia-coordination models to each dyad's observed state variables and returns the adjusted R-squares, along with the differences between them, so positive values indicate better fit for the first model in the comparison. The 3 comparisons are inertia minus coordination, full model minus inertia, and full model minus coordination.
 #'
 #' @param prepData A dataframe that was produced with the "dataPrep" function.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' compare <- indivInertCoordCompare(prepData=newData)
+#' summary(compare$R2inert)
+#' summary(compare$R2coord)
+#' summary(compare$R2inertCoord)
+#' summary(compare$R2dif_IC_I)
 #' 
 #' @return The function returns a named list including: 1) the adjusted R^2 for the inertia model for each dyad (called "R2inert"), 2) the adjusted R^2 for the coordination model for each dyad (called "R2coord"), 3) the adjusted R^2 for the full inertia-coordination model for each dyad (called "R2inertCoord"), 4) the difference between the R-squares for each dyad for inertia minus coordination (called "R2dif_I_C"), 5) the difference for the full model minus inertia (called "R2dif_IC_I"), and 6) the difference for the full model minus coordination (called "R2dif_IC_C")
 
@@ -223,6 +244,12 @@ indivInertCoordCompare <- function(prepData)
 #' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 #' @param minMax An optional vector with desired minimum and maximum quantiles to be used for setting the y-axis range on the plots, e.g., minMax <- c(.1, .9) would set the y-axis limits to the 10th and 90th percentiles of the observed state variables. If not provided, the default is to use the minimum and maximum observed values of the state variables.
 #' @param printPlots If true (the default) plots are displayed on the screen.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' temp <- newData[newData$dyad < 5, ]
+#' plots <- indivInertCoordPlots(prepData=temp, whichModel="inertCoord")
 #' 
 #' @return A list with the plots of the predicted values against the observed values for each dyad. 
 
@@ -291,7 +318,13 @@ indivInertCoordPlots <- function(prepData, whichModel, dist0name = NULL, dist1na
 #' @param printPlots If true (the default) plots are displayed on the screen.
 #' 
 #' @return A list with the histograms of the residuals for each dyad. 
-
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+#' obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+#' temp <- newData[newData$dyad < 5, ]
+#' residPlots <- inertCoordResids(prepData=temp, whichModel="inertCoord")
+#'
 #' @import ggplot2
 #' @export
 
@@ -351,6 +384,8 @@ inertCoordResids <- function(prepData, whichModel, printPlots=T)
 #' @param numPlots An optional value controlling how many random examples of each profile are produced. Default is 3.
 #' @param seed An optional integer argument that sets the seed of R's random number generator to create reproducible trajectories. If used, the "numPlots" can be set to one - otherwise each plot is replicated 3 times.
 #' @param printPlots If true (the default) plots are displayed on the screen.
+#' @examples
+#' # See vignettes for examples.
 #' 
 #' @return A list with the plots of predicted trajectories for each dyad. 
 

@@ -23,3 +23,8 @@ Prints the plots to the screen.
 \description{
 Produces auto-correlation plots of the observed state variable for lags of -+ 20 time steps for each dyad.
 }
+\examples{
+data <- rties_ExampleDataShort
+autoCorPlots(basedata=data, dyadId="couple", personId="person", obs_name="dial", time_name="time")
+
+}

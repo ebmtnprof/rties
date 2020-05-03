@@ -440,6 +440,9 @@ histAll <- function(basedata)
 #' @param dist1name An optional name for the level-1 of the distinguishing variable to appear on plots (e.g., "Men").
 #' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 #' @param printPlots If true (the default) plots are displayed on the screen.
+#' @examples
+#' data <- rties_ExampleDataShort
+#' plotRaw(basedata=data, dyad="couple", obs_name="dial", dist_name="female", time_name="time")
 
 #' @return A list of plots.
 
@@ -462,8 +465,7 @@ plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=
   dist <- NULL
   plots <- lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=plot_obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))
   
-  if(printPlots==T)
-    {lattice::xyplot(obs~time|as.factor(dyad), data = basedata, group=dist, type=c("l"), ylab=plot_obs_name, col=c("red", "blue"), key=list(space="right", text=list(c(dist1name,dist0name)), col=c("blue", "red")),as.table=T, layout = c(3,3))}
+  if(printPlots==T){print(plots)}
   
   return(plots)
 }
@@ -479,6 +481,8 @@ plotRaw <- function(basedata, dyadId, obs_name, dist_name, time_name, dist0name=
 #' @param dist1name An optional name for the level-1 of the distinguishing variable (e.g., "Men"). Default is dist1.
 #' @param plot_obs_name An optional name for the observed state variable to appear on plots (e.g., "Emotional Experience").
 #' @param printPlots If true (the default) plots are displayed on the screen.
+#' @examples
+#' # See vignettes for examples.
 
 #' @return A list of plots.
 

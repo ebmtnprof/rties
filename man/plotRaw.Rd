@@ -41,3 +41,7 @@ A list of plots.
 \description{
 Produces plots of the observed variable for each dyad over time to check for data errors, etc.
 }
+\examples{
+data <- rties_ExampleDataShort
+plotRaw(basedata=data, dyad="couple", obs_name="dial", dist_name="female", time_name="time")
+}

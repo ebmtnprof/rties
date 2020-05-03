@@ -15,3 +15,14 @@ The function returns a named list including: 1) the adjusted R^2 for the inertia
 \description{
 Fits inertia-only, coordination-only and full inertia-coordination models to each dyad's observed state variables and returns the adjusted R-squares, along with the differences between them, so positive values indicate better fit for the first model in the comparison. The 3 comparisons are inertia minus coordination, full model minus inertia, and full model minus coordination.
 }
+\examples{
+data <- rties_ExampleDataShort
+newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
+obs_name="dial", dist_name="female", time_name="time", time_lag=2)
+compare <- indivInertCoordCompare(prepData=newData)
+summary(compare$R2inert)
+summary(compare$R2coord)
+summary(compare$R2inertCoord)
+summary(compare$R2dif_IC_I)
+
+}

@@ -35,3 +35,6 @@ A list of plots.
 \description{
 Plots of de-trended observed variable over time, with dyads separated into groups based on LPA profile membership.
 }
+\examples{
+# See vignettes for examples.
+}
