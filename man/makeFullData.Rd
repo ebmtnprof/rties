@@ -30,8 +30,10 @@ data <- rties_ExampleDataShort
 newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
 obs_name="dial", dist_name="female", time_name="time", time_lag=2)
 ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
-profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, paramEst=ic$params, n_profiles=2)
-fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", dist_name="female", lpaData=profiles, params=ic$params)
+profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
+paramEst=ic$params, n_profiles=2)
+fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
+dist_name="female", lpaData=profiles, params=ic$params)
 head(fullData)
 
 }
