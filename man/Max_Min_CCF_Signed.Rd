@@ -11,6 +11,9 @@ Max_Min_CCF_Signed(a, b)
 
 \item{b}{Second time-series used in the cross-correlation}
 }
+\value{
+A list of maximum absolute value cross-correlations and the lag at which they occurred.
+}
 \description{
 A helper function for makeCrossCorr
 }

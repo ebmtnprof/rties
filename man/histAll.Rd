@@ -9,6 +9,9 @@ histAll(basedata)
 \arguments{
 \item{basedata}{A user-provided dataframe.}
 }
+\value{
+No return value. Prints plots to the console.
+}
 \description{
 Useful for checking distributions to assess normality
 }
@@ -17,4 +20,5 @@ data <- rties_ExampleDataShort
 vars <- c("reltime","ambiv","love","conflict")
 newData <- data[vars ]
 histAll(newData)
+
 }

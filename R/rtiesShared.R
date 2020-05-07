@@ -153,26 +153,6 @@ lineCenterById <- function(basedata)
   basedata <- as.data.frame(do.call(rbind, dataCent)) 	
 }		
 
-############# robustScale
-
-#' Apply robust scaling from the DescTools package one person at a time to the detrended observed variable (obs_deTrend). Currently not implemented since it wasn't clear it was working, or the optimal thing to do.
-
-#' @param basedata The input data set
-
-robustScale <- function(basedata){
-  newId <- unique(factor(basedata$id))
-  dataRobust <- list()
-  
-  for(i in 1:length(newId)){
-	datai <- basedata[basedata$id == newId[i],]
-	datai$obs_deTrend <- DescTools::RobScale(datai$obs_deTrend)
-	dataRobust[[i]] <- datai
-  }		
-  dataRobust <- as.data.frame(do.call(rbind, dataRobust)) 
-  basedata <- dataRobust
-}
-
-
 ########### removeDyads
 
 #' Remove data for specified dyads from a dataframe
@@ -330,6 +310,8 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData, params)
 
 #' @param a First time-series used in the cross-correlation
 #' @param b Second time-series used in the cross-correlation
+#' 
+#' @return A list of maximum absolute value cross-correlations and the lag at which they occurred.
 
 #' @importFrom stats ccf na.exclude
 
@@ -416,6 +398,8 @@ makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){
 #' vars <- c("reltime","ambiv","love","conflict")
 #' newData <- data[vars ]
 #' histAll(newData)
+#' 
+#' @return No return value. Prints plots to the console.
 
 #' @export
 

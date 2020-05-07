@@ -12,8 +12,8 @@ Description: The name of this package grew out of our research on temporal inter
     qualitatively distinct dynamics. Finally, the profile memberships can be used to either 
     predict, or be predicted by, another variable of interest. Currently, 2 models are supported:
     1) inertia-coordination, and 2) a coupled-oscillator. Extended documentation is provided 
-    in vignettes. Theoretical background can be found in Butler (2011) <doi: 10.1177/1088868311411164> 
-    and Butler & Barnard (2019) <doi: 10.1097/PSY.0000000000000703>.
+    in vignettes. Theoretical background can be found in Butler (2011) <doi:10.1177/1088868311411164> 
+    and Butler & Barnard (2019) <doi:10.1097/PSY.0000000000000703>.
 Depends: R (>= 2.10)
 Imports:
     DataCombine,
