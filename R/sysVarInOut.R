@@ -43,33 +43,37 @@ sysVarOut <- function(fullData, sysVar_name, sysVarType, dist0name=NULL, dist1na
 	
   basedata$dist1 <- ifelse(basedata$dist0 == 1, 0, 1)
   basedata$dist <- factor(basedata$dist0, labels=c(dist1name, dist0name))
-  basedata <- basedata[stats::complete.cases(basedata), ]
+
 	
   if (sysVarType == "dyadic"){	
 	  basedata <- basedata[!duplicated(basedata$dyad), ]
-	  basedata <- basedata[stats::complete.cases(basedata), ]
+	  modeldata <- basedata[ ,c("sysVar", "dyad", "profile", "dist")]
+	  modeldata <- modeldata[stats::complete.cases(modeldata), ]
 	
 	  if (family == "gaussian"){
-	    base <- stats::lm(sysVar ~ 1, data= basedata, na.action=na.exclude)
-	    profile <- stats::lm(sysVar ~ profile, data= basedata, na.action=na.exclude)
+	    base <- stats::lm(sysVar ~ 1, data= modeldata, na.action=na.exclude)
+	    profile <- stats::lm(sysVar ~ profile, data= modeldata, na.action=na.exclude)
 	  } else {
-	    base <- stats::glm(sysVar ~ 1, data= basedata, na.action=na.exclude, family=family)
-	    profile <- stats::glm(sysVar ~ profile, data= basedata, na.action=na.exclude, family=family)
+	    base <- stats::glm(sysVar ~ 1, data= modeldata, na.action=na.exclude, family=family)
+	    profile <- stats::glm(sysVar ~ profile, data= modeldata, na.action=na.exclude, family=family)
     }
   }
 
   if (sysVarType == "indiv"){
 	  
+	  modeldata <- basedata[ ,c("sysVar", "dyad", "profile", "dist")]
+	  modeldata <- modeldata[stats::complete.cases(modeldata), ]
+	  
     if (family == "gaussian"){
-	    base <- nlme::lme(sysVar ~ 1, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
-      profile <- nlme::lme(sysVar ~ profile, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
-	    profilePlusDist <- nlme::lme(sysVar ~ profile + dist, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
-	    profileByDist <- nlme::lme(sysVar ~ profile * dist, random= ~ 1 | dyad, data= basedata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
+	    base <- nlme::lme(sysVar ~ 1, random= ~ 1 | dyad, data= modeldata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
+      profile <- nlme::lme(sysVar ~ profile, random= ~ 1 | dyad, data= modeldata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
+	    profilePlusDist <- nlme::lme(sysVar ~ profile + dist, random= ~ 1 | dyad, data= modeldata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
+	    profileByDist <- nlme::lme(sysVar ~ profile * dist, random= ~ 1 | dyad, data= modeldata, na.action=na.exclude, control=nlme::lmeControl(opt="optim"), method="ML")
     } else {
-      base <- lme4::glmer(sysVar ~ 1 + (1 | dyad), data= basedata, na.action=na.exclude, control=lme4::glmerControl(), family=family)
-      profile <- lme4::glmer(sysVar ~ profile + (1 | dyad), data= basedata, na.action=na.exclude, control=lme4::glmerControl(), family=family)
-	    profilePlusDist <- lme4::glmer(sysVar ~ profile + dist + (1 | dyad), data= basedata, na.action=na.exclude, control=lme4::glmerControl(), family=family)
-	    profileByDist <- lme4::glmer(sysVar ~ profile * dist + (1 | dyad), data= basedata, na.action=na.exclude, control=lme4::glmerControl(), family=family)
+      base <- lme4::glmer(sysVar ~ 1 + (1 | dyad), data= modeldata, na.action=na.exclude, control=lme4::glmerControl(), family=family)
+      profile <- lme4::glmer(sysVar ~ profile + (1 | dyad), data= modeldata, na.action=na.exclude, control=lme4::glmerControl(), family=family)
+	    profilePlusDist <- lme4::glmer(sysVar ~ profile + dist + (1 | dyad), data= modeldata, na.action=na.exclude, control=lme4::glmerControl(), family=family)
+	    profileByDist <- lme4::glmer(sysVar ~ profile * dist + (1 | dyad), data= modeldata, na.action=na.exclude, control=lme4::glmerControl(), family=family)
 	  }
 	}
 
