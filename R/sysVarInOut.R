@@ -122,18 +122,21 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles){
   if(sysVarType != "indiv" & sysVarType != "dyadic") {stop("the sysVarType must be either indiv or dyadic")}
 
   colnames(basedata)[colnames(basedata)== sysVar_name] <- "sysVar" 	
-  basedata <- basedata[stats::complete.cases(basedata), ]
+  #basedata <- basedata[stats::complete.cases(basedata), ]
 
   if(sysVarType == "dyadic"){
     
     basedata <- basedata[!duplicated(basedata$dyad), ]
+    	modeldata <- basedata[ ,c("sysVar", "profileN")]
+	modeldata <- modeldata[stats::complete.cases(modeldata), ]
+
     
     if(n_profiles == 2){
-      base <- stats::glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
-      sysVarMain <- stats::glm(profileN ~ sysVar, data=basedata, na.action=na.exclude, family="binomial")    	
+      base <- stats::glm(profileN ~ 1, data=modeldata, na.action=na.exclude, family="binomial")
+      sysVarMain <- stats::glm(profileN ~ sysVar, data=modeldata, na.action=na.exclude, family="binomial")    	
      } else {
-     	 base <- nnet::multinom(profileN ~ 1, data=basedata, na.action=na.exclude,)
-     	 sysVarMain <- nnet::multinom(profileN ~ sysVar, data=basedata, na.action=na.exclude)
+     	 base <- nnet::multinom(profileN ~ 1, data=modeldata, na.action=na.exclude,)
+     	 sysVarMain <- nnet::multinom(profileN ~ sysVar, data=modeldata, na.action=na.exclude)
      }	
   }
   
@@ -143,16 +146,18 @@ sysVarIn <- function(fullData, sysVar_name, sysVarType, n_profiles){
       data2 <-  stats::reshape(data1, idvar="dyad", timevar = "dist0", direction= "wide")   
       dyad <- sysVar.1 <- profileN.1 <- sysVar.0 <- profileN.0 <- NULL
       data3 <- dplyr::rename(data2, dyad=dyad, sysVar0=sysVar.1, profileN1= profileN.1, sysVar1= sysVar.0, profileN=profileN.0)
-      basedata <- data3[stats::complete.cases(data3), ]
+      
+      modeldata <- data3[ ,c("profileN", "sysVar0", "sysVar1")]
+	  modeldata <- modeldata[stats::complete.cases(modeldata), ]
     
         if(n_profiles == 2){
-          base <- stats::glm(profileN ~ 1, data=basedata, na.action=na.exclude, family="binomial")
-          sysVarMain <- stats::glm(profileN ~ sysVar0 + sysVar1, data=basedata, na.action=na.exclude, family="binomial") 
-          sysVarInteract <- stats::glm(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude, family="binomial") 
+          base <- stats::glm(profileN ~ 1, data=modeldata, na.action=na.exclude, family="binomial")
+          sysVarMain <- stats::glm(profileN ~ sysVar0 + sysVar1, data=modeldata, na.action=na.exclude, family="binomial") 
+          sysVarInteract <- stats::glm(profileN ~ sysVar0 * sysVar1, data=modeldata, na.action=na.exclude, family="binomial") 
         } else {
-    	     base <- nnet::multinom(profileN ~ 1, data=basedata)
-    	     sysVarMain <- nnet::multinom(profileN ~ sysVar0 + sysVar1, data=basedata, na.action=na.exclude)
-    	     sysVarInteract <- nnet::multinom(profileN ~ sysVar0 * sysVar1, data=basedata, na.action=na.exclude)
+    	     base <- nnet::multinom(profileN ~ 1, data=modeldata)
+    	     sysVarMain <- nnet::multinom(profileN ~ sysVar0 + sysVar1, data=modeldata, na.action=na.exclude)
+    	     sysVarInteract <- nnet::multinom(profileN ~ sysVar0 * sysVar1, data=modeldata, na.action=na.exclude)
         }
     }
   
