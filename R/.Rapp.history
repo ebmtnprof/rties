@@ -1,26 +1,3 @@
-newdata <- basedata#
-  colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"#
-  colnames(newdata)[colnames(newdata)== personId] <- "person"#
-  colnames(newdata)[colnames(newdata)== obs_name] <- "dv"#
-  colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"#
-#
-  crossCorr <- list()#
-  dID <- unique(factor(newdata$dyad))
-length(dID)
-for (i in 1:length(dID)){#
-  datai <- newdata[newdata$dyad == dID[i], ]#
-  dist1 <- subset(datai, dist1==1, select=dv)#
-  dist0 <- subset(datai, dist1==0, select=dv)#
-  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)#
-  }
-crossCorr
-cctest <- as.data.frame(crossCorr)
-head(cctest)
-cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))
-cc1
-cc <- as.data.frame(do.call(rbind, crossCorr))
-head(cc)
-fix(c)
 fix(cc)
 cc$newID <- dID#
   colnames(cc) <- c("maxCor","maxLag", dyadId)
@@ -820,3 +797,50 @@ if(lag == 0){#
 lag <- time_lag
 ||
 devtools::install_github("ebmtnprof/rties", force=T)
+library(rties)
+data1 <- rties_ExampleDataFull
+data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time")
+names(data2)
+r2 <- function(basedata){#
+#
+  newDiD <- unique(factor(basedata$dyad))#
+  R2 <- vector()#
+  for (i in 1:length(newDiD)){#
+    datai <- basedata[basedata$dyad == newDiD[i], ]#
+	m <- stats::lm(model, na.action=na.exclude, data=datai)#
+	R2[[i]] <- summary(m)$adj.r.squared#
+  }			#
+#
+  return(R2)#
+}
+test <- r2(data2)
+r2 <- function(basedata){#
+#
+  model <- stats::formula(d2 ~ dist0:obs_deTrend + dist0:d1 + dist0:p_obs_deTrend + dist0:p_d1 + dist1:obs_deTrend + dist1:d1 + dist1:p_obs_deTrend + dist1:p_d1 -1)#
+  newDiD <- unique(factor(basedata$dyad))#
+  R2 <- vector()#
+  for (i in 1:length(newDiD)){#
+    datai <- basedata[basedata$dyad == newDiD[i], ]#
+	m <- stats::lm(model, na.action=na.exclude, data=datai)#
+	R2[[i]] <- summary(m)$adj.r.squared#
+  }			#
+#
+  return(R2)#
+}
+test <- r2(data2)
+data2 <- dataPrep(basedata=data1, dyadId="couple", personId="person", obs_name="dial", dist_name="female", time_name="time", time_lag=1)
+r2 <- function(basedata){#
+#
+  model <- stats::formula(obs_deTrend ~ -1 + dist0 + dist1 + dist0:p_obs_deTrend_Lag + dist1:p_obs_deTrend_Lag)  #
+  newDiD <- unique(factor(basedata$dyad))#
+  R2 <- vector()#
+  for (i in 1:length(newDiD)){#
+    datai <- basedata[basedata$dyad == newDiD[i], ]#
+	m <- stats::lm(model, na.action=na.exclude, data=datai)#
+	R2[[i]] <- summary(m)$adj.r.squared#
+  }			#
+#
+  return(R2)#
+}
+test <- r2(data2)
+summary(test)
