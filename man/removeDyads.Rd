@@ -4,24 +4,37 @@
 \alias{removeDyads}
 \title{Remove data for specified dyads from a dataframe}
 \usage{
-removeDyads(basedata, dyads, dyadId)
+removeDyads(
+  basedata,
+  dyadId,
+  dist_name,
+  obs_name,
+  dyadsToCut = NULL,
+  timeCut = NULL
+)
 }
 \arguments{
 \item{basedata}{A user provided dataframe.}
 
-\item{dyads}{A vector of dyad IDs to remove.}
-
 \item{dyadId}{The variable in the dataframe specifying dyad ID.}
+
+\item{dist_name}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
+
+\item{obs_name}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
+
+\item{dyadsToCut}{A vector of dyad IDs to remove.}
+
+\item{timeCut}{The time value cutoff for removing dyads with fewer time points.}
 }
 \value{
-A dataframe with the data for the specified dyads removed.
+A list with 1) a dataframe (basedata) with the data removed for dyads where the partners have unequal numbers of observations or completely missing data, any dyads specified by dyadsToCut, and dyads who had observations less than or equal to the timeCut value, 2) a list of the dyad IDs with unequal observations (unEqual) and 3) a list of the dyad IDs with completely missing observations (dyadsMissing).
 }
 \description{
-Useful for cleaning data if some dyads have extensive missing or otherwise problematic data.
+Useful for cleaning data if some dyads have extensive missing or otherwise problematic data. The function will automatically remove dyads where the two partners have an unequal number of observations or completely missing data. If this happens it provides a warning, prints the dyads that were removed and returns two lists (unEqual and dyadsMissing) with the dyad ids. In addition, you can 1) provide a vector of dyad IDs to remove, or 2) provide a time cut to remove dyads with fewer time points than the cutoff.
 }
 \examples{
 data <- rties_ExampleDataShort
-dyads <- c(3, 12)
-newData <- removeDyads(basedata=data, dyads=dyads, dyadId="couple")
+dyadsToCut <- c(3, 12)
+newData <- removeDyads(basedata=data, dyadId="couple", obs_name="dial", dist_name="female", dyadsToCut=dyadsToCut, timeCut=10)
 
 }

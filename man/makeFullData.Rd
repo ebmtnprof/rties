@@ -4,7 +4,7 @@
 \alias{makeFullData}
 \title{Combines profile membership data from the latent profile analysis with other data for using the profile membership to predict and be predicted by the system variable.}
 \usage{
-makeFullData(basedata, dyadId, personId, dist_name, lpaData, params)
+makeFullData(basedata, dyadId, personId, dist_name, lpaData)
 }
 \arguments{
 \item{basedata}{The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.}
@@ -16,8 +16,6 @@ makeFullData(basedata, dyadId, personId, dist_name, lpaData, params)
 \item{dist_name}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
 
 \item{lpaData}{The object returned by the "inspectProfiles" function}
-
-\item{params}{The list called "params" returned by one of the "indiv" functions (e.g., indivInertCoord or indivClo)}
 }
 \value{
 A dataframe that contains all variables needed for using the profiles to predict, or be predicted by, the system variable.
@@ -33,7 +31,7 @@ ic <- indivInertCoord(prepData=newData, whichModel="inertCoord")
 profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
 paramEst=ic$params, n_profiles=2)
 fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
-dist_name="female", lpaData=profiles, params=ic$params)
+dist_name="female", lpaData=profiles)
 head(fullData)
 
 }

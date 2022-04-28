@@ -100,7 +100,7 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 }
 
 
-################## makeDist
+################## makeDist; This function needs to be reconsidered. In the meantime, it is not exported
 
 #' Create a distinguishing variable (called "dist") for non-distinguishable dyads by assigning the partner who is lower on a chosen variable a 0 and the partner who is higher on the variable a 1. 
 #'
@@ -115,10 +115,7 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 #' time_name="time", dist_name="relstress")
 #' summary(newData$dist)
 
-
 #' @return The function returns the original dataframe with an additional variable, called "dist" that distinguishes between partners based on the user-specified variable indicated by "dist_name"
-
-#' @export
 
 makeDist <- function(basedata, dyadId, personId, time_name, dist_name)
 {
@@ -157,25 +154,117 @@ lineCenterById <- function(basedata)
 
 #' Remove data for specified dyads from a dataframe
 #'
-#' Useful for cleaning data if some dyads have extensive missing or otherwise problematic data.
+#' Useful for cleaning data if some dyads have extensive missing or otherwise problematic data. The function will automatically remove dyads where the two partners have an unequal number of observations or completely missing data. If this happens it provides a warning, prints the dyads that were removed and returns two lists (unEqual and dyadsMissing) with the dyad ids. In addition, you can 1) provide a vector of dyad IDs to remove, or 2) provide a time cut to remove dyads with fewer time points than the cutoff.
 #'
 #' @param basedata A user provided dataframe.
-#' @param dyads A vector of dyad IDs to remove.
 #' @param dyadId The variable in the dataframe specifying dyad ID.
+#' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
+#' @param dyadsToCut A vector of dyad IDs to remove.
+#' @param timeCut The time value cutoff for removing dyads with fewer time points.
 #' @examples
 #' data <- rties_ExampleDataShort
-#' dyads <- c(3, 12)
-#' newData <- removeDyads(basedata=data, dyads=dyads, dyadId="couple")
+#' dyadsToCut <- c(3, 12)
+#' newData <- removeDyads(basedata=data, dyadId="couple", obs_name="dial", dist_name="female", dyadsToCut=dyadsToCut, timeCut=10)
 #'
-#' @return A dataframe with the data for the specified dyads removed.
+#' @return A list with 1) a dataframe (basedata) with the data removed for dyads where the partners have unequal numbers of observations or completely missing data, any dyads specified by dyadsToCut, and dyads who had observations less than or equal to the timeCut value, 2) a list of the dyad IDs with unequal observations (unEqual) and 3) a list of the dyad IDs with completely missing observations (dyadsMissing).
 
 #' @export
 
-removeDyads <- function (basedata, dyads, dyadId){
-	colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
-	basedata <- basedata[!basedata$dyad %in% dyads, ]
-	colnames(basedata)[colnames(basedata)== "dyad"] <- dyadId
-	return(basedata)
+removeDyads <- function (basedata, dyadId, dist_name, obs_name, dyadsToCut=NULL, timeCut=NULL){
+  colnames(basedata)[colnames(basedata)== dyadId] <- "dId"
+  colnames(basedata)[colnames(basedata)== dist_name] <- "dist"
+  colnames(basedata)[colnames(basedata)== obs_name] <- "obs"
+  
+  # check partners have same number of observations. If not, provide warning and delete them
+  notEqual <- vector()
+  t <- table(basedata$dist, basedata$dId)
+  for(i in 1:ncol(t)){		
+    if (t[1,i] != t[2,i]){
+      notEqual <- append(notEqual, dimnames(t)[[2]][i])
+    }
+  }				
+  if (length(notEqual) > 0){
+    print(notEqual)
+    warning("the partners in these dyads have unequal number of observations and have been deleted")
+    basedata <- basedata[!basedata$dId %in% notEqual, ]
+  }
+  
+  if(!is.null(dyadsToCut)){
+    basedata <- basedata[!basedata$dId %in% dyadsToCut, ]
+  }
+  
+  newDid <- unique(factor(basedata$dId))
+  dyads <- vector()
+  missing <- vector()
+  
+  for (i in 1:length(newDid)){
+    datai <- basedata[basedata$dId == newDid[i], ]
+    datai0 <- basedata[basedata$dId == newDid[i] & basedata$dist == 0, ]
+    datai1 <- basedata[basedata$dId == newDid[i] & basedata$dist == 1, ]
+    
+    if(is.na(mean(datai0$obs, na.rm=T)) | is.na(mean(datai1$obs, na.rm=T))){
+      missing[i] <- unique(datai$dId)
+    }
+    
+    if(!is.null(timeCut)){
+      if(max(datai$time) <= timeCut){
+        dyads[i] <- unique(datai$dId)
+      }
+      basedata <- basedata[!basedata$dId %in% dyads, ]
+    }
+  }
+  
+  if(length(missing) > 0){
+    dyadsMissing <- missing[!is.na(missing) ]
+    print(dyadsMissing)
+    warning("the partners in these dyads have completely missing observations and have been deleted")
+    basedata <- basedata[!basedata$dId %in% dyadsMissing, ]
+  }
+  
+  dyadsMissing <- missing
+  
+  colnames(basedata)[colnames(basedata)== "dId"] <- dyadId
+  colnames(basedata)[colnames(basedata)== "dist"] <- dist_name
+  colnames(basedata)[colnames(basedata)== "obs"] <- obs_name
+  
+  results <- list(basedata = basedata, missing = dyadsMissing, notEqual = notEqual)
+  return(results)
+}
+
+######################## smoothData
+
+#' Smooth one column of a dataframe with a user specified smoothing window
+#'
+#' @param basedata A user provided dataframe.
+#' @param window A number specifying the window size to be smoothed over.
+#' @param personId The variable in the dataframe specifying person ID.
+#' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable that will be smoothed).
+#' 
+#' @return The original dataframe with an additional column holding the smoothed observation variable, called "obsSmooth"
+
+#' @export
+
+smoothData <- function(basedata, window, personId, obs_name){
+  
+  colnames(basedata)[colnames(basedata)== personId] <- "person"
+  colnames(basedata)[colnames(basedata)== obs_name] <- "observation"
+  
+  pId <- unique(factor(basedata$person))
+  smoothData <- list()
+  f <- rep(1/window, window)
+  
+  for (i in 1:length(pId)){
+    datai <- basedata[basedata$person == pId[i], ]
+    datai$observationNew <- zoo::na.approx(datai$observation, na.rm=F)
+    datai$obsSmooth <- filter(datai$observationNew, f, sides=2)
+    datai$obsSmooth <- as.numeric(datai$obsSmooth)
+    smoothData[[i]] <- datai
+  }
+  smoothDataAll <- plyr::ldply(smoothData, data.frame)
+  colnames(smoothDataAll)[colnames(smoothDataAll)== "person"] <- personId
+  colnames(smoothDataAll)[colnames(smoothDataAll)== "observation"] <- obs_name
+  return(smoothDataAll)
 }
 
 ################# actorPartnerDataCross
@@ -237,7 +326,7 @@ actorPartnerDataCross <- function(basedata, dyadId, personId){
 
 actorPartnerDataTime <- function(basedata, dyadId, personId){
 		
-    	colnames(basedata)[colnames(basedata) == dyadId] <- "dyad"
+  colnames(basedata)[colnames(basedata) == dyadId] <- "dyad"
 	colnames(basedata)[colnames(basedata) == personId] <- "person"
 	basedata <- basedata[order(basedata$person), ]
 	dataA <- basedata
@@ -275,7 +364,7 @@ actorPartnerDataTime <- function(basedata, dyadId, personId){
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #' @param lpaData The object returned by the "inspectProfiles" function
-#' @param params The list called "params" returned by one of the "indiv" functions (e.g., indivInertCoord or indivClo) 
+
 #' @examples
 #' data <- rties_ExampleDataShort
 #' newData <- dataPrep(basedata=data, dyadId="couple", personId="person", 
@@ -284,14 +373,14 @@ actorPartnerDataTime <- function(basedata, dyadId, personId){
 #' profiles <- inspectProfiles(whichModel="inertCoord", prepData=newData, 
 #' paramEst=ic$params, n_profiles=2)
 #' fullData <- makeFullData(basedata=data, dyadId="couple", personId="person", 
-#' dist_name="female", lpaData=profiles, params=ic$params)
+#' dist_name="female", lpaData=profiles)
 #' head(fullData)
 #'
 #' @return A dataframe that contains all variables needed for using the profiles to predict, or be predicted by, the system variable.
 
 #' @export
 
-makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData, params){
+makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData){
   colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
   colnames(basedata)[colnames(basedata)== personId] <- "person"
   colnames(basedata)[colnames(basedata)== dist_name ] <- "dist1"
@@ -303,6 +392,55 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData, params)
   
   return(fullData)
 }
+
+
+############## makeCohereData
+
+#' Takes typical long-format dyadic data, but assumes that it has been subsetted into separate dataframes for the two types of partner (e.g., the data passed to the function should only include data for one of the partner types). The function stacks two user-chosen observed variables on top of each other so they can be treated as "dyadic" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person.  
+#'
+#' @param basedata The original dataframe provided by the user that includes at least two time-series variables nested within-person for one type of partner (e.g., data from only men or women, not both)
+#' @param dyadId The name of the column in the dataframe that has the original couple-level identifier.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param obs1_name The name of the column in the dataframe that has the first time-series variable to be stacked.
+#' #' @param obs2_name The name of the column in the dataframe that has the second time-series variable to be stacked.
+#' @param labels A string vector with the names of the variables that are being stacked.
+#' @param idConvention The value that was added to the dist1 ID number to get the dist2 ID number
+#'
+#' @return A dataframe that contains the original data, plus the following columns: 1) var: the names of the stacked variables (taken from "labels"). 2) obs: the stacked observed variables, 3) dist: a zero/one distinguishing variable, and 4) varId: a variable ID that is similar to personId for use with rties. The varId for the first stacked variable is the same as the personId and the varId for the second stacked variable is personId + idConvention.
+
+#' @export
+
+makeCohereData <- function(basedata, dyadId, personId, time_name, obs1_name, obs2_name, labels, idConvention)
+{
+  colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
+  colnames(basedata)[colnames(basedata)== personId] <- "person"
+  colnames(basedata)[colnames(basedata)== time_name] <- "time"
+  colnames(basedata)[colnames(basedata)== obs1_name] <- "obs1"
+  colnames(basedata)[colnames(basedata)== obs2_name] <- "obs2"
+  
+  newData <- reshape(basedata, varying=c("obs1","obs2"), timevar="var", idvar=c("person","time"), direction="long", sep="")
+  
+  ### the next 3 steps must be in order
+  # make a zero/one distinguishing variable
+  newData$dist <- newData$var - 1
+  
+  # make a variable ID, nested within person, that will function like a person ID in rties code
+  newData$varId <- ifelse(newData$dist == 0, newData$person, newData$person + idConvention)
+  
+  # make var into a factor with recognizable names
+  newData$var <- factor(newData$var, levels=c(1,2), labels=labels)
+  
+  colnames(newData)[colnames(newData)== "dyad"] <- dyadId
+  colnames(newData)[colnames(newData)== "person"] <- personId
+  colnames(newData)[colnames(newData)== "time"] <- time_name
+  colnames(newData)[colnames(newData)== "obs1"] <- obs1_name
+  colnames(newData)[colnames(newData)== "obs12"] <- obs2_name
+  
+  return(newData)
+}
+
+
+
 
 ############# Max_Min_CCF_Signed
 
@@ -333,13 +471,14 @@ output
 
 ############# makeCrossCorr
 
-#' Calculates cross-correlations for a given variable and returns a dataframe with the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms).
+#' Calculates cross-correlations for a given variable and returns a dataframe with either: 1) if "time_lag" is null, the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms), or 2) if "time_lag is specified, the cross-correlations for each dyad at that lag.
 #'
 #' @param basedata The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.
 #' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
+#' @param time_lag If null (the default), the maximum absolute value cross-correlation and its corresponding lag are returned. Otherwise, the cross-correlation at the specified time lag is returned.
 #' @examples
 #' data <- rties_ExampleDataShort
 #' newData <- makeCrossCorr(basedata=data, dyadId="couple", personId="person", 
@@ -350,38 +489,51 @@ output
 
 #' @export
 
-makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name){
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name, time_lag=NULL){
   
   newdata <- basedata
   colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"
   colnames(newdata)[colnames(newdata)== personId] <- "person"
   colnames(newdata)[colnames(newdata)== obs_name] <- "dv"
   colnames(newdata)[colnames(newdata)== dist_name ] <- "dist1"
-
+  
   crossCorr <- list()
   dID <- unique(factor(newdata$dyad))
-
+  
   for (i in 1:length(dID)){
-  datai <- newdata[newdata$dyad == dID[i], ]
-  dist1 <- datai[ which(datai$dist1 == 1), "dv"]
-  dist0 <- datai[ which(datai$dist1 == 0), "dv"]
-  crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)
+    datai <- newdata[newdata$dyad == dID[i], ]
+    dist1 <- datai[ which(datai$dist1 == 1), "dv"]
+    dist0 <- datai[ which(datai$dist1 == 0), "dv"]
+    
+    if(is.null(time_lag)){
+      crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)}
+    else{
+      d <- ccf(dist0, dist1, plot = FALSE, na.action=na.exclude)
+      cor = d$acf[ ,,1] 
+      lag = d$lag[ ,,1] 
+      toLag <- which(lag == time_lag)
+      temp <- c(d$acf[ ,,1][toLag], time_lag)
+      crossCorr[[i]] <- temp
+    }
   }
-
+  
   cc1 <- lapply(crossCorr, function(x) lapply(x, function(x) ifelse(is.null(x), NA, x)))
   cc2 <- lapply(cc1, function(x) lapply(x, function(x) ifelse(is.numeric(x), round(x,digits=3), x)))
   cc <- as.data.frame(do.call(rbind, crossCorr))
   cc$newID <- dID
-  colnames(cc) <- c("maxCor","maxLag", dyadId)
- 
+  colnames(cc) <- c("cor","lag", dyadId)
+  
   temp1 <- newdata[!duplicated(newdata$person), ]
   colnames(temp1)[colnames(newdata)== "dyad"] <- dyadId
   colnames(temp1)[colnames(newdata)== "person"] <- personId
+  colnames(temp1)[colnames(newdata)== "dv"] <- obs_name
   temp2 <- plyr::join(cc, temp1)
   
   crossCorr <- temp2
   return(crossCorr)
- }
+}
+
+
 
 
 ################ Plotting functions

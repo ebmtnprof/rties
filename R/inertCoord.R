@@ -172,6 +172,13 @@ indivInertCoord <- function(prepData, whichModel)
   data <- suppressMessages(plyr::join(param, temp2))
   params <- data[data$dist0 == 1, ]
   
+  params$int0 <- as.numeric(params$int0)
+  params$int1 <- as.numeric(params$int1)
+  params$inert0 <- as.numeric(params$inert0)
+  params$inert1 <- as.numeric(params$inert1)
+  params$coord0 <- as.numeric(params$coord0)
+  params$coord1 <- as.numeric(params$coord1)
+  
   results <- list(params=params)
 }
 

@@ -2,9 +2,9 @@
 % Please edit documentation in R/rtiesShared.R
 \name{makeCrossCorr}
 \alias{makeCrossCorr}
-\title{Calculates cross-correlations for a given variable and returns a dataframe with the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms).}
+\title{Calculates cross-correlations for a given variable and returns a dataframe with either: 1) if "time_lag" is null, the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms), or 2) if "time_lag is specified, the cross-correlations for each dyad at that lag.}
 \usage{
-makeCrossCorr(basedata, dyadId, personId, obs_name, dist_name)
+makeCrossCorr(basedata, dyadId, personId, obs_name, dist_name, time_lag = NULL)
 }
 \arguments{
 \item{basedata}{The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.}
@@ -16,12 +16,14 @@ makeCrossCorr(basedata, dyadId, personId, obs_name, dist_name)
 \item{obs_name}{The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).}
 
 \item{dist_name}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
+
+\item{time_lag}{If null (the default), the maximum absolute value cross-correlation and its corresponding lag are returned. Otherwise, the cross-correlation at the specified time lag is returned.}
 }
 \value{
 A cross-sectional version of the original dataframe with maximal absolute-value cross-correlations and their lags added for each dyad.
 }
 \description{
-Calculates cross-correlations for a given variable and returns a dataframe with the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms).
+Calculates cross-correlations for a given variable and returns a dataframe with either: 1) if "time_lag" is null, the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms), or 2) if "time_lag is specified, the cross-correlations for each dyad at that lag.
 }
 \examples{
 data <- rties_ExampleDataShort

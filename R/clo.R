@@ -325,7 +325,7 @@ indivClo <- function(derivData, whichModel)
 	param[[i]][numParam + 1] <- unique(datai$dyad)
   }			
   params <- as.data.frame(do.call(rbind, param))
-  colnames(params) <- paramNames	
+  colnames(params) <- paramNames
   results <- list(R2=R2, params=params)
 }
 
