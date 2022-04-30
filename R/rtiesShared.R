@@ -396,7 +396,7 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData){
 
 ############## makeCohereData
 
-#' Takes typical long-format dyadic data, but assumes that it has been subsetted into separate dataframes for the two types of partner (e.g., the data passed to the function should only include data for one of the partner types). The function stacks two user-chosen observed variables on top of each other so they can be treated as "dyadic" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person.  
+#' Takes typical long-format dyadic data, but assumes that it has been subsetted into separate dataframes for the two types of partner (e.g., the data passed to the function should only include data for one of the partner types). The function stacks two user-chosen observed variables on top of each other so they can be treated as "dyadic" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person. This data can then be used for any process that needs variables-within-person, including calculating cross-correlations with the makeCrossCorr function.  
 #'
 #' @param basedata The original dataframe provided by the user that includes at least two time-series variables nested within-person for one type of partner (e.g., data from only men or women, not both)
 #' @param dyadId The name of the column in the dataframe that has the original couple-level identifier.
@@ -440,21 +440,20 @@ makeCohereData <- function(basedata, dyadId, personId, time_name, obs1_name, obs
 }
 
 
-
-
 ############# Max_Min_CCF_Signed
 
 #' A helper function for makeCrossCorr
 
 #' @param a First time-series used in the cross-correlation
 #' @param b Second time-series used in the cross-correlation
+#' @lagMax maximum lag at which to calculate the acf. Default is 10*log10(N/m) where N is the number of observations and m the number of series. 
 #' 
 #' @return A list of maximum absolute value cross-correlations and the lag at which they occurred.
 
 #' @importFrom stats ccf na.exclude
 
-Max_Min_CCF_Signed <- function (a, b) {
-d <- ccf(a, b, plot = FALSE, na.action=na.exclude)
+Max_Min_CCF_Signed <- function (a, b,lagMax) {
+d <- ccf(a, b, plot = FALSE, na.action=na.exclude, lag.max = lagMax)
 cor = d$acf[ ,,1] 
 lag = d$lag[ ,,1] 
 res = data.frame(cor,lag) 
@@ -471,7 +470,7 @@ output
 
 ############# makeCrossCorr
 
-#' Calculates cross-correlations for a given variable and returns a dataframe with either: 1) if "time_lag" is null, the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms), or 2) if "time_lag is specified, the cross-correlations for each dyad at that lag.
+#' Calculates cross-correlations for a given variable and returns a dataframe with either: 1) if "time_lag" is null, the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms -- the sign is retained), or 2) if "time_lag is specified, the cross-correlations for each dyad at that lag.
 #'
 #' @param basedata The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.
 #' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
@@ -479,6 +478,7 @@ output
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #' @param time_lag If null (the default), the maximum absolute value cross-correlation and its corresponding lag are returned. Otherwise, the cross-correlation at the specified time lag is returned.
+#' @lagMax Maximum lag at which to calculate the acf if time_lag is null. Default is 10*log10(N/m) where N is the number of observations and m the number of series. 
 #' @examples
 #' data <- rties_ExampleDataShort
 #' newData <- makeCrossCorr(basedata=data, dyadId="couple", personId="person", 
@@ -489,7 +489,7 @@ output
 
 #' @export
 
-makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name, time_lag=NULL){
+makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name, time_lag=NULL, lagMax=NULL){
   
   newdata <- basedata
   colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"
@@ -506,7 +506,7 @@ makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name, time_
     dist0 <- datai[ which(datai$dist1 == 0), "dv"]
     
     if(is.null(time_lag)){
-      crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1)}
+      crossCorr[[i]] <- Max_Min_CCF_Signed(dist0, dist1, lagMax)}
     else{
       d <- ccf(dist0, dist1, plot = FALSE, na.action=na.exclude)
       cor = d$acf[ ,,1] 

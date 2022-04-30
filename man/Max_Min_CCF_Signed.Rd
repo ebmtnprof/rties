@@ -4,7 +4,7 @@
 \alias{Max_Min_CCF_Signed}
 \title{A helper function for makeCrossCorr}
 \usage{
-Max_Min_CCF_Signed(a, b)
+Max_Min_CCF_Signed(a, b, lagMax)
 }
 \arguments{
 \item{a}{First time-series used in the cross-correlation}

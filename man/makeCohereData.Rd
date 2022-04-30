@@ -2,7 +2,7 @@
 % Please edit documentation in R/rtiesShared.R
 \name{makeCohereData}
 \alias{makeCohereData}
-\title{Takes typical long-format dyadic data, but assumes that it has been subsetted into separate dataframes for the two types of partner (e.g., the data passed to the function should only include data for one of the partner types). The function stacks two user-chosen observed variables on top of each other so they can be treated as "dyadic" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person.}
+\title{Takes typical long-format dyadic data, but assumes that it has been subsetted into separate dataframes for the two types of partner (e.g., the data passed to the function should only include data for one of the partner types). The function stacks two user-chosen observed variables on top of each other so they can be treated as "dyadic" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person. This data can then be used for any process that needs variables-within-person, including calculating cross-correlations with the makeCrossCorr function.}
 \usage{
 makeCohereData(
   basedata,
@@ -33,5 +33,5 @@ makeCohereData(
 A dataframe that contains the original data, plus the following columns: 1) var: the names of the stacked variables (taken from "labels"). 2) obs: the stacked observed variables, 3) dist: a zero/one distinguishing variable, and 4) varId: a variable ID that is similar to personId for use with rties. The varId for the first stacked variable is the same as the personId and the varId for the second stacked variable is personId + idConvention.
 }
 \description{
-Takes typical long-format dyadic data, but assumes that it has been subsetted into separate dataframes for the two types of partner (e.g., the data passed to the function should only include data for one of the partner types). The function stacks two user-chosen observed variables on top of each other so they can be treated as "dyadic" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person.
+Takes typical long-format dyadic data, but assumes that it has been subsetted into separate dataframes for the two types of partner (e.g., the data passed to the function should only include data for one of the partner types). The function stacks two user-chosen observed variables on top of each other so they can be treated as "dyadic" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person. This data can then be used for any process that needs variables-within-person, including calculating cross-correlations with the makeCrossCorr function.
 }
