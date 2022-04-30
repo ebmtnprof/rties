@@ -446,7 +446,7 @@ makeCohereData <- function(basedata, dyadId, personId, time_name, obs1_name, obs
 
 #' @param a First time-series used in the cross-correlation
 #' @param b Second time-series used in the cross-correlation
-#' @lagMax maximum lag at which to calculate the acf. Default is 10*log10(N/m) where N is the number of observations and m the number of series. 
+#' @param lagMax Maximum lag at which to calculate the acf. Default is 10*log10(N/m) where N is the number of observations and m the number of series. 
 #' 
 #' @return A list of maximum absolute value cross-correlations and the lag at which they occurred.
 
@@ -478,7 +478,7 @@ output
 #' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #' @param time_lag If null (the default), the maximum absolute value cross-correlation and its corresponding lag are returned. Otherwise, the cross-correlation at the specified time lag is returned.
-#' @lagMax Maximum lag at which to calculate the acf if time_lag is null. Default is 10*log10(N/m) where N is the number of observations and m the number of series. 
+#' @param lagMax Maximum lag at which to calculate the acf if time_lag is null. Default is 10*log10(N/m) where N is the number of observations and m the number of series. 
 #' @examples
 #' data <- rties_ExampleDataShort
 #' newData <- makeCrossCorr(basedata=data, dyadId="couple", personId="person", 

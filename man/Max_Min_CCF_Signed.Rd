@@ -10,6 +10,8 @@ Max_Min_CCF_Signed(a, b, lagMax)
 \item{a}{First time-series used in the cross-correlation}
 
 \item{b}{Second time-series used in the cross-correlation}
+
+\item{lagMax}{Maximum lag at which to calculate the acf. Default is 10*log10(N/m) where N is the number of observations and m the number of series.}
 }
 \value{
 A list of maximum absolute value cross-correlations and the lag at which they occurred.

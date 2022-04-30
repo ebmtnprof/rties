@@ -26,6 +26,8 @@ makeCrossCorr(
 \item{dist_name}{The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1.}
 
 \item{time_lag}{If null (the default), the maximum absolute value cross-correlation and its corresponding lag are returned. Otherwise, the cross-correlation at the specified time lag is returned.}
+
+\item{lagMax}{Maximum lag at which to calculate the acf if time_lag is null. Default is 10*log10(N/m) where N is the number of observations and m the number of series.}
 }
 \value{
 A cross-sectional version of the original dataframe with maximal absolute-value cross-correlations and their lags added for each dyad.
