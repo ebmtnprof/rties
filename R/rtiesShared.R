@@ -18,6 +18,7 @@
 #' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
 #' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param time_lag An optional argument for the number of lags for the lagged observable. If a number is provided, the observed variable is lagged that amount. The other option is to use "absMaxCC". In this case the maximum cross-correlation is found for each dyad and the lag at which that occurs is used to lag their observed variables.
+#' @param lagMax An optional argument for the maximum number of lags to be considered for the lagged observable. If a number is provided, it is used as the range of lags to consider. The default is 10*log10(N/m) where N is the number of observations and m the number of series (e.g., the default for the ccf function). 
 #'
 #' @examples 
 #' data <- rties_ExampleDataShort
@@ -39,7 +40,7 @@
 
 #' @export
 
-dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL){
+dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name, time_lag=NULL, lagMax = NULL){
   
   vars <- c(dyadId, personId, obs_name, dist_name, time_name)
   basedata <- basedata[vars]

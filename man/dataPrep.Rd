@@ -11,7 +11,8 @@ dataPrep(
   obs_name,
   dist_name,
   time_name,
-  time_lag = NULL
+  time_lag = NULL,
+  lagMax = NULL
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ dataPrep(
 \item{time_name}{The name of the column in the dataframe that indicates sequential temporal observations.}
 
 \item{time_lag}{An optional argument for the number of lags for the lagged observable. If a number is provided, the observed variable is lagged that amount. The other option is to use "absMaxCC". In this case the maximum cross-correlation is found for each dyad and the lag at which that occurs is used to lag their observed variables.}
+
+\item{lagMax}{An optional argument for the maximum number of lags to be considered for the lagged observable. If a number is provided, it is used as the range of lags to consider. The default is 10*log10(N/m) where N is the number of observations and m the number of series (e.g., the default for the ccf function).}
 }
 \value{
 The function returns a dataframe that has all the variables needed for modeling system dynamics, each renamed to a generic variable name, which are:
