@@ -75,9 +75,9 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 	lag <- time_lag
 	  
   if(lag == "absMaxCC"){
-	crossCorr <- makeCrossCorr(basedata=basedata, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1")
+	crossCorr <- makeCrossCorr(basedata=basedata, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1", lagMax = NULL)
 	cc <- crossCorr[!duplicated(crossCorr$dyad), ]
-    lagTemp <- as.numeric(unlist(cc$maxLag))
+    lagTemp <- as.numeric(unlist(cc$lag))
     lag <- ifelse(lagTemp == 0, 1, lagTemp)
     dID <- unique(factor(basedata$dyad))
     lagData <- list()
