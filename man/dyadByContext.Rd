@@ -2,7 +2,7 @@
 % Please edit documentation in R/rtiesShared.R
 \name{dyadByContext}
 \alias{dyadByContext}
-\title{Creates variables indicating dyad by context membership and person by context membership. These can then be used in place of "dyadID" and "personID" in all other rties functions in order to apply them to contexts nested within dyads (or persons)}
+\title{Creates variables indicating dyad by context membership (dyadContext) and person by context (personContext) membership. These are renamed by the dataPrep function into "dyad" and "person," which can be used as normal for all other rties functions that use the dataframe produced by dataPrep. Other functions that use the dataframe prior to the dataPrep step will need to use the dyadContext and personContext variables instead.}
 \usage{
 dyadByContext(
   basedata,
@@ -37,5 +37,5 @@ The function returns the original dataframe with additional variables, called "d
 #' @export
 }
 \description{
-Creates variables indicating dyad by context membership and person by context membership. These can then be used in place of "dyadID" and "personID" in all other rties functions in order to apply them to contexts nested within dyads (or persons)
+Creates variables indicating dyad by context membership (dyadContext) and person by context (personContext) membership. These are renamed by the dataPrep function into "dyad" and "person," which can be used as normal for all other rties functions that use the dataframe produced by dataPrep. Other functions that use the dataframe prior to the dataPrep step will need to use the dyadContext and personContext variables instead.
 }

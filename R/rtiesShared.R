@@ -103,7 +103,7 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 
 ################## dyadByContext; To be used for data where each dyad (or person) engages in multiple contexts. Allows all other rties functions to be applied to one context at a time, nested within dyad or person
 
-#'Creates variables indicating dyad by context membership and person by context membership. These can then be used in place of "dyadID" and "personID" in all other rties functions in order to apply them to contexts nested within dyads (or persons)
+#'Creates variables indicating dyad by context membership (dyadContext) and person by context (personContext) membership. These are renamed by the dataPrep function into "dyad" and "person," which can be used as normal for all other rties functions that use the dataframe produced by dataPrep. Other functions that use the dataframe prior to the dataPrep step will need to use the dyadContext and personContext variables instead. 
 
 #' @param basedata A user-provided dataframe.
 #' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
