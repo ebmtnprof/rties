@@ -27,7 +27,7 @@ makeCohereData(
 
 \item{labels}{A string vector with the names of the variables that are being stacked.}
 
-\item{idConvention}{The value that was added to the dist1 ID number to get the dist2 ID number}
+\item{idConvention}{The value that was added to the dist1 personID number to get the dist2 personID number}
 }
 \value{
 A dataframe that contains the original data, plus the following columns: 1) var: the names of the stacked variables (taken from "labels"). 2) obs: the stacked observed variables, 3) dist: a zero/one distinguishing variable, and 4) varId: a variable ID that is similar to personId for use with rties. The varId for the first stacked variable is the same as the personId and the varId for the second stacked variable is personId + idConvention.
