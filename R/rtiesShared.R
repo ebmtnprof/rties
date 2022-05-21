@@ -101,6 +101,50 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 }
 
 
+################## dyadByContext; To be used for data where each dyad (or person) engages in multiple contexts. Allows all other rties functions to be applied to one context at a time, nested within dyad or person
+
+#'Creates variables indicating dyad by context membership and person by context membership. These can then be used in place of "dyadID" and "personID" in all other rties functions in order to apply them to contexts nested within dyads (or persons)
+
+#' @param basedata A user-provided dataframe.
+#' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param context The name of the column in the dataframe that has the variable indicating context. This must be an integer variable.
+#' @param obs_name The name of the column in the dataframe that has the time-varying observable (e.g., the variable for which dynamics will be assessed).
+#' @param dist_name The name of the column in the dataframe that has a variable that distinguishes the partners (e.g., sex, mother/daughter, etc) that is numeric and scored 0/1. 
+#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
+#' #' @param idConvention The value that was added to the dist1 personID number to get the dist2 personID number
+
+#' @return The function returns the original dataframe with additional variables, called "dyadContext" and "personContext." These have the original dyad or person ID numbers with the context number * .001 appended. For example, dyad 33 in context 4 would get the value for "dyadContext" of 33.004. Similarly, person 502 in context 2 would get the value 502.002.
+#' 
+#' #' @export
+
+dyadByContext <- function(basedata, dyadId, personId, context, obs_name, dist_name, time_name, idConvention)
+{
+  colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
+  colnames(basedata)[colnames(basedata)== personId] <- "person"
+  colnames(basedata)[colnames(basedata)== context] <- "context"
+  colnames(basedata)[colnames(basedata)== time_name] <- "time"
+  colnames(basedata)[colnames(basedata)== obs_name] <- "obs"
+  colnames(basedata)[colnames(basedata)== dist_name] <- "dist"
+  
+  if(!is.numeric(basedata$dist)) stop("Distinguishor must be an 0/1 numeric variable")
+  if(!is.integer(basedata$context)) stop("Context must be an integer variable")
+  
+  basedata$contextNum <- as.numeric(basedata$context)
+  basedata$dyadContext <- basedata$dyad + (basedata$contextNum * .001)
+  basedata$personContext <- ifelse(basedata$dist == 0, basedata$dyadContext, basedata$dyadContext + idConvention)
+  
+  basedata <- subset(basedata, select=-c(dyad, person))
+  
+  colnames(basedata)[colnames(basedata)== "context"] <- context
+  colnames(basedata)[colnames(basedata)== "time"] <- time_name
+  colnames(basedata)[colnames(basedata)== "obs"] <- obs_name
+  colnames(basedata)[colnames(basedata)== "dist"] <- dist_name
+  
+  return(basedata)
+}
+
+
 ################## makeDist; This function needs to be reconsidered. In the meantime, it is not exported
 
 #' Create a distinguishing variable (called "dist") for non-distinguishable dyads by assigning the partner who is lower on a chosen variable a 0 and the partner who is higher on the variable a 1. 
@@ -405,7 +449,7 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData){
 #' @param obs1_name The name of the column in the dataframe that has the first time-series variable to be stacked.
 #' #' @param obs2_name The name of the column in the dataframe that has the second time-series variable to be stacked.
 #' @param labels A string vector with the names of the variables that are being stacked.
-#' @param idConvention The value that was added to the dist1 ID number to get the dist2 ID number
+#' @param idConvention The value that was added to the dist1 personID number to get the dist2 personID number
 #'
 #' @return A dataframe that contains the original data, plus the following columns: 1) var: the names of the stacked variables (taken from "labels"). 2) obs: the stacked observed variables, 3) dist: a zero/one distinguishing variable, and 4) varId: a variable ID that is similar to personId for use with rties. The varId for the first stacked variable is the same as the personId and the varId for the second stacked variable is personId + idConvention.
 
