@@ -144,57 +144,6 @@ dyadByContext <- function(basedata, dyadId, personId, context, obs_name, dist_na
   return(basedata)
 }
 
-
-################## makeDist; This function needs to be reconsidered. In the meantime, it is not exported
-
-#' Create a distinguishing variable (called "dist") for non-distinguishable dyads by assigning the partner who is lower on a chosen variable a 0 and the partner who is higher on the variable a 1. 
-#'
-#' @param basedata A user-provided dataframe.
-#' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
-#' @param personId The name of the column in the dataframe that has the person-level identifier.
-#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
-#' @param dist_name The name of the column in the dataframe that holds the variable to use for distinguishing the partners. For example, if "influence" was the variable, for each dyad the partner scoring lower on "influence" would be given a score of 0 on "dist" and the partner scoring higher on "influence" would be given a score of 1 on "dist"
-#' @examples
-#' data <- rties_ExampleDataShort
-#' newData <- makeDist(basedata=data, dyadId="couple", personId="person", 
-#' time_name="time", dist_name="relstress")
-#' summary(newData$dist)
-
-#' @return The function returns the original dataframe with an additional variable, called "dist" that distinguishes between partners based on the user-specified variable indicated by "dist_name"
-
-makeDist <- function(basedata, dyadId, personId, time_name, dist_name)
-{
-    vars1 <- c(dyadId, personId, time_name, dist_name)
-    temp1 <- basedata[vars1]
-    temp2 <- actorPartnerDataTime(temp1, dyadId, personId)     
-    temp2$dist <- ifelse(temp2[ ,4] == temp2[ ,8], NA, 
-				ifelse(temp2[ ,4] < temp2[ ,8], 0, 1))
-    vars2 <- c("dyad", "person", "time", "dist")
-    temp3 <- temp2[vars2]
-    colnames(temp3)[colnames(temp3) == "dyad"] <- dyadId
-    colnames(temp3)[colnames(temp3) == "person"] <- personId
-    colnames(temp3)[colnames(temp3) == "time"] <- time_name
-     
-    temp4 <- plyr::join(basedata, temp3)
-    return(temp4)
- }
-
-############### lineCenterById
-
-# This function creates a person-centered version of the observed variable "obs" called "obs_deTrend" that is centered around a linear regression line for each person, e.g., "obs_deTrend" is the residuals of "obs" when predicted from a linear regression on "time" for each person one at a time. 
-
-lineCenterById <- function(basedata)
-{
-  newId <- unique(factor(basedata$id))
-  dataCent <- list()
-  for(i in 1:length(newId)){
-	datai <- basedata[basedata$id == newId[i],]
-	datai$obs_deTrend <- stats::resid(stats::lm(obs ~ time, data=datai, na.action=na.exclude))
-	dataCent[[i]] <- datai
-  }		
-  basedata <- as.data.frame(do.call(rbind, dataCent)) 	
-}		
-
 ########### removeDyads
 
 #' Remove data for specified dyads from a dataframe
@@ -439,13 +388,13 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData){
 }
 
 
-############## makeCohereData
+############## makeBiVarData
 
-#' Takes typical long-format dyadic data, but assumes that it has been subsetted into separate dataframes for the two types of partner (e.g., the data passed to the function should only include data for one of the partner types). The function stacks two user-chosen observed variables on top of each other so they can be treated as "dyadic" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person. This data can then be used for any process that needs variables-within-person, including calculating cross-correlations with the makeCrossCorr function.  
+#' Takes typical long-format data, with time nested in person, and stacks two user-chosen observed variables on top of each other so they can be treated as "bivariate" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person. This data can then be used with the rties functions, but instead of "dyad" being the highest nesting variable, "person" is and should be substituted instead of dyad wherever needed.  
 #'
-#' @param basedata The original dataframe provided by the user that includes at least two time-series variables nested within-person for one type of partner (e.g., data from only men or women, not both)
-#' @param dyadId The name of the column in the dataframe that has the original couple-level identifier.
+#' @param basedata The original dataframe provided by the user that includes at least two time-series variables nested within-person
 #' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
 #' @param obs1_name The name of the column in the dataframe that has the first time-series variable to be stacked.
 #' #' @param obs2_name The name of the column in the dataframe that has the second time-series variable to be stacked.
 #' @param labels A string vector with the names of the variables that are being stacked.
@@ -455,9 +404,8 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData){
 
 #' @export
 
-makeCohereData <- function(basedata, dyadId, personId, time_name, obs1_name, obs2_name, labels, idConvention)
+makeBiVarData <- function(basedata, personId, time_name, obs1_name, obs2_name, labels, idConvention)
 {
-  colnames(basedata)[colnames(basedata)== dyadId] <- "dyad"
   colnames(basedata)[colnames(basedata)== personId] <- "person"
   colnames(basedata)[colnames(basedata)== time_name] <- "time"
   colnames(basedata)[colnames(basedata)== obs1_name] <- "obs1"
@@ -475,7 +423,6 @@ makeCohereData <- function(basedata, dyadId, personId, time_name, obs1_name, obs
   # make var into a factor with recognizable names
   newData$var <- factor(newData$var, levels=c(1,2), labels=labels)
   
-  colnames(newData)[colnames(newData)== "dyad"] <- dyadId
   colnames(newData)[colnames(newData)== "person"] <- personId
   colnames(newData)[colnames(newData)== "time"] <- time_name
   colnames(newData)[colnames(newData)== "obs1"] <- obs1_name
@@ -483,35 +430,6 @@ makeCohereData <- function(basedata, dyadId, personId, time_name, obs1_name, obs
   
   return(newData)
 }
-
-
-############# Max_Min_CCF_Signed
-
-#' A helper function for makeCrossCorr
-
-#' @param a First time-series used in the cross-correlation
-#' @param b Second time-series used in the cross-correlation
-#' @param lagMax Maximum lag at which to calculate the acf. Default is 10*log10(N/m) where N is the number of observations and m the number of series. 
-#' 
-#' @return A list of maximum absolute value cross-correlations and the lag at which they occurred.
-
-#' @importFrom stats ccf na.exclude
-
-Max_Min_CCF_Signed <- function (a, b,lagMax) {
-d <- ccf(a, b, plot = FALSE, na.action=na.exclude, lag.max = lagMax)
-cor = d$acf[ ,,1] 
-lag = d$lag[ ,,1] 
-res = data.frame(cor,lag) 
-for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {
-res_max = res[which.max(res$cor),] 
-res_min = res[which.min(res$cor),]
-res_min_abs = abs(res_min)
-res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))
-if (res.max.abs==1) max=res_max else max=res_min}
-output <-data.frame(max = max)
-output
-}
-
 
 ############# makeCrossCorr
 
@@ -576,6 +494,40 @@ makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name, time_
   
   crossCorr <- temp2
   return(crossCorr)
+}
+
+################## makeDist; This function needs to be reconsidered. In the meantime, it is not exported
+
+#' Create a distinguishing variable (called "dist") for non-distinguishable dyads by assigning the partner who is lower on a chosen variable a 0 and the partner who is higher on the variable a 1. 
+#'
+#' @param basedata A user-provided dataframe.
+#' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
+#' @param personId The name of the column in the dataframe that has the person-level identifier.
+#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
+#' @param dist_name The name of the column in the dataframe that holds the variable to use for distinguishing the partners. For example, if "influence" was the variable, for each dyad the partner scoring lower on "influence" would be given a score of 0 on "dist" and the partner scoring higher on "influence" would be given a score of 1 on "dist"
+#' @examples
+#' data <- rties_ExampleDataShort
+#' newData <- makeDist(basedata=data, dyadId="couple", personId="person", 
+#' time_name="time", dist_name="relstress")
+#' summary(newData$dist)
+
+#' @return The function returns the original dataframe with an additional variable, called "dist" that distinguishes between partners based on the user-specified variable indicated by "dist_name"
+
+makeDist <- function(basedata, dyadId, personId, time_name, dist_name)
+{
+  vars1 <- c(dyadId, personId, time_name, dist_name)
+  temp1 <- basedata[vars1]
+  temp2 <- actorPartnerDataTime(temp1, dyadId, personId)     
+  temp2$dist <- ifelse(temp2[ ,4] == temp2[ ,8], NA, 
+                       ifelse(temp2[ ,4] < temp2[ ,8], 0, 1))
+  vars2 <- c("dyad", "person", "time", "dist")
+  temp3 <- temp2[vars2]
+  colnames(temp3)[colnames(temp3) == "dyad"] <- dyadId
+  colnames(temp3)[colnames(temp3) == "person"] <- personId
+  colnames(temp3)[colnames(temp3) == "time"] <- time_name
+  
+  temp4 <- plyr::join(basedata, temp3)
+  return(temp4)
 }
 
 
@@ -701,5 +653,54 @@ plotDataByProfile <- function(prepData, fullData, n_profiles, dist0name=NULL, di
     if(printPlots==T){print(plots)}
     
     return(plots)
+}
+
+
+############# Max_Min_CCF_Signed
+
+
+################################## Helper functions
+
+############### lineCenterById
+
+# A helper function for dataPrep. This function creates a person-centered version of the observed variable "obs" called "obs_deTrend" that is centered around a linear regression line for each person, e.g., "obs_deTrend" is the residuals of "obs" when predicted from a linear regression on "time" for each person one at a time. 
+
+lineCenterById <- function(basedata)
+{
+  newId <- unique(factor(basedata$id))
+  dataCent <- list()
+  for(i in 1:length(newId)){
+    datai <- basedata[basedata$id == newId[i],]
+    datai$obs_deTrend <- stats::resid(stats::lm(obs ~ time, data=datai, na.action=na.exclude))
+    dataCent[[i]] <- datai
+  }		
+  basedata <- as.data.frame(do.call(rbind, dataCent)) 	
+}		
+
+################ Max_Min_CCF_Signed
+
+#' A helper function for makeCrossCorr
+
+#' @param a First time-series used in the cross-correlation
+#' @param b Second time-series used in the cross-correlation
+#' @param lagMax Maximum lag at which to calculate the acf. Default is 10*log10(N/m) where N is the number of observations and m the number of series. 
+#' 
+#' @return A list of maximum absolute value cross-correlations and the lag at which they occurred.
+
+#' @importFrom stats ccf na.exclude
+
+Max_Min_CCF_Signed <- function (a, b,lagMax) {
+  d <- ccf(a, b, plot = FALSE, na.action=na.exclude, lag.max = lagMax)
+  cor = d$acf[ ,,1] 
+  lag = d$lag[ ,,1] 
+  res = data.frame(cor,lag) 
+  for(i in 1:nrow(res)) if(is.na(res[i,1])) max=NA else {
+    res_max = res[which.max(res$cor),] 
+    res_min = res[which.min(res$cor),]
+    res_min_abs = abs(res_min)
+    res.max.abs = which.max(c(res_max$cor, res_min_abs$cor))
+    if (res.max.abs==1) max=res_max else max=res_min}
+  output <-data.frame(max = max)
+  output
 }
 
