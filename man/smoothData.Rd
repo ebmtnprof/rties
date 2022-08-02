@@ -2,7 +2,7 @@
 % Please edit documentation in R/rtiesShared.R
 \name{smoothData}
 \alias{smoothData}
-\title{Smooth one column of a dataframe with a user specified smoothing window}
+\title{Smooth one column of a dataframe that has time nested in people (e.g., the function is applied one person at a time) with a user specified smoothing window}
 \usage{
 smoothData(basedata, window, personId, obs_name)
 }
@@ -19,5 +19,5 @@ smoothData(basedata, window, personId, obs_name)
 The original dataframe with an additional column holding the smoothed observation variable, called "obsSmooth"
 }
 \description{
-Smooth one column of a dataframe with a user specified smoothing window
+Smooth one column of a dataframe that has time nested in people (e.g., the function is applied one person at a time) with a user specified smoothing window
 }

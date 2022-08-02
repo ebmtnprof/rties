@@ -9,7 +9,7 @@
 
 #' Reformat a user-provided dataframe in a generic form appropriate for \emph{rties} modeling
 #'
-#' The dataframe must be in a specific format and include several specific variables. See the "overview_data_prep" vignette for complete details on the necessary format and follow it closely if you'd like to avoid error messages. That vignette also includes information on how to structure the data if you have two variables within people (rather thean two people within dyads) or have indistinguishable dyads.
+#' The dataframe must be in a specific format and include several specific variables. See the "overview_data_prep" vignette for complete details on the necessary format and follow it closely if you'd like to avoid error messages. That vignette also includes information on how to structure the data if you have two variables within people (rather than two people within dyads) or have indistinguishable dyads.
 #'
 #' @param basedata A user-provided dataframe that includes all variables needed for an rties analysis.
 #' @param dyadId The name of the column in the dataframe that has the dyad-level identifier.
@@ -76,7 +76,7 @@ dataPrep <- function(basedata, dyadId, personId, obs_name, dist_name, time_name,
 	lag <- time_lag
 	  
   if(lag == "absMaxCC"){
-	crossCorr <- makeCrossCorr(basedata=basedata, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1", lagMax = NULL)
+	crossCorr <- makeCrossCorDyadic(basedata=basedata, dyadId="dyad", personId="id", obs_name="obs_deTrend", dist_name="dist1", lagMax = NULL)
 	cc <- crossCorr[!duplicated(crossCorr$dyad), ]
     lagTemp <- as.numeric(unlist(cc$lag))
     lag <- ifelse(lagTemp == 0, 1, lagTemp)
@@ -228,7 +228,7 @@ removeDyads <- function (basedata, dyadId, dist_name, obs_name, dyadsToCut=NULL,
 
 ######################## smoothData
 
-#' Smooth one column of a dataframe with a user specified smoothing window
+#' Smooth one column of a dataframe that has time nested in people (e.g., the function is applied one person at a time) with a user specified smoothing window
 #'
 #' @param basedata A user provided dataframe.
 #' @param window A number specifying the window size to be smoothed over.
@@ -388,52 +388,10 @@ makeFullData <- function(basedata, dyadId, personId, dist_name, lpaData){
 }
 
 
-############## makeBiVarData
 
-#' Takes typical long-format data, with time nested in person, and stacks two user-chosen observed variables on top of each other so they can be treated as "bivariate" within person. In other words, two time-series variables from each person are stacked on top of each other, forming a bivariate pair of variables within person. This data can then be used with the rties functions, but instead of "dyad" being the highest nesting variable, "person" is and should be substituted instead of dyad wherever needed.  
-#'
-#' @param basedata The original dataframe provided by the user that includes at least two time-series variables nested within-person
-#' @param personId The name of the column in the dataframe that has the person-level identifier.
-#' @param time_name The name of the column in the dataframe that indicates sequential temporal observations.
-#' @param obs1_name The name of the column in the dataframe that has the first time-series variable to be stacked.
-#' #' @param obs2_name The name of the column in the dataframe that has the second time-series variable to be stacked.
-#' @param labels A string vector with the names of the variables that are being stacked.
-#' @param idConvention The value that was added to the dist1 personID number to get the dist2 personID number
-#'
-#' @return A dataframe that contains the original data, plus the following columns: 1) var: the names of the stacked variables (taken from "labels"). 2) obs: the stacked observed variables, 3) dist: a zero/one distinguishing variable, and 4) varId: a variable ID that is similar to personId for use with rties. The varId for the first stacked variable is the same as the personId and the varId for the second stacked variable is personId + idConvention.
+############# makeCrossCorDyadic
 
-#' @export
-
-makeBiVarData <- function(basedata, personId, time_name, obs1_name, obs2_name, labels, idConvention)
-{
-  colnames(basedata)[colnames(basedata)== personId] <- "person"
-  colnames(basedata)[colnames(basedata)== time_name] <- "time"
-  colnames(basedata)[colnames(basedata)== obs1_name] <- "obs1"
-  colnames(basedata)[colnames(basedata)== obs2_name] <- "obs2"
-  
-  newData <- reshape(basedata, varying=c("obs1","obs2"), timevar="var", idvar=c("person","time"), direction="long", sep="")
-  
-  ### the next 3 steps must be in order
-  # make a zero/one distinguishing variable
-  newData$dist <- newData$var - 1
-  
-  # make a variable ID, nested within person, that will function like a person ID in rties code
-  newData$varId <- ifelse(newData$dist == 0, newData$person, newData$person + idConvention)
-  
-  # make var into a factor with recognizable names
-  newData$var <- factor(newData$var, levels=c(1,2), labels=labels)
-  
-  colnames(newData)[colnames(newData)== "person"] <- personId
-  colnames(newData)[colnames(newData)== "time"] <- time_name
-  colnames(newData)[colnames(newData)== "obs1"] <- obs1_name
-  colnames(newData)[colnames(newData)== "obs12"] <- obs2_name
-  
-  return(newData)
-}
-
-############# makeCrossCorr
-
-#' Calculates cross-correlations for a given variable and returns a dataframe with either: 1) if "time_lag" is null, the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms -- the sign is retained), or 2) if "time_lag is specified, the cross-correlations for each dyad at that lag.
+#' Calculates cross-correlations for a variable that is nested by person within dyad (e.g. it is the same variable for both partners). It returns a dataframe with either: 1) if "time_lag" is null, the largest absolute cross-correlation and its lag added for each dyad (e.g., it returns either the most negative or most positive cross-correlation, whichever is larger in absolute terms -- the sign is retained), or 2) if "time_lag is specified, the cross-correlations for each dyad at that lag.
 #'
 #' @param basedata The original dataframe provided by the user that includes all variables needed for an rties analysis, including potential system and control variables, etc.
 #' @param dyadId The name of the column in the dataframe that has the couple-level identifier.
@@ -452,7 +410,7 @@ makeBiVarData <- function(basedata, personId, time_name, obs1_name, obs2_name, l
 
 #' @export
 
-makeCrossCorr <- function(basedata, dyadId, personId, obs_name, dist_name, time_lag=NULL, lagMax=NULL){
+makeCrossCorDyadic <- function(basedata, dyadId, personId, obs_name, dist_name, time_lag=NULL, lagMax=NULL){
   
   newdata <- basedata
   colnames(newdata)[colnames(newdata)== dyadId] <- "dyad"

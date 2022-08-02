@@ -46,7 +46,7 @@ The function returns a dataframe that has all the variables needed for modeling 
 }
 }
 \description{
-The dataframe must be in a specific format and include several specific variables. See the "overview_data_prep" vignette for complete details on the necessary format and follow it closely if you'd like to avoid error messages. That vignette also includes information on how to structure the data if you have two variables within people (rather thean two people within dyads) or have indistinguishable dyads.
+The dataframe must be in a specific format and include several specific variables. See the "overview_data_prep" vignette for complete details on the necessary format and follow it closely if you'd like to avoid error messages. That vignette also includes information on how to structure the data if you have two variables within people (rather than two people within dyads) or have indistinguishable dyads.
 }
 \examples{
 data <- rties_ExampleDataShort
