@@ -132,7 +132,7 @@ dyadByContext <- function(basedata, dyadId, personId, context, obs_name, dist_na
   
   basedata$contextNum <- as.numeric(basedata$context)
   basedata$dyadContext <- basedata$dyad + (basedata$contextNum * .001)
-  basedata$personContext <- ifelse(basedata$dist == 0, basedata$dyadContext, basedata$dyadContext + idConvention)
+  basedata$personContext <- ifelse(basedata$dist == 0, basedata$dyadContext + idConvention, basedata$dyadContext)
   
   basedata <- subset(basedata, select=-c(dyad, person))
   
